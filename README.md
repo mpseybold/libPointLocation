@@ -10,4 +10,7 @@ Point location for fully-dynamic line segments in the plane R^2 and great circle
 
 
 Roadmap:
-TBD
+1) STL based with const fanout graph nodes on the heap and point/segment information in vectors
+2a) B-Tree style linearization of the heap objects in vectors ???
+2b) First-Fit strategy
+3) STXXL vectors for partially out-of-memory structures
