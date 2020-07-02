@@ -1,0 +1,8 @@
+build
+
+.vscode
+
+cmake_install.cmake
+cgal_create_CMakeLists
+
+gmon.out
