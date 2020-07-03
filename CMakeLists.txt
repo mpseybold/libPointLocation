@@ -32,21 +32,13 @@ endif()
 
 # include for local package
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
-
-find_library( MPFR libmpfr.a )
-find_library( GMP libgmp.a )
-find_library( CGAL libCGAL.a )
-
 
 # Creating entries for target: main
 # ############################
 
-add_executable( main  main.cpp geom.cpp)
-message("${CMAKE_CXX_FLAGS}")
-message("${MPFR} ${GMP}")
-message("${CGAL}")
+add_executable( main  main.cpp )
+
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
+
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(main  ${MPFR} ${GMP} ${CGAL} )
+target_link_libraries(main   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )

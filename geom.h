@@ -42,20 +42,20 @@ class PointCart {
 };
 
 
-// template <class PointType>
-// class Segment {
+template <class PointType>
+class Segment {
 
-//     private:
+    private:
     
-//         PointType source;
-//         PointType target;
+        PointType source;
+        PointType target;
     
-//     public:
+    public:
 
-//         Segment(PointType s, PointType t) : source(s), target(t) {}
+        Segment(PointType s, PointType t) : source(s), target(t) {}
 
-//         PointType get_source() { return source; }
-//         PointType get_target() { return target; }
+        PointType get_source() { return source; }
+        PointType get_target() { return target; }
 
 
-// };
+};
