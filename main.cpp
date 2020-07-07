@@ -11,13 +11,13 @@
 
 int main() {
     
-    Point_2 a = Point_2(0, 0);
-    Point_2 b = Point_2(1, 1);
+    PointCart a = PointCart(0, 0);
+    PointCart b = PointCart(1, 1);
 
-    Segment<Point_2> segment = Segment<Point_2>(a, b);
+    Segment<PointCart> segment = Segment<PointCart>(a, b);
 
     // Line_2 line = Line_2(a, b);
 
-    Cut<Point_2, Line_2> cut = Cut<Point_2, Line_2>(EDGE, &segment, nullptr);
+    Cut<PointCart, LineCart> cut = Cut<PointCart, LineCart>(EDGE, &segment, nullptr);
 
 }

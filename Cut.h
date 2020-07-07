@@ -34,17 +34,17 @@ class Cut {
         Segment<PointType>* get_intersecting_seg() { return intersecting_seg; }
 
         bool has_on_positive_side(PointType p) {
-            switch(cut_type) {
-                case SOURCE:
-                    return segment->get_source().has_on_positive_side(p);
-                case TARGET:
-                    return segment->get_target().has_on_positive_side(p);
-                case EDGE:
-                    return defining_line.has_on_positive_side(p);
-                case INTERSECTION:
-                    return defining_line
-                    .intersect_has_on_positive_side(intersecting_line, p);
-            }
+            return false;
+            // switch(cut_type) {
+            //     case SOURCE:
+            //         return segment->get_source().has_on_positive_side(p);
+            //     case TARGET:
+            //         return segment->get_target().has_on_positive_side(p);
+            //     case EDGE:
+            //         return defining_line.has_on_positive_side(p);
+            //     case INTERSECTION:
+            //         return defining_line
+            //         .intersect_has_on_positive_side(intersecting_line, p);
+            // }
         }
-
 };
