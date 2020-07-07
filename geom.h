@@ -2,11 +2,13 @@
 
 #include <CGAL/Point_2.h>
 #include <CGAL/Line_2.h>
+#include <CGAL/Vector_2.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point_2 = CGAL::Point_2<Kernel>;
 using Line_2 = CGAL::Line_2<Kernel>;
+using Vector_2 = CGAL::Vector_2<Kernel>;
 using lazy = CGAL::Lazy_exact_nt<CGAL::Epeck_ft>;
 
 class PointCart {
@@ -24,21 +26,35 @@ class PointCart {
             return cgal_point;
         }
 
-        // Check if 'other' is on the positive side of
-        // vertical line through this point using an
-        // implicit shear transformation
-        bool has_on_positive_side(PointCart other) {
-
-            Point_2 other_cgal = other.get_cgal_point();
-            lazy shear = cgal_point.x() + cgal_point.y();
-            lazy other_shear = other_cgal.x() + other_cgal.y();
-
-            return other_shear > shear;
-        }
+        // Compares the x coordinates of a and b using an implicit
+        // shear transformation. 
+        // Returns 
+        // -1 if b is left of a
+        // 0 if a and b conincide
+        // 1 if b is right of a 
+        static int v_orientation(PointCart a, PointCart b);
 
         lazy x() { return cgal_point.x(); }
-        lazy y() { return cgal_point.y(); }
-        
+        lazy y() { return cgal_point.y(); }        
+};
+
+class LineCart {
+
+    private:
+        Line_2 cgal_line;
+
+    public:
+
+        LineCart() {}
+
+        LineCart(PointCart a, PointCart b) {
+            cgal_line = Line_2(a.get_cgal_point(), b.get_cgal_point());
+        }
+
+        bool has_on_positive_side(PointCart p) {
+            return cgal_line.has_on_positive_side(p.get_cgal_point());
+        }
+
 };
 
 
