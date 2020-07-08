@@ -33,6 +33,8 @@ endif()
 # include for local package
 
 
+add_subdirectory(test)
+
 # Creating entries for target: main
 # ############################
 
