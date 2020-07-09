@@ -23,7 +23,12 @@ if ( NOT Boost_FOUND )
 
 endif()
 
-add_executable(Google_Tests_run ../geom.cpp geom_tests.cpp)
+add_executable(Google_Tests_run 
+  ../geom.cpp 
+  geom_tests.cpp
+  ../Cut.cpp
+  cut_tests.cpp
+)
 
 #target_link_libraries(Google_Tests_run main_lib)
 target_link_libraries(Google_Tests_run gtest gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})

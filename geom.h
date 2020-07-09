@@ -64,37 +64,28 @@ class PointCart {
         lazy y() { return cgal_point.y(); }        
 };
 
-class LineCart {
-
-    private:
-        Line_2 cgal_line;
-
-    public:
-
-        LineCart() {}
-
-        LineCart(PointCart a, PointCart b) {
-            cgal_line = Line_2(a.get_cgal_point(), b.get_cgal_point());
-        }
-
-        bool has_on_positive_side(PointCart p) {
-            return cgal_line.has_on_positive_side(p.get_cgal_point());
-        }
-};
-
-
-template <class PointType>
+template <class PointType, class OrderType>
 class Segment {
 
     private:
     
         PointType source;
         PointType target;
+        OrderType priority;
     
     public:
 
-        Segment(PointType s, PointType t) : source(s), target(t) {}
+        Segment(PointType s, PointType t, OrderType pri) : source(s), target(t), priority(pri) {
+            if (PointType::v_orientation(s, t) == -1) {
+                source = s;
+                target = t;
+            } else {
+                source = t;
+                target = s;
+            }
+        }
 
         PointType get_source() { return source; }
         PointType get_target() { return target; }
+        OrderType get_priority() { return priority; }
 };
