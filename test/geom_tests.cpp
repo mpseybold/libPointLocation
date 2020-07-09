@@ -81,3 +81,14 @@ TEST(GeomTests, intersectionOrientation) {
         ), 1
     );
 }
+
+TEST(GeomTest, segmentConstructor) {
+    PointCart p = PointCart(0, 0);
+    PointCart q = PointCart(1, 0);
+
+    Segment<PointCart, int> seg_1 = Segment<PointCart, int>(p, q, 1);
+    Segment<PointCart, int> seg_2 = Segment<PointCart, int>(q, p, 1);
+
+    ASSERT_EQ(seg_1.get_source().x(), 0);
+    ASSERT_EQ(seg_2.get_source().x(), 0);
+}
