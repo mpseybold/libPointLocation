@@ -11,36 +11,28 @@ int PointCart::v_orientation(PointCart a, PointCart b) {
     Point_2 a_cgal = a.get_cgal_point();
     Point_2 b_cgal = b.get_cgal_point();
 
-    Point_2 a_shear = Point_2(
-        a_cgal.x() + a_cgal.y(), a_cgal.y()
-    );
-    
-    Point_2 b_shear = Point_2(
-        b_cgal.x() + b_cgal.y(), b_cgal.y()
-    );
+    if (a_cgal.x() > b_cgal.x()) 
+        return 1;
+    if (a_cgal.x() < b_cgal.x())
+        return -1;
 
-    Line_2 line_through_a = Line_2(a_shear, Vector_2(0, 1));
+    if (a_cgal.y() < b_cgal.y())
+        return -1;
+    if (a_cgal.y() > b_cgal.y())
+        return 1;
 
-    auto side = line_through_a.oriented_side(b_shear);
-
-    switch(side) {
-        case CGAL::ON_NEGATIVE_SIDE:
-            return -1;
-        case CGAL::ON_POSITIVE_SIDE:
-            return 1;
-        case CGAL::ON_ORIENTED_BOUNDARY:
-            return 0;
-    }
-
-    throw std::logic_error("error: failed to compare points");
+    return 0;
 }
 
 int PointCart::line_orientation(
     PointCart source, PointCart target, PointCart p) {
 
-        Line_2 line = Line_2(source.get_cgal_point(), target.get_cgal_point());
+    if (source.x() == target.x())
+        return v_orientation(source, p);
 
-        auto side = line.oriented_side(p.get_cgal_point());
+    Line_2 line = Line_2(source.get_cgal_point(), target.get_cgal_point());
+
+    auto side = line.oriented_side(p.get_cgal_point());
 
     switch(side) {
         case CGAL::ON_NEGATIVE_SIDE:
