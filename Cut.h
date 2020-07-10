@@ -31,7 +31,10 @@ class Cut {
 
         Segment<PointType, OrderType>* get_intersecting_seg() { return intersecting_seg; }
 
-        OrderType priority() { return segment->get_priority(); }
+        OrderType get_priority() { return segment->get_priority(); }
 
         int orientation(PointType p);
+
+        //TODO: implement this properly
+        bool intersects_segment(Segment<PointType, OrderType>* seg) { return true; }
 };

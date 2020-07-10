@@ -22,6 +22,14 @@ class Node {
         destroying_cut(cut), trapezoid(trapezoid) {}
 
         bool is_leaf() { return destroying_cut.type == NO_CUT; }
+        OrderType get_priority() { return destroying_cut.get_priority(); }
+        
+        bool contains(Segment<PointType, OrderType>* seg) { 
+
+            //TODO: Implement this    
+            return true; 
+        
+        };
 
         Node<PointType, OrderType>* get_negative_child() { return negative_child; }
         Node<PointType, OrderType>* get_positive_child() { return positive_child; }

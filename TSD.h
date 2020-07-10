@@ -8,6 +8,7 @@ class TSD {
     private:
         
         Node<PointType, OrderType>* root;
+        std::vector<Segment<PointType, OrderType>> segments;
 
     public:
 
