@@ -38,7 +38,16 @@ add_subdirectory(test)
 # Creating entries for target: main
 # ############################
 
-add_executable( main  main.cpp geom.cpp Cut.cpp )
+add_executable( main  
+  main.cpp 
+  geom.cpp 
+  Cut.cpp
+  TSD.cpp
+  TSD_algorithms/v_merge.cpp
+  TSD_algorithms/merge.cpp
+  TSD_algorithms/partition.cpp
+  TSD_algorithms/v_partition.cpp  
+)
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 

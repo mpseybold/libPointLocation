@@ -4,6 +4,8 @@
 // #include <CGAL/Line_2.h>
 #include "Cut.h"
 #include "geom.h"
+#include "Node.h"
+
 
 
 // using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
@@ -19,5 +21,5 @@ int main() {
     // Line_2 line = Line_2(a, b);
 
     // Cut<PointCart, LineCart> cut = Cut<PointCart, LineCart>(EDGE, &segment, nullptr);
-
+    Node<PointCart, int>* n = new Node<PointCart, int>(Cut<PointCart, int>(), BoundingTrap<PointCart, int>());
 }
