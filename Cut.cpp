@@ -28,6 +28,8 @@ int Cut<PointType, OrderType>::orientation(PointType p) {
             p
         );
     }
+
+    throw std::logic_error("failed to compare point with cut");
 }
 
 template class Cut<PointCart, int>;

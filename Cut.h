@@ -1,7 +1,7 @@
 #pragma once
 #include "geom.h"
 
-enum CutType { EDGE, SOURCE, TARGET, INTERSECTION };
+enum CutType { EDGE, SOURCE, TARGET, INTERSECTION, NO_CUT };
 
 template <class PointType, class OrderType>
 class Cut {
@@ -19,6 +19,10 @@ class Cut {
             if (ct == INTERSECTION) {
                 assert(is != nullptr);
             }
+        }
+
+        Cut() {
+            cut_type = NO_CUT;
         }
 
         CutType get_cut_type() { return cut_type; } 
