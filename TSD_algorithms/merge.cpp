@@ -5,4 +5,4 @@ void TSD<PointType, OrderType>::merge(Node<PointType, OrderType>* node, Cut<Poin
     //TODO: Implement this function.
 }
 
-template class TSD<PointCart, int>;
+// template class TSD<PointCart, int>;

@@ -63,8 +63,13 @@ class PointCart {
 
         lazy x() { return cgal_point.x(); }
         lazy y() { return cgal_point.y(); }        
+        
 };
 
+
+Point_2 shear(Point_2 p) {
+    return Point_2(p.x() + p.y(), p.y());
+}
 
 int PointCart::v_orientation(PointCart a, PointCart b) {
     

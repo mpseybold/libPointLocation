@@ -5,4 +5,4 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
     //TODO: Implement this function.
 }
 
-template class TSD<PointCart, int>;
+// template class TSD<PointCart, int>;

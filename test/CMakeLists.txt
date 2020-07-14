@@ -24,7 +24,7 @@ if ( NOT Boost_FOUND )
 endif()
 
 add_executable(Google_Tests_run 
-  ../geom.cpp 
+  ../Segment.hpp 
   geom_tests.cpp
   ../Cut.cpp
   cut_tests.cpp

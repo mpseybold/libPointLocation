@@ -1,7 +1,8 @@
 #pragma once
 #include "Node.h"
-#include "geom.h"
+#include "Segment.hpp"
 #include "BoundingTrap.h"
+#include<vector>
 
 template <class PointType, class OrderType>
 class TSD {

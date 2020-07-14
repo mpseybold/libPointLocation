@@ -16,4 +16,4 @@ BoundingTrap<PointType, OrderType>::destroy(Cut<PointType, OrderType> cut) {
     return std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>();
 }
 
-template class BoundingTrap<PointCart, int>;
+// template class BoundingTrap<PointCart, int>;     // MPS: What does this do?

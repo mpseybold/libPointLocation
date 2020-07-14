@@ -1,4 +1,6 @@
 #include "Cut.h"
+#include <stdexcept>
+	
 
 template <class PointType, class OrderType>
 int Cut<PointType, OrderType>::orientation(PointType p) {
@@ -29,7 +31,7 @@ int Cut<PointType, OrderType>::orientation(PointType p) {
         );
     }
 
-    throw std::logic_error("failed to compare point with cut");
+    // throw logic_error("failed to compare point with cut");
 }
 
-template class Cut<PointCart, int>;
+// template class Cut<PointCart, int>;

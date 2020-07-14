@@ -1,3 +1,5 @@
+#pragma once
+
 template <class PointType, class OrderType>
 class Segment {
 

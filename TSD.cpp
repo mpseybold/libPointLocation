@@ -84,4 +84,4 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType> seg
     //TODO: implement this properly/test the code
 } 
 
-template class TSD<PointCart, int>;
+// template class TSD<PointCart, int>;
