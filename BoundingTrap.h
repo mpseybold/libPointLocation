@@ -8,29 +8,46 @@ class BoundingTrap {
 
     private:
     
-        std::vector<Cut<PointType, OrderType>> cuts;
+        Cut<PointType, OrderType> top, bottom, left, right;
+
         TrapType type;
 
     public:
 
         BoundingTrap(
-            Cut<PointType, OrderType> c_1,
-            Cut<PointType, OrderType> c_2,
-            Cut<PointType, OrderType> c_3,
-            Cut<PointType, OrderType> c_4
-        ) { 
-            cuts = {c_1, c_2, c_3, c_4};
-            type = BRTL; 
+            Cut<PointType, OrderType> top,
+            Cut<PointType, OrderType> bottom,
+            Cut<PointType, OrderType> left,
+            Cut<PointType, OrderType> right
+        ) : top(top), bottom(bottom), left(left), right(right){ 
+            if (left.get_cut_type() == NO_CUT) {
+                assert(right.get_cut_type() != NO_CUT);
+                assert(top.get_cut_type() != NO_CUT);
+                assert(bottom.get_cut_type() != NO_CUT);
+                type = BRT;
+            } else if (right.get_cut_type() == NO_CUT) {
+                assert(left.get_cut_type() != NO_CUT);
+                assert(top.get_cut_type() != NO_CUT);
+                assert(bottom.get_cut_type() != NO_CUT);
+                type = BTL;
+            } else {
+                assert(left.get_cut_type() != NO_CUT);
+                assert(right.get_cut_type() != NO_CUT);
+                assert(top.get_cut_type() != NO_CUT);
+                assert(bottom.get_cut_type() != NO_CUT);
+                type = BRTL;
+            }
         }
 
         BoundingTrap() { 
-            cuts = std::vector<Cut<PointType, OrderType>>();
             type = TrapType::NONE;
-        };
+        }
 
-        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(Cut<PointType, OrderType>);
+        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(Cut<PointType, OrderType> cut);
 
-        BoundingTrap<PointType, OrderType> merge(BoundingTrap<PointType, OrderType>);
+        BoundingTrap<PointType, OrderType> merge(BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2);
 
         bool contains_segment(Segment<PointType, OrderType>* seg);
+
+        bool contains_defining_point(Cut<PointType, OrderType> cut) { return true; }
 };

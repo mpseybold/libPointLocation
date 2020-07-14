@@ -1,6 +1,8 @@
 #pragma once
 #include "BoundingTrap.h"
 
+enum DestructionPattern { VVE, VE, E };
+
 template <class PointType, class OrderType>
 class Node {
 
@@ -31,6 +33,9 @@ class Node {
         
         };
 
+        Cut<PointType, OrderType> get_cut() { return destroying_cut; }
+        BoundingTrap<PointType, OrderType> get_trapezoid() { return trapezoid; }
+
         Node<PointType, OrderType>* get_negative_child() { return negative_child; }
         Node<PointType, OrderType>* get_positive_child() { return positive_child; }
         Node<PointType, OrderType>* get_L() { return L; }
@@ -44,5 +49,8 @@ class Node {
         void set_R(Node<PointType, OrderType>* node) { R = node; }
         void set_A(Node<PointType, OrderType>* node) { A = node; }
         void set_B(Node<PointType, OrderType>* node) {  B = node; }
+
+        //TODO: Implement this properly 
+        DestructionPattern get_dest_pattern() { return VVE; } 
 
 };

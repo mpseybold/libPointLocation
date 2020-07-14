@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.h"
 #include "geom.h"
+#include "BoundingTrap.h"
 
 template <class PointType, class OrderType>
 class TSD {
@@ -23,6 +24,8 @@ class TSD {
         std::vector<Node<PointType, OrderType>*> affected_subdag_roots(Segment<PointType, OrderType>* seg);
 
         void v_merge(Node<PointType, OrderType>* node, Cut<PointType, OrderType> v_cut);
+
+        void v_part_handle_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType> v_cut);
 
         void v_partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType> v_cut);        
 

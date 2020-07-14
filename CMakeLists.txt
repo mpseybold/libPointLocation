@@ -43,6 +43,7 @@ add_executable( main
   geom.cpp 
   Cut.cpp
   TSD.cpp
+  BoundingTrap.cpp
   TSD_algorithms/v_merge.cpp
   TSD_algorithms/merge.cpp
   TSD_algorithms/partition.cpp

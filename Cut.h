@@ -35,6 +35,8 @@ class Cut {
 
         int orientation(PointType p);
 
+        int defining_point_cut_comparrison(Cut<PointType, OrderType> other_cut) { return 1; }
+
         //TODO: implement this properly
         bool intersects_segment(Segment<PointType, OrderType>* seg) { return true; }
 };

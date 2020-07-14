@@ -5,6 +5,7 @@ namespace {
     template <class PointType, class OrderType>
     std::pair<Node<PointType, OrderType>*, Node<PointType, OrderType>*> 
     search_refinement(Node<PointType, OrderType>* node, std::set<Node<PointType, OrderType>*>& visited) {
+        //TODO: Implement this
         return {nullptr, nullptr};
     }
 }
