@@ -1,5 +1,6 @@
 #include "TSD.h"
 #include <stack>
+#include <set>
 
 namespace {
     template <class PointType, class OrderType>
