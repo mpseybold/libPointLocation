@@ -35,7 +35,7 @@ class PointS2ratss {
     private:
         Point_3 cgal_point;
         inline static ratss::ProjectS2   projection;
-        inline static int                projectionPrecision = 15;
+        inline static int                projectionPrecision = 31;
 
         // inline static traitsXY           projectionXY;
         // inline static OrientationXY      orientationXY;
@@ -46,12 +46,12 @@ class PointS2ratss {
     public:
         PointS2ratss(double lon, double lat) {
             mpfr::mpreal _lat (lat);
-            mpfr::mpreal _lon (lon);
+            mpfr::mpreal _lon (lon - 90.0);
             FT xs, ys, zs;
 
             projection.projectFromGeo<FT>(_lat, _lon, xs,ys,zs, projectionPrecision ); 
             cgal_point = Point_3(xs, ys, zs);
-            assert( zs < 1.0 && zs > 1.0 );     // Neither North nor South pole
+            assert( zs < 1.0 && zs > -1.0 );     // Neither North nor South pole
         }
 
         Point_3& get_cgal_point() {
@@ -207,6 +207,7 @@ Point_3 PointS2ratss::intersection( Point_3& s1, Point_3& t1, Point_3& s2, Point
 
             return i;
         } else {
+            assert( false );
             // TODO: exception segs are non-crossing!
         }
     }
