@@ -25,6 +25,8 @@ class Cut {
             cut_type = NO_CUT;
         }
 
+        bool operator== (Cut<PointType, OrderType>& other_cut);
+
         CutType get_cut_type() { return cut_type; } 
 
         Segment<PointType, OrderType>* get_segment() { return segment; }
@@ -35,8 +37,28 @@ class Cut {
 
         int orientation(PointType p);
 
-        int defining_point_cut_comparrison(Cut<PointType, OrderType> other_cut) { return 1; }
+        int orientation(Segment<PointType, OrderType>* seg, int endpoint) {
+            assert(cut_type == EDGE);
+            PointType p = endpoint == 0 ? seg->get_source() : seg->get_target();
+            PointType other_p = endpoint == 0 ? seg->get_target() : seg->get_source();
+            
+            if (orientation(p) == 0) {
+                if (orientation(other_p) != 0) {
+                    return orientation(other_p);
+                }
+                return has_seg_on_pos_side(seg) ? 1 : -1;
+            }
+
+            return orientation(p);
+        }
+
+        int defining_point_cut_comparison(Cut<PointType, OrderType> other_cut);
 
         //TODO: implement this properly
         bool intersects_segment(Segment<PointType, OrderType>* seg) { return true; }
+
+        static int v_cut_edge_orientation(Cut<PointType, OrderType>& v_cut, Cut<PointType, OrderType>& e_cut);
+        bool has_seg_on_pos_side(Segment<PointType, OrderType>* seg);
+        bool has_seg_on_neg_side(Segment<PointType, OrderType>* seg);
+        bool has_on(Segment<PointType, OrderType>* seg);
 };
