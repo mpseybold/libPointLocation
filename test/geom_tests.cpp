@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
-#include "../geom.h"
+// #include "../geom.h"
+// #include "../Point_2D.hpp"
+#include "../Segment.h"
 
 TEST(GeomTests, vOrientation) {
     PointCart p = PointCart(1324.553267241, 0.00432543);
@@ -92,6 +94,7 @@ TEST(GeomTest, segmentConstructor) {
     ASSERT_EQ(seg_1.get_source().x(), 0);
     ASSERT_EQ(seg_2.get_source().x(), 0);
 }
+
 
 TEST(GeomTest, segmentEqualityTest) {
     PointCart p = PointCart(1, 1);

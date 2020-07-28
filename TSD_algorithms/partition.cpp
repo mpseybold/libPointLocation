@@ -40,23 +40,23 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
     assert(intersects_A || intersects_B);
 
-    if (intersects_B && intersects_A) {
-        auto intersection_cut = Cut<PointType, OrderType>(
-            INTERSECTION, e_cut, node->get_e()
-        );
+    // if (intersects_B && intersects_A) {
+    //     auto intersection_cut = Cut<PointType, OrderType>(
+    //         INTERSECTION, e_cut, node->get_e()
+    //     );
 
-        if (!node->get_A()->is_partition_visited()) {
-            v_partition(node->get_A(), intersection_cut);
-            node->get_A()->toggle_partition_visited();
-            partition_visited_nodes.push_back(node->get_A());
-        }
+    //     if (!node->get_A()->is_partition_visited()) {
+    //         v_partition(node->get_A(), intersection_cut);
+    //         node->get_A()->toggle_partition_visited();
+    //         partition_visited_nodes.push_back(node->get_A());
+    //     }
 
-        if (!node->get_B()->is_partition_visited())
-    } else if(intersects_B) {
+    //     if (!node->get_B()->is_partition_visited())
+    // } else if(intersects_B) {
         
-    } else if(intersects_A) {
+    // } else if(intersects_A) {
 
-    }
+    // }
 }
 
 template <class PointType, class OrderType>
@@ -119,7 +119,6 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
             partition_VV_case(node, cut);
             break;
         }
+        
     }
 }
-
-template class TSD<PointCart, int>;

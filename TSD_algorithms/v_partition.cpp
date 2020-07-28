@@ -374,6 +374,7 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::v_partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut) {
     DestructionPattern pattern = node->get_dest_pattern();
 
+
     switch(pattern) {
         case E:
             v_part_handle_E_case(node, v_cut);
@@ -390,5 +391,3 @@ void TSD<PointType, OrderType>::v_partition(Node<PointType, OrderType>* node, Cu
             break;
     }
 }
-
-template class TSD<PointCart, int>;

@@ -42,7 +42,8 @@ BoundingTrap<PointType, OrderType>::vertical_destruction(Cut<PointType, OrderTyp
             ) != 1);
 
             new_trap_neg = 
-            BoundingTrap<PointType, OrderType>(bottom, cut, top, left);
+            BoundingTrap<PointType,
+             OrderType>(bottom, cut, top, left);
 
             new_trap_pos =
             BoundingTrap<PointType, OrderType>(bottom, Cut<PointType, OrderType>(), top, cut);    

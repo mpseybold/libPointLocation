@@ -1,5 +1,7 @@
 #pragma once
-#include "geom.h"
+// #include "geom.h"
+#include "Segment.h"
+// #include "Point_2D.hpp"
 
 enum CutType { EDGE, SOURCE, TARGET, INTERSECTION, NO_CUT };
 

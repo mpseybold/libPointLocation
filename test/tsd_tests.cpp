@@ -19,9 +19,11 @@ TEST(TSDTests, searchTest) {
         PointCart(30, 50), PointCart(70, 50), 0
     );
 
+
     Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
         PointCart(40, 25), PointCart(80, 25), 1
     );
+
 
     Cut<PointCart, int> source_seg_1 = Cut<PointCart, int>(
         SOURCE, &seg_1, nullptr

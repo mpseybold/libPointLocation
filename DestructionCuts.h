@@ -1,6 +1,6 @@
 #pragma once
 
-#include "geom.h"
+// #include "geom.h"
 #include "Cut.h"
 
 enum DestructionPattern { VVE, VV, V, VE, EV, E, NO_DESTRUCTION };
