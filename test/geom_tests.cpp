@@ -38,8 +38,8 @@ TEST(GeomTests, intersectionVOrientation) {
     PointCart p = PointCart(1, 1);
     
 
-    ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, just_right), -1);
-    ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, just_left), 1);
+    ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, just_right), 1);
+    ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, just_left), -1);
     ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, just_above), -1);
     ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, just_below), 1);
     ASSERT_EQ(PointCart::intersection_v_orientation(s_1, t_1, s_2, t_2, p), 0);
@@ -64,14 +64,14 @@ TEST(GeomTests, intersectionOrientation) {
         PointCart::intersection_orientation(
             top_is_left_s, top_is_left_t,
             s_1, t_1, s_2, t_2
-        ), -1
+        ), 1
     );
 
     ASSERT_EQ(
         PointCart::intersection_orientation(
             top_is_right_s, top_is_right_t,
             s_1, t_1, s_2, t_2
-        ), 1
+        ), -1
     );
 
     ASSERT_EQ(
@@ -91,4 +91,18 @@ TEST(GeomTest, segmentConstructor) {
 
     ASSERT_EQ(seg_1.get_source().x(), 0);
     ASSERT_EQ(seg_2.get_source().x(), 0);
+}
+
+TEST(GeomTest, segmentEqualityTest) {
+    PointCart p = PointCart(1, 1);
+    PointCart q = PointCart(2, 2);
+    PointCart r = PointCart(3, 3);
+
+    Segment<PointCart, int> seg_1 = Segment<PointCart, int>(p, q, 1);
+    Segment<PointCart, int> seg_2 = Segment<PointCart, int>(p, r, 1);
+    Segment<PointCart, int> seg_3 = Segment<PointCart, int>(p, q, 3);
+
+    ASSERT_TRUE(seg_1 == seg_1);
+    ASSERT_FALSE(seg_1 == seg_2);
+    ASSERT_TRUE(seg_1 == seg_3);    
 }
