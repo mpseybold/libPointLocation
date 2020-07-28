@@ -32,3 +32,10 @@ add_executable(Google_Tests_run
 
 #target_link_libraries(Google_Tests_run main_lib)
 target_link_libraries(Google_Tests_run gtest gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+
+
+add_executable(gTestsGeometryS2 
+  ../Segment.hpp 
+  geomS2_tests.cpp
+)
+target_link_libraries(gTestsGeometryS2 gtest gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} dts2 ratss)
