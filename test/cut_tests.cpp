@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 #include "../Cut.h"
+#include "../Point_2D.h"
+
 
 TEST(CutTests, definingPointCutComparisonTest) {
     Segment<PointCart, int> seg_1 = Segment<PointCart, int>(

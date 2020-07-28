@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Cut.h"
 
 enum TrapType { BRTL, BTL, BRT, NONE };

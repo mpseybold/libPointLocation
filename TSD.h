@@ -1,6 +1,8 @@
 #pragma once
+
 #include "Node.h"
-#include "geom.h"
+#include "Segment.h"
+// #include "geom.h"
 #include "BoundingTrap.h"
 #include <stack>
 
@@ -60,3 +62,9 @@ class TSD {
 
         void partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& cut);
 };
+
+#include "TSD.cpp"
+#include "TSD_algorithms/partition.cpp"
+#include "TSD_algorithms/v_partition.cpp"
+#include "TSD_algorithms/merge.cpp"
+#include "TSD_algorithms/v_merge.cpp"

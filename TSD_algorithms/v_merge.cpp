@@ -3,6 +3,7 @@
 template <class PointType, class OrderType>
 Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     
+    
     assert(left != nullptr);
     assert(right != nullptr);
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
@@ -105,5 +106,3 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
 
     assert(false);
 }
-
-template class TSD<PointCart, int>;

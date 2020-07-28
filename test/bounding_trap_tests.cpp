@@ -353,6 +353,7 @@ TEST(BoundingTrapTests, segmentIntersectionTests) {
         PointCart(-2, 0.5), PointCart(0, 0.5), 1
     );
 
+
     ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_1));
     ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_2));
     ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_3));

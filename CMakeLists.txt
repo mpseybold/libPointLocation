@@ -39,15 +39,10 @@ add_subdirectory(test)
 # ############################
 
 add_executable( main  
-  main.cpp 
-  geom.cpp 
+  main.cpp
+  Point_2D.cpp 
   Cut.cpp
-  TSD.cpp
   BoundingTrap.cpp
-  TSD_algorithms/v_merge.cpp
-  TSD_algorithms/merge.cpp
-  TSD_algorithms/partition.cpp
-  TSD_algorithms/v_partition.cpp  
 )
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )

@@ -10,6 +10,7 @@
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>* seg, Node<PointType, OrderType>* node) {
     
+    
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
     
     if (node->get_L() != nullptr) 
@@ -184,5 +185,3 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType> seg) {
     //TODO: implement this properly/test the code
 } 
-
-template class TSD<PointCart, int>;
