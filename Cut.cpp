@@ -1,4 +1,6 @@
 #include "Cut.h"
+#include <stdexcept>
+	
 
 template <class PointType, class OrderType>
 int Cut<PointType, OrderType>::orientation(PointType p) {
@@ -29,9 +31,10 @@ int Cut<PointType, OrderType>::orientation(PointType p) {
         );
     }
 
-    throw std::logic_error("failed to compare point with cut");
+    // throw logic_error("failed to compare point with cut");
 }
 
+<<<<<<< HEAD
 template <class PointType, class OrderType>
 bool Cut<PointType, OrderType>::operator== (Cut<PointType, OrderType>& other_cut) {
     
@@ -134,3 +137,6 @@ int Cut<PointType, OrderType>::v_cut_edge_orientation(Cut<PointType, OrderType>&
 }
 
 template class Cut<PointCart, int>;
+=======
+// template class Cut<PointCart, int>;
+>>>>>>> 5af8a9bf0016634b5828fdca7032381fc1cea160

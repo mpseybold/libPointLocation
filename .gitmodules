@@ -1,3 +1,6 @@
 [submodule "test/googletest"]
 	path = test/googletest
 	url = https://github.com/google/googletest.git
+[submodule "libdts2"]
+	path = libdts2
+	url = https://github.com/fmi-alg/libdts2.git

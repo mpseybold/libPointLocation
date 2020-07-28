@@ -505,4 +505,4 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
     return false;
 }
 
-template class BoundingTrap<PointCart, int>;
+// template class BoundingTrap<PointCart, int>;     // MPS: What does this do?

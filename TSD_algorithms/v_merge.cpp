@@ -106,4 +106,4 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
     assert(false);
 }
 
-template class TSD<PointCart, int>;
+// template class TSD<PointCart, int>;

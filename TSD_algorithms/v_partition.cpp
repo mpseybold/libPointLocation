@@ -391,4 +391,4 @@ void TSD<PointType, OrderType>::v_partition(Node<PointType, OrderType>* node, Cu
     }
 }
 
-template class TSD<PointCart, int>;
+// template class TSD<PointCart, int>;

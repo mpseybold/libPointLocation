@@ -40,7 +40,7 @@ add_subdirectory(test)
 
 add_executable( main  
   main.cpp 
-  geom.cpp 
+  Segment.hpp 
   Cut.cpp
   TSD.cpp
   BoundingTrap.cpp
