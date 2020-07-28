@@ -28,6 +28,11 @@ add_executable(Google_Tests_run
   geom_tests.cpp
   ../Cut.cpp
   cut_tests.cpp
+  ../BoundingTrap.cpp
+  bounding_trap_tests.cpp
+  ../TSD.cpp
+  tsd_tests.cpp
+  ../TSD_algorithms/v_partition.cpp
 )
 
 #target_link_libraries(Google_Tests_run main_lib)
