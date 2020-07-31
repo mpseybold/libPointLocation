@@ -14,6 +14,8 @@
 #include <CGAL/intersections.h>
 #include <CGAL/Direction_3.h>
 
+#define VERBOSITY 100
+
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 typedef typename Kernel::FT         FT;
 using Point_3   = CGAL::Point_3<Kernel>;
@@ -35,11 +37,13 @@ using Direction_3 = CGAL::Direction_3<Kernel>;
 Point_3  const northPole = Point_3 (0.0, 0.0, +1.0 );
 Vector_3 const northPoleVec=Vector_3(CGAL::ORIGIN, northPole );
 
+
 class PointS2ratss {
     private:
         Point_3 cgal_point;
-        inline static ratss::ProjectS2   projection;
-        inline static int                projectionPrecision = 31;
+        // inline static ratss::ProjectS2   projection;
+        // inline static int                projectionPrecision = 31;
+        
 
         void initSimpler(double lon, double lat){
             lon = lon - 90.0;   // 0-Meridian is at x=0
@@ -58,6 +62,12 @@ class PointS2ratss {
         inline static Point_3   intersection( Point_3& s1, Point_3& t1, Point_3& s2, Point_3& t2 );
 
     public:
+
+        PointS2ratss(double x, double y, double z){
+            assert( x != 0.0 || y != 0.0 ); // Neither S/N-pole nor length==0;
+            cgal_point = Point_3(x,y,z);
+        }
+
         PointS2ratss(double lon, double lat) {
             // mpfr::mpreal _lat (lat);
             // mpfr::mpreal _lon (lon - 90.0);
@@ -67,13 +77,17 @@ class PointS2ratss {
             // cgal_point = Point_3(xs, ys, zs);
             
             initSimpler(lon,lat);
-
             assert( cgal_point.z() < 1.0 && cgal_point.z() > -1.0 );
             // assert( zs < 1.0 && zs > -1.0 );     // Neither North nor South pole
         }
 
         Point_3& get_cgal_point() {
             return cgal_point;
+        }
+
+        friend bool operator==(const PointS2ratss& lhs, const PointS2ratss& rhs ){
+            // TODO: this assumes length==1; Do isCOLLINEAR instead !
+            return lhs.cgal_point == rhs.cgal_point;
         }
 
         inline static bool isValidSegment(PointS2ratss& src, PointS2ratss& trg){
@@ -114,6 +128,8 @@ class PointS2ratss {
             PointS2ratss s4,   PointS2ratss t4
         );
 };
+
+
 
 
 // Point_2 shear(Point_2 p) {
@@ -164,15 +180,21 @@ int PointS2ratss::orientV( Point_3& self, Point_3& other) {
                     return +1;
                 } else{
 
-                    Vector_3  selfVec( CGAL::ORIGIN, self  );
-                    Vector_3 otherVec( CGAL::ORIGIN, other );
-                    Vector_3 moreNorthVec = cross_product(selfVec, otherVec);
-                    Point_3  moreNorth( moreNorth.x(), moreNorth.y(), moreNorth.z() );
+                    Point_3  moreNorth = CGAL::ORIGIN + cross_product(self - CGAL::ORIGIN, other - CGAL::ORIGIN);
+                    PointXY  moreNorthXY = PointXY( moreNorth.x(), moreNorth.y() );
+                    if( VERBOSITY >= 100 ){
+                        std::cout <<"moreNorth=" << moreNorth << std::endl;
+                        std::cout <<"moreNorthXY=" << moreNorthXY << std::endl;
+                    }
 
-                    // Convention: looking on the plane-defining points from positive half gives points in CCW order
-                    Plane_3 plane (CGAL::ORIGIN, self, other);
-                    // assumes  ON_NEGATIVE_SIDE = -1, ON_ORIENTED_BOUNDARY = 0, ON_POSITIVE_SIDE = 1
-                    return plane.oriented_side( moreNorth );
+                    // // Convention: looking on the plane-defining points from positive half gives points in CCW order
+                    // Plane_3 plane (CGAL::ORIGIN, self, other);
+                    // // assumes  ON_NEGATIVE_SIDE = -1, ON_ORIENTED_BOUNDARY = 0, ON_POSITIVE_SIDE = 1
+                    // return plane.oriented_side( moreNorth );
+
+                    int result = CGAL::orientation( moreNorthXY, myOrigin, selfXY ); 
+                    assert(result != 0 );
+                    return result;
 
                     // ASSUMES INTERSECTION POINT HAS LENGTH==1
                     // return (other.z() > self.z()) ? -1 : +1;    // s.z != o.z since points are distinct and length==1

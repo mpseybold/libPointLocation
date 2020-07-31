@@ -96,6 +96,36 @@ TEST(GeomTest, poiS2OrientV) {
     ASSERT_EQ(  PoiS2::orientV(q,r), +1 );
     ASSERT_EQ(  PoiS2::orientV(r,q), -1 );
 }
+TEST(GeomTest, poiS2OrientV_degen) {
+    double eps = 0.0001;
+
+    PoiS2 p = PoiS2(0.0     , -1.0      , 1.0-   eps),
+          q = PoiS2(0.0     , -1.0      , 1.0- 2*eps);
+
+    ASSERT_EQ(  PoiS2::orientV(p,q), +1 );
+    ASSERT_EQ(  PoiS2::orientV(q,p), -1 );
+
+    PoiS2 r = PoiS2(0.0     , -1.0      , 0.7       ),
+          s = PoiS2(0.0     , -2.0      , 1.4       ),
+          t = PoiS2(0.0+ eps, -1.0      , 0.7       );
+
+    ASSERT_EQ(  PoiS2::orientV(r,t), +1 );
+    ASSERT_EQ(  PoiS2::orientV(t,r), -1 );
+    ASSERT_EQ(  PoiS2::orientV(r,s),  0 );
+
+    // WEST
+    PoiS2 u = PoiS2(0.0     , 1.0      , 0.0+eps       ),
+          v = PoiS2(0.0     , 1.0      , 0.0-eps       );
+    ASSERT_EQ( PoiS2::orientV(u,v), +1);
+    ASSERT_EQ( PoiS2::orientV(v,u), -1);
+
+    // EAST
+    PoiS2 uu = PoiS2(0.0     , -1.0      , 0.0+eps       ),
+          vv = PoiS2(0.0     , -1.0      , 0.0-eps       );
+    ASSERT_EQ( PoiS2::orientV(uu,vv), +1);
+    ASSERT_EQ( PoiS2::orientV(vv,uu), -1);
+
+}
 
 TEST(GeomTest, poiS2OrientE) {
     PoiS2 p = PoiS2( 108.0, 45.0); 
