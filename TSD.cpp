@@ -100,6 +100,9 @@ TSD<PointType, OrderType>::TSD() {
             ), nullptr
         )
     );
+
+    trapezoid.set_type(BRTL);
+
     root = new Node<PointType, OrderType>(trapezoid);
     segments = std::vector<Segment<PointType, OrderType>>();
 }
@@ -139,6 +142,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
 
         search_refinement(seg, top);
 
+        bool non_null_seen = false;
+
         for (int i = 0; i < intersecting_descendants.size(); ++i) {
             Node<PointType, OrderType>* node = intersecting_descendants[i];
             if (node != nullptr && !node->is_visited()) {
@@ -148,6 +153,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
                     visited_nodes.push_back(node);
                     num_subdag_roots++;
                     intersecting_descendants[i] = nullptr;
+                } else {
+                    non_null_seen = true;
                 }
             } else {
                 if (node != nullptr) {
@@ -155,7 +162,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
                     intersecting_descendants[i] = nullptr;
                 }
             }
-    
+            if (non_null_seen)
+                break;
         }
 
         for (int i = intersecting_descendants.size()-1; i >= 0; --i) {
@@ -176,12 +184,204 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
     }
 }
 
+struct MergeIndices {
+    int start_index;
+    int end_index;
+    int side;
+
+    MergeIndices(int si, int ei, int s) :
+    start_index(si), end_index(ei), side(s) {
+        assert(side == -1 || side == 1);
+    } 
+};
+
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType> seg) {
+void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& seg) {
    //TODO: implement this properly/test the code
+
+    affected_subdag_roots(&seg);
+
+    // make a first pass over affected roots to make
+    // v-partition calls.
+    for (int i = 0; i < subdag_roots.size(); ++i) {
+        
+        auto node = subdag_roots[i];
+        int v_part_count = 0;
+
+        if (i == 0) {
+            if (node->contains_endpoint(&seg, 0)) {
+                auto v_cut = Cut<PointType, OrderType>(
+                    SOURCE, &seg, nullptr
+                );
+                v_partition(node, v_cut);
+                v_part_count++;
+            }
+            if (i < subdag_roots.size()-1) {
+                auto next = subdag_roots[i+1];
+                assert(next != nullptr);
+
+                if (next->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()) {
+                auto intersection_cut = Cut<PointType, OrderType>(
+                        INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
+                    );
+                    v_partition(node, intersection_cut);
+                    v_part_count++;
+                }
+                if (next->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()) {
+                    auto intersection_cut = Cut<PointType, OrderType>(
+                        INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
+                    );
+                    v_partition(node, intersection_cut);
+                    v_part_count++;
+                }
+            }
+        }
+
+        if (i > 0 && i < subdag_roots.size() - 1) {
+            auto next = subdag_roots[i+1];
+            auto prev = subdag_roots[i-1];
+
+            assert(next != prev);
+            assert(prev != nullptr);
+            assert(next != nullptr);
+
+            if (prev->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()) {
+                auto intersection_cut = Cut<PointType, OrderType>(
+                    INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
+                );
+                v_partition(node, intersection_cut);
+                v_part_count++;
+            }
+            if (next->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()) {
+                auto intersection_cut = Cut<PointType, OrderType>(
+                    INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
+                );
+                v_partition(node, intersection_cut);
+                v_part_count++;
+            }
+            if (prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()) {
+                auto intersection_cut = Cut<PointType, OrderType>(
+                    INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
+                );
+                v_partition(node, intersection_cut);
+                v_part_count++;
+            }
+            if (next->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()) {
+                auto intersection_cut = Cut<PointType, OrderType>(
+                    INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
+                );
+                v_partition(node, intersection_cut);
+                v_part_count++;
+            }
+        }
+
+        if (i == subdag_roots.size() - 1) {
+            if (i > 0) {
+                auto prev = subdag_roots[i-1];
+                assert(prev != nullptr);
+
+                if (prev->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()) {
+                    auto intersection_cut = Cut<PointType, OrderType>(
+                        INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
+                    );
+                    v_partition(node, intersection_cut);
+                    v_part_count++;
+                }
+                if (prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()) {
+                    auto intersection_cut = Cut<PointType, OrderType>(
+                        INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
+                    );
+                    v_partition(node, intersection_cut);
+                    v_part_count++;
+                }
+            }
+
+            if (node->contains_endpoint(&seg, 1)) {
+                auto v_cut = Cut<PointType, OrderType>(
+                    TARGET, &seg, nullptr
+                );
+                v_partition(node, v_cut);
+                v_part_count++;
+            }
+        }
+    }
+
+    auto e_cut = Cut<PointType, OrderType>(
+        EDGE, &seg, nullptr
+    );
+
+    // second pass over affected roots
+    // to make edge partition calls
+
+    auto merge_indices = std::vector<MergeIndices>();
+
+    for (int i = 0; i < subdag_roots.size(); ++i) {
+        auto node = subdag_roots[i];
+        partition(node, e_cut);
+        
+        if (i > 0) {
+            auto prev = subdag_roots[i-1];
+            // bool top_or_bottom = (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
+            // prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom());
+            // bool right_and_left = prev->get_trapezoid().get_right() == node->get_trapezoid().get_left();
+            if (prev->get_trapezoid().get_right() == node->get_trapezoid().get_left() &&
+            (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
+            prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom())) {
+
+                // set the pointers for v_merge
+                prev->set_right(node);
+                node->set_left(prev);
+
+                auto v_cut = prev->get_trapezoid().get_right();
+
+                //if (v_cut.defining_point_cut_comparison(e_cut) == 1) {
+                if (Cut<PointType, OrderType>::v_cut_edge_orientation(v_cut, e_cut) == 1) {
+                    // merge below the segment
+                    if (merge_indices.size() > 0 && merge_indices.back().end_index == i-1 && merge_indices.back().side == -1) {
+                        merge_indices.back().end_index = i;
+                    } else {
+                        merge_indices.push_back(MergeIndices(i-1, i, -1));
+                    }
+                } else {
+                    // merge above segment
+                    if (merge_indices.size() > 0 && merge_indices.back().end_index == i-1 && merge_indices.back().side == 1) {
+                        merge_indices.back().end_index = i;
+                    } else {
+                        merge_indices.push_back(MergeIndices(i-1, i, 1));
+                    }
+                }
+            }
+        }
+    }
+
+    // final pass to merge nodes
+    for (auto& indices: merge_indices) {
+        Node<PointType, OrderType>* merged_node = indices.side == -1 
+        ? subdag_roots[indices.start_index]->get_B() : subdag_roots[indices.start_index]->get_A();
+
+        for (int i = indices.start_index + 1; i <= indices.end_index; ++i) {
+            auto node = subdag_roots[i];
+            if (indices.side == -1) {
+                merged_node = v_merge(merged_node, node->get_B());
+            } else if (indices.side == 1) {
+                merged_node = v_merge(merged_node, node->get_A());
+            } else {
+                assert(false);
+            }
+        }
+
+        for (int i = indices.start_index; i <= indices.end_index; ++i) {
+            auto node = subdag_roots[i];
+            if (indices.side == -1) {
+                node->set_B(merged_node);
+            } else {
+                node->set_A(merged_node);
+            }
+        }
+    }
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType> seg) {
+void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& seg) {
     //TODO: implement this properly/test the code
 } 

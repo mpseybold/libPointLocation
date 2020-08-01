@@ -48,6 +48,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     
     assert(left != nullptr);
     assert(right != nullptr);
+    if (!(left->get_trapezoid().get_right() == right->get_trapezoid().get_left())) {
+        std::cout << "hmm";
+    }
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());

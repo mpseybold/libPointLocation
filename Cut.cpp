@@ -90,6 +90,14 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
             );
             break;
         }
+        case EDGE: {
+            return PointType::intersection_line_orientation(
+                other_cut.get_segment()->get_source(), other_cut.get_segment()->get_target(),
+                segment->get_source(), segment->get_target(),
+                intersecting_seg->get_source(), intersecting_seg->get_target()
+            );
+            break;
+        }
     }
 }
 

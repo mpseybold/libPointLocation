@@ -46,12 +46,14 @@ class BoundingTrap {
                 assert(top.get_cut_type() != NO_CUT);
                 assert(bottom.get_cut_type() != NO_CUT);
                 type = BRTL;
-            }
+            } 
         }
 
         BoundingTrap() { 
             type = TrapType::NONE;
         }
+
+        void set_type(TrapType _type) { type = _type; }
 
         Cut<PointType, OrderType>& get_top() { return top; }
         Cut<PointType, OrderType>& get_bottom() { return bottom; }
@@ -80,4 +82,10 @@ class BoundingTrap {
         bool intersects_segment(Segment<PointType, OrderType>* seg);
 
         bool contains_defining_point(Cut<PointType, OrderType> cut) { return true; }
+
+        bool contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint);
+
+        bool seg_intersects_top(Segment<PointType, OrderType>* seg);
+
+        bool seg_intersects_bottom(Segment<PointType, OrderType>* seg);
 };
