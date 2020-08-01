@@ -10,10 +10,15 @@ class Node {
 
         Node<PointType, OrderType>* negative_child; // delete
         Node<PointType, OrderType>* positive_child; // delete
-        Node<PointType, OrderType>* L;
-        Node<PointType, OrderType>* R;
-        Node<PointType, OrderType>* A;
-        Node<PointType, OrderType>* B;
+        Node<PointType, OrderType>* L = nullptr;
+        Node<PointType, OrderType>* R = nullptr;
+        Node<PointType, OrderType>* A = nullptr;
+        Node<PointType, OrderType>* B = nullptr;
+
+        Node<PointType, OrderType>* left;
+        Node<PointType, OrderType>* right;
+
+        
 
         DestructionCuts<PointType, OrderType> destruction_cuts;
         Cut<PointType, OrderType> destroying_cut;
@@ -21,6 +26,7 @@ class Node {
 
         bool visited = false;
         bool partition_visited = false;
+        bool v_partition_visited = false;
 
     public:
 
@@ -48,8 +54,33 @@ class Node {
             clear_v_2();
         };
 
+        // clears cuts and descendant pointers but
+        // not the bounding trapezoid!
+        void clear() {
+            clear_cuts();
+            L = nullptr;
+            R = nullptr;
+            A = nullptr;
+            B = nullptr;
+        };
+
+        void copy_node(Node<PointType, OrderType>* other) {
+            assert(other != nullptr);
+            
+            copy_cuts(other);
+            
+            set_desc(
+                other->get_L(),
+                other->get_R(),
+                other->get_A(),
+                other->get_B()
+            );
+
+            trapezoid = other->get_trapezoid();
+        }
+
         void copy_cuts(Node<PointType, OrderType>* other) {
-            assert(other !=  nullptr);
+            assert(other != nullptr);
             set_e(other->get_e());
             set_v_1(other->get_v_1());
             set_v_2(other->get_v_2());
@@ -67,14 +98,30 @@ class Node {
 
         bool is_partition_visited() { return partition_visited; }
         
+        bool is_v_partition_visited() { return v_partition_visited; }
+
         void toggle_visited() { visited = !visited; }
 
         void toggle_partition_visited() { partition_visited = !partition_visited; }
+
+        void toggle_v_partition_visited() { v_partition_visited = !v_partition_visited; }
 
         bool contains(Segment<PointType, OrderType>* seg) { 
             //TODO: Implement this    
             return true; 
         }
+
+        bool contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint) {
+            assert(seg !=  nullptr);
+            return trapezoid.contains_endpoint(seg, endpoint);
+        }
+
+        bool intersects_segment(Segment<PointType, OrderType>* seg) {
+            return trapezoid.intersects_segment(seg);
+        }
+
+        bool seg_intersects_top(Segment<PointType, OrderType>* seg) { return trapezoid.seg_intersects_top(seg); }
+        bool seg_intersects_bottom(Segment<PointType, OrderType>* seg) { return trapezoid.seg_intersects_bottom(seg); }
 
         Cut<PointType, OrderType>& get_cut() { return destroying_cut; }
         BoundingTrap<PointType, OrderType>& get_trapezoid() { return trapezoid; }
@@ -85,12 +132,18 @@ class Node {
         Node<PointType, OrderType>* get_A() { return A; }
         Node<PointType, OrderType>* get_B() { return B; }
 
+        Node<PointType, OrderType>* get_left() { return left; }
+        Node<PointType, OrderType>* get_right() { return right; }
+
         void set_negative_child(Node<PointType, OrderType>* node) { negative_child = node; }
         void set_positive_child(Node<PointType, OrderType>* node) { positive_child = node; }
         void set_L(Node<PointType, OrderType>* node) { L = node; }
         void set_R(Node<PointType, OrderType>* node) { R = node; }
         void set_A(Node<PointType, OrderType>* node) { A = node; }
         void set_B(Node<PointType, OrderType>* node) {  B = node; }
+
+        void set_left(Node<PointType, OrderType>* _left) { left = _left; }
+        void set_right(Node<PointType, OrderType>* _right) { right = _right; }
 
         //TODO: Implement this properly 
         DestructionPattern get_dest_pattern() { 

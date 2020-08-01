@@ -4,6 +4,7 @@
 #include "Segment.h"
 // #include "geom.h"
 #include "BoundingTrap.h"
+#include "io.h"
 #include <stack>
 
 template <class PointType, class OrderType>
@@ -48,9 +49,9 @@ class TSD {
         Node<PointType, OrderType>* get_root() { return root; }
         std::vector<Node<PointType, OrderType>*> get_subdag_roots() { return subdag_roots; }
 
-        void insert_segment(Segment<PointType, OrderType> seg);
+        void insert_segment(Segment<PointType, OrderType>& seg);
 
-        void delete_segment(Segment<PointType, OrderType> seg);
+        void delete_segment(Segment<PointType, OrderType>& seg);
 
         void affected_subdag_roots(Segment<PointType, OrderType>* seg);
 

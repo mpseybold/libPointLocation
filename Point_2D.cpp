@@ -83,6 +83,37 @@ int PointCart::intersection_v_orientation(
     return 0;
 }
 
+int PointCart::intersection_line_orientation(
+    PointCart s_1, PointCart t_1,
+    PointCart s_2, PointCart t_2,
+    PointCart s_3, PointCart t_3
+) {
+    Line_2 line_1 = Line_2(s_1.get_cgal_point(), t_1.get_cgal_point());
+    Line_2 line_2 = Line_2(s_2.get_cgal_point(), t_2.get_cgal_point());
+    Line_2 line_3 = Line_2(s_3.get_cgal_point(), t_3.get_cgal_point());
+
+    auto intersection = CGAL::intersection(line_2, line_3);
+    Point_2 ip;
+
+    if (intersection) {
+        ip = boost::get<Point_2>(*intersection);
+    } else {
+        assert(false);
+    }
+
+    auto side = line_1.oriented_side(ip);
+
+    switch(side) {
+        case CGAL::ON_NEGATIVE_SIDE:
+            return -1;
+        case CGAL::ON_POSITIVE_SIDE:
+            return 1;
+        case CGAL::ON_ORIENTED_BOUNDARY: {
+            return 0;
+        }
+    }
+}
+
 int PointCart::intersection_orientation(
             PointCart s, PointCart t,
             PointCart s_1, PointCart t_1,

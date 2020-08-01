@@ -6,6 +6,7 @@
 enum DestructionPattern { VVE, VV, V, VE, EV, E, NO_DESTRUCTION };
 
 template <class PointType, class OrderType>
+
 class DestructionCuts {
     private:
         Cut<PointType, OrderType> v_1;
@@ -80,8 +81,8 @@ class DestructionCuts {
             if (e.get_cut_type() != NO_CUT)
                 return e.get_priority();
             if (v_1.get_cut_type() != NO_CUT)
-                return e.get_priority();
+                return v_1.get_priority();
             if (v_2.get_cut_type() != NO_CUT)
-                return e.get_priority();
+                return v_2.get_priority();
         }
 };
