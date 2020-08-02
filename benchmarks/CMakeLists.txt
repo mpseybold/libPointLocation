@@ -1,7 +1,7 @@
 # Created by the script cgal_create_CMakeLists
 # This is the CMake script for compiling a set of CGAL applications.
 
-project( main )
+project( benchmarks )
 cmake_minimum_required(VERSION 2.8.11)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -37,23 +37,12 @@ endif()
 # include for local package
 
 
-add_subdirectory(test)
-add_subdirectory(benchmarks)
-add_subdirectory(libdts2)
 
 # Creating entries for target: main
 # ############################
 
 add_executable( main  
-  main.cpp 
-  Segment.hpp 
-  Cut.cpp
-  TSD.cpp
-  BoundingTrap.cpp
-  TSD_algorithms/v_merge.cpp
-  TSD_algorithms/merge.cpp
-  TSD_algorithms/partition.cpp
-  TSD_algorithms/v_partition.cpp  
+	cgal-2d-arr-intersect-batch.cpp
 )
 
 set_property(TARGET main PROPERTY CXX_STANDARD 17)
@@ -61,4 +50,4 @@ set_property(TARGET main PROPERTY CXX_STANDARD 17)
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(main   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} dts2 ratss)
+target_link_libraries(main   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
