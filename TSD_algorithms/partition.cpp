@@ -167,12 +167,6 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
 
         delete old_R;
     } else {
-        bool var_1 = node->get_R()->get_trapezoid().intersects_segment(e_cut.get_segment());
-        bool var_2 = !node->get_L()->get_trapezoid().intersects_segment(e_cut.get_segment());
-        bool var_3 = node->get_L()->get_trapezoid().get_right().orientation(e_cut.get_segment()->get_source()) == 0;
-        // bool var_4 = node->g
-        // auto traps = {node->get_R()->get_trapezoid(), node->get_L()->get_trapezoid()};
-        // io::write_trapezoids(traps, "plotting/debub.dat");
         assert(false);
     }
 }

@@ -119,8 +119,6 @@ template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_merge(
     BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
 ) { 
-    if (!(trap_1.get_top() == trap_2.get_top()))
-        std::cout << "hmm";
     assert(trap_1.get_top() == trap_2.get_top());
     assert(trap_1.get_bottom() == trap_2.get_bottom());
     assert(trap_1.get_right() == trap_2.get_left());
@@ -345,10 +343,16 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
     if (source_region == 4 && target_region == 6)
         return true;
 
-    if (source_region == 5 && target_region == 8)
+    // if (source_region == 5 && target_region == 8)
+    //     return true;
+
+    // if (source_region == 8 && target_region == 5)
+    //     return true;
+
+    if (source_region == 2 && target_region == 8)
         return true;
 
-    if (source_region == 8 && target_region == 5)
+    if (target_region == 2 && source_region == 8)
         return true;
 
 
@@ -385,21 +389,47 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
         intersects_via_bottom = bottom.orientation(seg->get_source()) == 1;
     }
 
-
     bool intersects_via_left = false;
     if (left_cut.has_seg_on_pos_side(seg) && left_cut.has_seg_on_neg_side(seg)) {
-        if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment()) == 0) {            
-            if (top_intersection.defining_point_cut_comparison(left_cut) == 1 && top_intersection.defining_point_cut_comparison(right_cut) == -1) {
-                intersects_via_left = true;
-            }
+        if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment()) == 0) {      
+            int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment());
+            assert(top_slope_comp != 0);
+            bool top_test = top_slope_comp == 1
+            ? top_intersection.defining_point_cut_comparison(left_cut) == -1
+            : top_intersection.defining_point_cut_comparison(left_cut) == 1;
+
+            int bottom_test = top_intersection.defining_point_cut_comparison(bottom) == 1;
+            intersects_via_left = top_test && bottom_test;
+            // if (top_intersection.defining_point_cut_comparison(left_cut) == 1 && top_intersection.defining_point_cut_comparison(right_cut) == -1) {
+            //     intersects_via_left = true;
+            // }
         }
         else if (Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment()) == 0) {
-            if (bottom_intersection.defining_point_cut_comparison(left_cut) == 1 && bottom_intersection.defining_point_cut_comparison(right_cut) == -1) {
-                intersects_via_left = true;
-            }
+            int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment());
+            assert(bottom_slope_comp != 0);
+            bool bottom_test = bottom_slope_comp == 1
+            ? bottom_intersection.defining_point_cut_comparison(left_cut) == 1
+            : bottom_intersection.defining_point_cut_comparison(left_cut) == -1;
+
+            int top_test = bottom_intersection.defining_point_cut_comparison(top) == -1;
+            intersects_via_left = top_test && bottom_test;
+            // if (bottom_intersection.defining_point_cut_comparison(left_cut) == 1 && bottom_intersection.defining_point_cut_comparison(right_cut) == -1) {
+            //     intersects_via_left = true;
+            // }
         }
         else if (bottom_intersection.defining_point_cut_comparison(left_cut) * top_intersection.defining_point_cut_comparison(left_cut) == -1) {
-            intersects_via_left = true;
+            int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment());
+            int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment());
+            bool bottom_test = bottom_slope_comp == 1
+            ? bottom_intersection.defining_point_cut_comparison(left_cut) == 1
+            : bottom_intersection.defining_point_cut_comparison(left_cut) == -1;
+
+            bool top_test = top_slope_comp == 1
+            ? top_intersection.defining_point_cut_comparison(left_cut) == -1
+            : top_intersection.defining_point_cut_comparison(left_cut) == 1;
+
+            intersects_via_left = top_test && bottom_test;
+            // intersects_via_left = true;
         }
     }
 
@@ -567,7 +597,7 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
 
     
 
-    std::cout << "this is not where I want to be...\n";
+    // std::cout << "this is not where I want to be...\n";
     return false;
 }
 

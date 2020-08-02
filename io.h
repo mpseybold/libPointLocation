@@ -62,13 +62,15 @@ namespace io {
 
             auto intersection_1 = CGAL::intersection(prev_line, defining_line);
             Point_2 source;
-            if (!CGAL::assign(source, intersection_1))
-                throw std::logic_error("lines do not intersect");
-
+            if (!CGAL::assign(source, intersection_1)) 
+                continue;
+                //assert(false);
+            
             auto intersection_2 = CGAL::intersection(defining_line, next_line);
             Point_2 target;
-            if (! CGAL::assign(target, intersection_2))
-                throw std::logic_error("lines do not intersect");
+            if (!CGAL::assign(target, intersection_2))
+                continue;
+                // assert(false);
 
             file << source.x() << " " << source.y() << 
             " " << target.x() << " " << target.y() << std::endl;

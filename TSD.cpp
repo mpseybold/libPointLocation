@@ -1,6 +1,6 @@
 #include "TSD.h"
 
-#define VERBOSITY_LEVEL 100
+#define VERBOSITY_LEVEL 1
 
 
 // Returns the next priority descendants of 'node'
@@ -44,9 +44,37 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             if (node->get_A()->get_trapezoid().get_right()
             .defining_point_cut_comparison(
                 node->get_B()->get_trapezoid().get_right()
-            ) > -1)
-                if (node->get_B()->get_trapezoid().intersects_segment(seg))
+            ) > -1) {
+                if (node->get_B()->get_trapezoid().intersects_segment(seg)) {
                     intersecting_descendants[2] = node->get_B();
+                }
+            }
+            else {
+                if (node->get_e().has_seg_on_neg_side(seg) && node->get_e().has_seg_on_pos_side(seg)) {
+                    auto seg_intersection = Cut<PointType, OrderType>(
+                        INTERSECTION, seg, node->get_e().get_segment()
+                    );
+                    if (seg_intersection.defining_point_cut_comparison(
+                        node->get_A()->get_trapezoid().get_right()
+                    ) == -1) {
+                        if (node->get_B()->get_trapezoid().intersects_segment(seg))
+                            intersecting_descendants[2] = node->get_B();
+                    }
+                }
+                // if (Segment<PointType, OrderType>::slope_comparison(
+                //     *seg, *node->get_trapezoid().get_bottom().get_segment()
+                // ) != 0) {
+                //     auto bottom_intersection = Cut<PointType, OrderType>(
+                //         INTERSECTION, seg, node->get_trapezoid().get_bottom().get_segment()
+                //     );
+                //     if (bottom_intersection.defining_point_cut_comparison(
+                //         node->get_B()->get_trapezoid().get_right()
+                //     ) == -1) {
+                //         if (node->get_B()->get_trapezoid().intersects_segment(seg))
+                //             intersecting_descendants[2] = node->get_B();
+                //     }
+                // }
+            }
         } else {
             if (node->get_B()->get_trapezoid().intersects_segment(seg))
                 intersecting_descendants[1] = node->get_B();
@@ -57,9 +85,24 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             if (node->get_A()->get_trapezoid().get_right()
             .defining_point_cut_comparison(
                 node->get_B()->get_trapezoid().get_right()
-            ) < 1)
-                if (node->get_A()->get_trapezoid().intersects_segment(seg))
+            ) < 1) {
+                if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
                     intersecting_descendants[2] = node->get_A();
+                }
+            } else {
+                if (node->get_e().has_seg_on_neg_side(seg) && node->get_e().has_seg_on_pos_side(seg)) {
+                    auto seg_intersection = Cut<PointType, OrderType>(
+                        INTERSECTION, seg, node->get_e().get_segment()
+                    );
+                    if (seg_intersection.defining_point_cut_comparison(
+                        node->get_B()->get_trapezoid().get_right()
+                    ) == -1) {
+                        if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
+                            intersecting_descendants[2] = node->get_A();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -127,9 +170,13 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
         Node<PointType, OrderType>* top = search_stack.top();
         while(top->is_visited()) {
             search_stack.pop();
+            if (search_stack.empty())
+                break;
             top = search_stack.top();
             assert(top != nullptr);
         }
+        if (search_stack.empty())
+            continue;
         search_stack.pop();
 
         if (top->is_leaf()) {
@@ -158,7 +205,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
                 }
             } else {
                 if (node != nullptr) {
-                    std::cout << "node seen twice\n";
+                    // std::cout << "node seen twice\n";
                     intersecting_descendants[i] = nullptr;
                 }
             }
