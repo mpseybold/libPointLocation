@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "../TSD.h"
 #include "../io.h"
+#include <random>
 
 
 TEST(TSDTests, searchTest) {
@@ -409,20 +410,56 @@ TEST(TSDTests, leafInsertTest) {
         PointCart(4, 99), PointCart(98, 4), 12
     );
 
+    Segment<PointCart, int> seg_13 = Segment<PointCart, int>(
+        PointCart(4, 99), PointCart(4, 72), 13
+    );
 
-    tsd.insert_segment(seg_1);
-    tsd.insert_segment(seg_2);
-    tsd.insert_segment(seg_3);
+    // Segment<PointCart, int> seg_14 = Segment<PointCart, int>(
+    //     PointCart(3, 89), PointCart(99.999, 89), 14
+    // );
+
+    std::mt19937 generator (1234);
+    std::uniform_real_distribution<double> dis(0.0, 1.0);
+
+    auto segments = std::vector<Segment<PointCart, int>>();
+
+    for (int i = 1; i <= 17; ++i) {
+        // segments.push_back(
+        //     Segment<PointCart, int>(
+        //         PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), 
+        //         PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), i
+        //     )
+        // );
+
+        auto seg = new Segment<PointCart, int>(
+                PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), 
+                PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), i
+            );
+
+        if (i == 17) {
+            tsd.affected_subdag_roots(seg);
+            std::cout << seg->get_source().x() << " " << seg->get_source().y()
+            << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+        } else {
+            tsd.insert_segment(*seg);
+        }
+    }
+
+    // tsd.insert_segment(seg_1);
+    // tsd.insert_segment(seg_2);
+    // tsd.insert_segment(seg_3);
     // tsd.insert_segment(seg_4);
     // tsd.insert_segment(seg_5);
-    tsd.insert_segment(seg_6);
+    // tsd.insert_segment(seg_6);
     // tsd.insert_segment(seg_7);
     // tsd.insert_segment(seg_8);
     // tsd.insert_segment(seg_9);
     // tsd.insert_segment(seg_10);
     // tsd.insert_segment(seg_11);
-    tsd.insert_segment(seg_12);
-    tsd.affected_subdag_roots(&seg_12);
+    // tsd.insert_segment(seg_12);
+    // tsd.insert_segment(seg_13);
+    // tsd.insert_segment(seg_14);
+    // tsd.affected_subdag_roots(&seg_12);
 
     auto subdag_traps = std::vector<BoundingTrap<PointCart,int>>();
     for (auto node: tsd.get_subdag_roots()) {

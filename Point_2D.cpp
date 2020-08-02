@@ -130,6 +130,7 @@ int PointCart::intersection_orientation(
     if (intersection_1) {
         ip_1 = boost::get<Point_2>(*intersection_1);
     }   else {
+        assert(false);
         throw std::logic_error("lines do not intersect");
     }
 
@@ -139,6 +140,7 @@ int PointCart::intersection_orientation(
     if (intersection_2) {
         ip_2 = boost::get<Point_2>(*intersection_2);
     } else {
+        assert(false);
         throw std::logic_error("lines do not intersect");
     }
 
