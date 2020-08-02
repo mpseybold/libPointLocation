@@ -3,7 +3,8 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
-#include "TSD.h"
+#include "Cut.h"
+#include "BoundingTrap.h"
 
 namespace {
     Line_2 get_defining_line(Cut<PointCart, int> cut) {

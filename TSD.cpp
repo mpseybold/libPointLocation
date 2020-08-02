@@ -1,6 +1,7 @@
 #include "TSD.h"
+// #include "io.h"
 
-#define VERBOSITY_LEVEL 1
+#define VERBOSITY_LEVEL 2
 
 
 // Returns the next priority descendants of 'node'
@@ -9,9 +10,31 @@
 // stabbing order. 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>* seg, Node<PointType, OrderType>* node) {
-    
-    
+       
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
+
+    if (VERBOSITY_LEVEL >= 2) {
+        auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
+
+        if (node->get_L() != nullptr) {
+            traps.push_back(node->get_L()->get_trapezoid());
+        }
+        if (node->get_R() != nullptr) {
+            traps.push_back(node->get_R()->get_trapezoid());
+        }
+        if (node->get_A() != nullptr) {
+            traps.push_back(node->get_A()->get_trapezoid());
+        }
+        if (node->get_B() != nullptr) {
+            traps.push_back(node->get_B()->get_trapezoid());
+        }
+
+        io::write_trapezoids(traps, "refinement_debug.dat");
+    }
+
+    if (node->get_priority() > 5 && seg->get_priority() == 17) {
+        std::cout << "debug...";
+    }
     
     if (node->get_L() != nullptr) 
         if (node->get_L()->get_trapezoid().intersects_segment(seg)) {

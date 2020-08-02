@@ -178,6 +178,20 @@ TEST(TSDTests, searchTest) {
     ASSERT_EQ(roots[3]->name, "RA");
     ASSERT_EQ(roots[4]->name, "BB");
     ASSERT_EQ(roots[5]->name, "RR");
+
+    Segment<PointCart, int> query_seg_4 = Segment<PointCart, int>(
+        PointCart(29, 1), PointCart(81, 99), 2
+    );
+    tsd.affected_subdag_roots(&query_seg_4);
+    roots = tsd.get_subdag_roots();
+    ASSERT_EQ(roots.size(), 7);
+    ASSERT_EQ(roots[0]->name, "L");
+    ASSERT_EQ(roots[1]->name, "BL");
+    ASSERT_EQ(roots[2]->name, "BB");
+    ASSERT_EQ(roots[3]->name, "BA");
+    ASSERT_EQ(roots[4]->name, "A");
+    ASSERT_EQ(roots[5]->name, "RA");
+    ASSERT_EQ(roots[6]->name, "RR");
 }
 
 TEST(TSDTests, vPartTest) {
