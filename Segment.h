@@ -10,6 +10,8 @@ class Segment {
         PointType source;
         PointType target;
         OrderType priority;
+
+        double source_x, source_y, target_x, target_y;
     
     public:
 
@@ -21,6 +23,13 @@ class Segment {
                 source = t;
                 target = s;
             }
+
+            source_x = CGAL::to_double(source.get_cgal_point().x());
+            source_y = CGAL::to_double(source.get_cgal_point().y());
+            target_x = CGAL::to_double(target.get_cgal_point().x());
+            target_y = CGAL::to_double(target.get_cgal_point().y());
+
+            // std::cout << CGAL::to_double(s.get_cgal_point().x()) << " " << CGAL::to_double(s.get_cgal_point().y()) << "\n";
         }
 
         PointType get_source() { return source; }
@@ -45,10 +54,7 @@ class Segment {
         }
 
         bool operator< (Segment<PointType, OrderType>& other) {
-            // auto this_add = reinterpret_cast<long>(this);
-            // auto other_add = reinterpret_cast<long>(&other);
-            // return this_add > other_add;
-            return false; 
+            return (long)this < (long)&other; 
         }
 };
 

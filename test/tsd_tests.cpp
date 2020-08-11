@@ -437,27 +437,29 @@ TEST(TSDTests, leafInsertTest) {
 
     auto segments = std::vector<Segment<PointCart, int>>();
 
-    for (int i = 1; i <= 17; ++i) {
-        // segments.push_back(
-        //     Segment<PointCart, int>(
-        //         PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), 
-        //         PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), i
-        //     )
-        // );
+    std::cout << "start...\n";
+    for (int i = 1; i <= 33; ++i) {
 
-        auto seg = new Segment<PointCart, int>(
-                PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), 
-                PointCart((double)100 * dis(generator), (double)100 *  dis(generator)), i
-            );
+        std::cout << i << std::endl;
+        
+        PointCart s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+        PointCart t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
 
-        if (i == 17) {
-            tsd.affected_subdag_roots(seg);
+        while (s.x() == t.x() && s.y() == t.y())
+            t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+
+        auto seg = new Segment<PointCart, int>(s, t, i); 
+
+        if (i == 33) {
             std::cout << seg->get_source().x() << " " << seg->get_source().y()
             << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+            tsd.affected_subdag_roots(seg);
+            // tsd.insert_segment(*seg);
         } else {
             tsd.insert_segment(*seg);
         }
     }
+    std::cout << "end...\n";
 
     // tsd.insert_segment(seg_1);
     // tsd.insert_segment(seg_2);

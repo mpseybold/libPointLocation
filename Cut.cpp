@@ -105,7 +105,7 @@ template <class PointType, class OrderType>
 bool Cut<PointType, OrderType>::has_seg_on_pos_side(Segment<PointType, OrderType>* seg) {
 
     if (cut_type == EDGE && has_on(seg)) {
-        return Segment<PointType, OrderType>::lexicographic_comparison(*get_segment(), *seg) == 1;
+        return segment < seg;
     }
 
     return orientation(seg->get_source()) == 1 || orientation(seg->get_target()) == 1;
@@ -115,7 +115,7 @@ template <class PointType, class OrderType>
 bool Cut<PointType, OrderType>::has_seg_on_neg_side(Segment<PointType, OrderType>* seg) {
 
     if (cut_type == EDGE && has_on(seg)) {
-        return Segment<PointType, OrderType>::lexicographic_comparison(*get_segment(), *seg) == -1;
+        return seg < segment;
     }
 
     return orientation(seg->get_source()) == -1 || orientation(seg->get_target()) == -1;

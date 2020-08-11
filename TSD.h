@@ -4,8 +4,8 @@
 #include "Segment.h"
 // #include "geom.h"
 #include "BoundingTrap.h"
-#include "io.h"
 #include <stack>
+#include "io.h"
 
 template <class PointType, class OrderType>
 class TSD {

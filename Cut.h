@@ -20,7 +20,7 @@ class Cut {
         cut_type(ct), segment(s), intersecting_seg(is) {
             if (ct == INTERSECTION) {
                 assert(is != nullptr);
-            }
+            } 
         }
 
         Cut() {
@@ -48,7 +48,7 @@ class Cut {
                 if (orientation(other_p) != 0) {
                     return orientation(other_p);
                 }
-                return has_seg_on_pos_side(seg) ? 1 : -1;
+                return *segment < *seg ? 1 : -1;
             }
 
             return orientation(p);
