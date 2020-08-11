@@ -11,6 +11,9 @@ BoundingTrap<PointType, OrderType>::vertical_destruction(Cut<PointType, OrderTyp
     switch(type) {
         case BRTL: {
             assert(cut.defining_point_cut_comparison(left) != -1);
+            if (cut.defining_point_cut_comparison(right) == 1) {
+                assert(false);
+            }
             assert(cut.defining_point_cut_comparison(right) != 1);
 
             new_trap_pos =
@@ -119,6 +122,10 @@ template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_merge(
     BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
 ) { 
+
+    if (!(trap_1.get_top() == trap_2.get_top())) {
+        std::cout << "here is a problem\n";
+    }
     assert(trap_1.get_top() == trap_2.get_top());
     assert(trap_1.get_bottom() == trap_2.get_bottom());
     assert(trap_1.get_right() == trap_2.get_left());
@@ -176,7 +183,7 @@ int BoundingTrap<PointType, OrderType>::trap_cut_region(Segment<PointType, Order
     ? Cut<PointType, OrderType>(INTERSECTION, top.get_segment(), bottom.get_segment())
     : right;
 
-    if (left_cut.orientation(p) < 0) {
+    if (left_cut.orientation(p) < 0 || (left_cut.orientation(p) == 0 && left_cut.orientation(other_p) < 0)) {
         if (top.orientation(seg, endpoint) > 0) {
             return 1;
         }
@@ -203,15 +210,15 @@ int BoundingTrap<PointType, OrderType>::trap_cut_region(Segment<PointType, Order
                 if (right_cut.orientation(p) < 0 || (right_cut.orientation(p) == 0 && right_cut.orientation(other_p) == -1)) {
                     return 5;
                 }
-                if (right_cut.orientation(p) > 0) {
+                if (right_cut.orientation(p) > 0 || (right_cut.orientation(p) == 0 && right_cut.orientation(other_p) == 1)) {
                     return 6;
                 } 
             }
             if (bottom.orientation(seg, endpoint) < 0) {
-                if (right_cut.orientation(p) < 0) {
+                if (right_cut.orientation(p) < 0 || (right_cut.orientation(p) == 0 && right_cut.orientation(other_p) == -1)) {
                     return 8;
                 }
-                if (right_cut.orientation(p) > 0) {
+                if (right_cut.orientation(p) > 0 || (right_cut.orientation(p) == 0 && right_cut.orientation(other_p) == 1)) {
                     return 9;
                 }
             }
@@ -224,7 +231,7 @@ int BoundingTrap<PointType, OrderType>::trap_cut_region(Segment<PointType, Order
 template <class PointType, class OrderType>
 std::pair<int, int> BoundingTrap<PointType, OrderType>::trap_cut_regions(Segment<PointType, OrderType>* seg) {
 
-    if (top.has_seg_on_pos_side(seg) && !top.has_seg_on_neg_side(seg)) 
+    if (top.has_seg_on_pos_side(seg) && !top.has_seg_on_neg_side(seg))
         return {1, 1};
 
     if (bottom.has_seg_on_neg_side(seg) && !bottom.has_seg_on_pos_side(seg))
@@ -343,17 +350,18 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
     if (source_region == 4 && target_region == 6)
         return true;
 
-    // if (source_region == 5 && target_region == 8)
-    //     return true;
-
-    // if (source_region == 8 && target_region == 5)
-    //     return true;
-
     if (source_region == 2 && target_region == 8)
         return true;
 
     if (target_region == 2 && source_region == 8)
         return true;
+
+    // handle degenerate cases where the segment lies
+    // on the top or bottom boundary
+    if (bottom.has_on(seg) || top.has_on(seg)) {
+        if (source_region == 4 && target_region != 4 && target_region != 0)
+            return true;
+    }
 
 
 
@@ -533,9 +541,11 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
 
     if (intersects_via_bottom || intersects_via_top || intersects_via_left || intersects_via_right)
         return true;
-
-    if (source_region != 0 && target_region != 0)
+    else
         return false;
+
+    // if (source_region != 0 && target_region != 0)
+    //     return false;
 
     if (top.has_on(seg)) {
         if (left_cut.has_seg_on_pos_side(seg) && right_cut.has_seg_on_neg_side(seg))
@@ -546,7 +556,7 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
 
     if (bottom.has_on(seg)) {
         if (left_cut.has_seg_on_pos_side(seg) && right_cut.has_seg_on_neg_side(seg))
-            return seg > bottom.get_segment();
+            return !(seg < bottom.get_segment());
         else
             return false;
     }
@@ -595,9 +605,6 @@ bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, O
             return false;
     }
 
-    
-
-    // std::cout << "this is not where I want to be...\n";
     return false;
 }
 
@@ -605,7 +612,6 @@ template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint) {
     assert(endpoint == 0 || endpoint == 1);
     assert(seg != nullptr);
-
     PointType p = endpoint == 0 ? seg->get_source()
     : seg->get_target();
 
@@ -615,7 +621,8 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, Or
     bool bottom_test, right_test, top_test, left_test;
 
     bottom_test = bottom.orientation(p) == 1
-    || (bottom.orientation(p) == 0 && bottom.orientation(other_p) == 1);
+    || (bottom.orientation(p) == 0 && bottom.orientation(other_p) == 1)
+    || (bottom.orientation(p) == 0 && bottom.orientation(other_p) == 0 && *bottom.get_segment() < *seg);;
 
     if (right.get_cut_type() == NO_CUT)
         right_test = true;
@@ -625,7 +632,8 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, Or
     }
 
     top_test = top.orientation(p) == -1
-    || (top.orientation(p) == 0 && top.orientation(other_p) == -1);
+    || (top.orientation(p) == 0 && top.orientation(other_p) == -1)
+    || (top.orientation(p) == 0 && top.orientation(other_p) == 0 && *seg < *top.get_segment());
 
     if (left.get_cut_type() == NO_CUT) {
         left_test = true;

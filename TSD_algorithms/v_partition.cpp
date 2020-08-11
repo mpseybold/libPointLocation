@@ -8,7 +8,6 @@ void TSD<PointType, OrderType>::v_part_handle_leaf_case(Node<PointType, OrderTyp
     assert(node->get_R() == nullptr);
     assert(node->is_leaf());
 
-    
     auto trap = node->get_trapezoid();
     auto pos_neg = trap.destroy(v_cut);
     auto L = new Node<PointType, OrderType>(pos_neg.second);

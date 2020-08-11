@@ -1,7 +1,7 @@
 #include "TSD.h"
 // #include "io.h"
 
-#define VERBOSITY_LEVEL 2
+#define VERBOSITY_LEVEL 1
 
 
 // Returns the next priority descendants of 'node'
@@ -13,7 +13,8 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
 
-    if (VERBOSITY_LEVEL >= 2) {
+    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 151097 
+    && node->get_priority() > 70000) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
 
         if (node->get_L() != nullptr) {
@@ -32,9 +33,6 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
         io::write_trapezoids(traps, "refinement_debug.dat");
     }
 
-    if (node->get_priority() > 5 && seg->get_priority() == 17) {
-        std::cout << "debug...";
-    }
     
     if (node->get_L() != nullptr) 
         if (node->get_L()->get_trapezoid().intersects_segment(seg)) {
@@ -55,9 +53,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             *seg, *edge_cut.get_segment()
         );
 
-        if (Segment<PointType, OrderType>::slope_comparison(
-            *seg, *edge_cut.get_segment()
-        ) > 0) {
+        if (slope_comp > 0) {
             if (node->get_A()->get_trapezoid().intersects_segment(seg))
                 intersecting_descendants[1] = node->get_A();
             // If B intersects the region adjacent to the right of
@@ -81,6 +77,20 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                         node->get_A()->get_trapezoid().get_right()
                     ) == -1) {
                         if (node->get_B()->get_trapezoid().intersects_segment(seg))
+                            intersecting_descendants[2] = node->get_B();
+                    }
+                } else {
+                    if ((node->get_B()->get_trapezoid().contains_endpoint(seg, 0)
+                        && node->get_A()->get_trapezoid().get_right().orientation(seg->get_source()) == -1)
+                        || (node->get_B()->get_trapezoid().contains_endpoint(seg, 1)
+                        && node->get_A()->get_trapezoid().get_right().orientation(seg->get_target()) == -1)
+                    ) {
+                        if (node->get_B()->get_trapezoid().intersects_segment(seg)) {
+                            intersecting_descendants[2] = node->get_B();
+                        }
+                    } else if (!(node->get_B()->get_trapezoid().contains_endpoint(seg, 0))
+                        && !(node->get_B()->get_trapezoid().contains_endpoint(seg, 1))
+                        && node->get_B()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_B();
                     }
                 }
@@ -124,6 +134,20 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                             intersecting_descendants[2] = node->get_A();
                         }
                     }
+                } else {
+                    if ((node->get_A()->get_trapezoid().contains_endpoint(seg, 0)
+                        && node->get_B()->get_trapezoid().get_right().orientation(seg->get_source()) == -1)
+                        || (node->get_A()->get_trapezoid().contains_endpoint(seg, 1)
+                        && node->get_B()->get_trapezoid().get_right().orientation(seg->get_target()) == -1)
+                    ) {
+                        if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
+                            intersecting_descendants[2] = node->get_A();
+                        }
+                    } else if (!(node->get_A()->get_trapezoid().contains_endpoint(seg, 0))
+                        && !(node->get_A()->get_trapezoid().contains_endpoint(seg, 1))
+                        && node->get_A()->get_trapezoid().intersects_segment(seg)) {
+                            intersecting_descendants[2] = node->get_A();
+                    }
                 }
             }
         }
@@ -141,28 +165,28 @@ TSD<PointType, OrderType>::TSD() {
     trapezoid.set_top(
         Cut<PointType, OrderType>(
             EDGE, new Segment<PointType, OrderType>(
-                PointCart(-10, 100), PointCart(110, 100), -1
+                PointCart(-1000000, -20), PointCart(11000, -20), -1
             ), nullptr
         )
     );
     trapezoid.set_bottom(
         Cut<PointType, OrderType>(
             EDGE, new Segment<PointType, OrderType>(
-                PointCart(-20, 0), PointCart(120, 0), -1
+                PointCart(-200000, -23), PointCart(12000, -23), -1
             ), nullptr
         )
     );
     trapezoid.set_left(
         Cut<PointType, OrderType>(
             TARGET, new Segment<PointType, OrderType>(
-                PointCart(-30, 50), PointCart(0, 50), -1
+                PointCart(110, -20), PointCart(164, -20), -1
             ), nullptr
         )
     );
     trapezoid.set_right(
         Cut<PointType, OrderType>(
             SOURCE, new Segment<PointType, OrderType>(
-                PointCart(100, 50), PointCart(150, 50), -1
+                PointCart(168, -20), PointCart(180, -20), -1
             ), nullptr
         )
     );
@@ -269,14 +293,94 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& seg) {
    //TODO: implement this properly/test the code
 
+    // for (auto& s: segments) {
+    //     assert(!(s == seg));
+    // }
+    segments.push_back(seg);
+
     affected_subdag_roots(&seg);
+
+    // if (seg.get_priority() == 151097) {
+    //     auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
+    //     for (auto& node: subdag_roots)
+    //         traps.push_back(node->get_trapezoid());
+    //     io::write_trapezoids(traps, "roots.dat");
+    // }
+
+
+    // // experimental first pass
+
+    // for (int i = 0; i < subdag_roots.size(); ++i) {
+    //     auto node = subdag_roots[i];
+
+    //     if (i == 0) {
+    //         if (node->contains_endpoint(&seg, 0)) {
+    //             auto v_cut = Cut<PointType, OrderType>(
+    //                 SOURCE, &seg, nullptr
+    //             );
+    //             v_partition(node, v_cut);
+    //         }
+    //     }
+
+    //     if (node->get_trapezoid().get_bottom().orientation(seg.get_source()) == -1) {
+    //         if (node->get_trapezoid().seg_intersects_bottom(&seg)) {
+    //             auto intersection_cut = Cut<PointType, OrderType>(
+    //                 INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
+    //             );
+    //             v_partition(node, intersection_cut);
+    //         }
+    //     }
+
+    //     if (node->get_trapezoid().get_top().orientation(seg.get_source()) == 1) {
+    //         if (node->get_trapezoid().seg_intersects_top(&seg)) {
+    //             auto intersection_cut = Cut<PointType, OrderType>(
+    //                 INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
+    //             );
+    //             v_partition(node, intersection_cut);
+    //         }
+    //     }
+
+    //     if (node->get_trapezoid().get_bottom().orientation(seg.get_target()) == -1) {
+    //         if (node->get_trapezoid().seg_intersects_bottom(&seg)) {
+    //             auto intersection_cut = Cut<PointType, OrderType>(
+    //                 INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
+    //             );
+    //             v_partition(node, intersection_cut);
+    //         }
+    //     }
+
+    //     if (node->get_trapezoid().get_top().orientation(seg.get_target()) == 1) {
+    //         if (node->get_trapezoid().seg_intersects_top(&seg)) {
+    //             auto intersection_cut = Cut<PointType, OrderType>(
+    //                 INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
+    //             );
+    //             v_partition(node, intersection_cut);
+    //         }
+    //     }
+
+    //     if (i == subdag_roots.size() - 1) {
+    //         if (node->contains_endpoint(&seg, 1)) {
+    //             auto v_cut = Cut<PointType, OrderType>(
+    //                 SOURCE, &seg, nullptr
+    //             );
+    //             v_partition(node, v_cut);
+    //         }
+    //     }
+
+    // }
 
     // make a first pass over affected roots to make
     // v-partition calls.
     for (int i = 0; i < subdag_roots.size(); ++i) {
-        
+
         auto node = subdag_roots[i];
         int v_part_count = 0;
+
+        if (node->get_trapezoid().get_top().has_on(&seg)
+        || node->get_trapezoid().get_bottom().has_on(&seg)) {
+            std::cout << "aha!\n";
+            return;
+        }
 
         if (i == 0) {
             if (node->contains_endpoint(&seg, 0)) {
@@ -391,9 +495,16 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         
         if (i > 0) {
             auto prev = subdag_roots[i-1];
-            // bool top_or_bottom = (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
-            // prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom());
-            // bool right_and_left = prev->get_trapezoid().get_right() == node->get_trapezoid().get_left();
+
+            // if (i == 3 && VERBOSITY_LEVEL >= 2) {
+            //     io::write_trapezoids({subdag_roots[i-1]->get_trapezoid(), subdag_roots[i]->get_trapezoid()}, "merge_debug.dat");
+            // }
+
+            bool right_left_match = prev->get_trapezoid().get_right() == node->get_trapezoid().get_left();
+            bool top_match = prev->get_trapezoid().get_top() == node->get_trapezoid().get_top();
+            bool bottom_match = prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom();
+
+
             if (prev->get_trapezoid().get_right() == node->get_trapezoid().get_left() &&
             (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
             prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom())) {

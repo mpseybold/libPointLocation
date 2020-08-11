@@ -170,8 +170,21 @@ int PointCart::intersection_v_orientation(
     auto intersection_1 = CGAL::intersection(line_1, line_2);
     auto intersection_2 = CGAL::intersection(line_3, line_4);
 
-    Point_2 ip_1 = boost::get<Point_2>(*intersection_1);
-    Point_2 ip_2 = boost::get<Point_2>(*intersection_2);
+    Point_2 ip_1;
+    
+    if (intersection_1) {
+        ip_1 = boost::get<Point_2>(*intersection_1);
+    } else {
+        assert(false);
+    }
+    
+    Point_2 ip_2;
+
+    if (intersection_2) {
+        ip_2 = boost::get<Point_2>(*intersection_2);
+    } else {
+        assert(false);
+    }
 
     if (ip_1.x() < ip_2.x())
         return 1;
@@ -199,8 +212,21 @@ int PointCart::intersection_h_orientation(
     auto intersection_1 = CGAL::intersection(line_1, line_2);
     auto intersection_2 = CGAL::intersection(line_3, line_4);
 
-    Point_2 ip_1 = boost::get<Point_2>(*intersection_1);
-    Point_2 ip_2 = boost::get<Point_2>(*intersection_2);
+    Point_2 ip_1;
+    
+    if (intersection_1) {
+        ip_1 = boost::get<Point_2>(*intersection_1);
+    } else {
+        assert(false);
+    }
+    
+    Point_2 ip_2;
+
+    if (intersection_2) {
+        ip_2 = boost::get<Point_2>(*intersection_2);
+    } else {
+        assert(false);
+    }
 
     if (ip_1.y() < ip_2.y())
         return 1;

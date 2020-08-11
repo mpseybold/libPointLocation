@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Cut.h"
 #include "BoundingTrap.h"
+#include <random>
 
 namespace {
     Line_2 get_defining_line(Cut<PointCart, int> cut) {
@@ -44,7 +45,6 @@ namespace {
 namespace io {
     void write_trapezoid(BoundingTrap<PointCart, int> trap, std::fstream& file) {
         std::vector<Cut<PointCart, int>> cuts = std::vector<Cut<PointCart, int>>();
-
         cuts.push_back(trap.get_bottom());
         if (trap.get_right().get_cut_type() != NO_CUT)
             cuts.push_back(trap.get_right());
@@ -52,7 +52,16 @@ namespace io {
         if (trap.get_left().get_cut_type() != NO_CUT)
             cuts.push_back(trap.get_left());
 
-        std::vector<std::pair<Point_2, Point_2>> segments = std::vector<std::pair<Point_2, Point_2>>();
+        auto top_seg = trap.get_top().get_segment();
+
+        if (top_seg->get_source().x() == top_seg->get_target().x())
+            return;
+
+        auto bottom_seg = trap.get_bottom().get_segment();
+
+        if (bottom_seg->get_source().x() == bottom_seg->get_target().x())
+            return;
+        
 
         for (int i = 1; i <= cuts.size(); ++i) {
             int index = i % cuts.size();
@@ -72,9 +81,9 @@ namespace io {
             if (!CGAL::assign(target, intersection_2))
                 continue;
                 // assert(false);
-
-            file << source.x() << " " << source.y() << 
-            " " << target.x() << " " << target.y() << std::endl;
+            file << std::setprecision(std::numeric_limits<long double>::digits10);
+            file << CGAL::to_double(source.x()) << " " << CGAL::to_double(source.y()) << 
+            " " << CGAL::to_double(target.x()) << " " << CGAL::to_double(target.y()) << std::endl;
         }
     }
 
@@ -87,5 +96,46 @@ namespace io {
         }
 
         file.close();
+    }
+
+    template <class PointType, class OrderType>
+    std::vector<Segment<PointType, OrderType>> read_segments(std::string filename) {
+        std::string path = "data/" + filename;
+
+        std::cout << path << std::endl;
+        std::ifstream file(path);
+
+        if (!file.is_open()) {
+            std::cout << "failed to open file\n";
+        } 
+
+        std::vector<Segment<PointType, OrderType>> output;
+        std::vector<std::vector<long double>> seg_coords;
+        long double x_1, y_1, x_2, y_2;
+        while (file >> x_1 >> y_1 >> x_2 >> y_2) {
+            std::vector<long double> coords;
+            coords.push_back(x_1);
+            coords.push_back(y_1);
+            coords.push_back(x_2);
+            coords.push_back(y_2);
+            seg_coords.push_back(coords);
+        }
+
+        file.close();
+
+        // std::random_device rd;
+        // std::mt19937 g(rd());
+
+        std::random_shuffle(seg_coords.begin(), seg_coords.end());
+
+        for (int i = 0; i < seg_coords.size(); ++i) {
+            output.push_back(
+                Segment<PointType, OrderType>(
+                    PointType(seg_coords[i][0], seg_coords[i][1]), PointType(seg_coords[i][2], seg_coords[i][3]), i
+                )
+            );
+        }
+
+        return output;
     }
 }
