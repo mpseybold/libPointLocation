@@ -6,6 +6,7 @@ cmake_install.cmake
 cgal_create_CMakeLists
 
 gmon.out
+profiler_output.txt
 
 data
 plotting
