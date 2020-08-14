@@ -35,6 +35,12 @@ endif()
 
 add_subdirectory(test)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+# SET(RELEASE_OPTIONS "-pg")
+# add_compile_options("$<$<CONFIG:RELEASE>:${RELEASE_OPTIONS}>")
+
 # Creating entries for target: main
 # ############################
 
@@ -49,3 +55,5 @@ add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(main   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
+target_compile_options(main PRIVATE -pg)

@@ -296,78 +296,11 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // for (auto& s: segments) {
     //     assert(!(s == seg));
     // }
+
+    // TODO: check if move is needed
     segments.push_back(seg);
 
     affected_subdag_roots(&seg);
-
-    // if (seg.get_priority() == 151097) {
-    //     auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
-    //     for (auto& node: subdag_roots)
-    //         traps.push_back(node->get_trapezoid());
-    //     io::write_trapezoids(traps, "roots.dat");
-    // }
-
-
-    // // experimental first pass
-
-    // for (int i = 0; i < subdag_roots.size(); ++i) {
-    //     auto node = subdag_roots[i];
-
-    //     if (i == 0) {
-    //         if (node->contains_endpoint(&seg, 0)) {
-    //             auto v_cut = Cut<PointType, OrderType>(
-    //                 SOURCE, &seg, nullptr
-    //             );
-    //             v_partition(node, v_cut);
-    //         }
-    //     }
-
-    //     if (node->get_trapezoid().get_bottom().orientation(seg.get_source()) == -1) {
-    //         if (node->get_trapezoid().seg_intersects_bottom(&seg)) {
-    //             auto intersection_cut = Cut<PointType, OrderType>(
-    //                 INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
-    //             );
-    //             v_partition(node, intersection_cut);
-    //         }
-    //     }
-
-    //     if (node->get_trapezoid().get_top().orientation(seg.get_source()) == 1) {
-    //         if (node->get_trapezoid().seg_intersects_top(&seg)) {
-    //             auto intersection_cut = Cut<PointType, OrderType>(
-    //                 INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
-    //             );
-    //             v_partition(node, intersection_cut);
-    //         }
-    //     }
-
-    //     if (node->get_trapezoid().get_bottom().orientation(seg.get_target()) == -1) {
-    //         if (node->get_trapezoid().seg_intersects_bottom(&seg)) {
-    //             auto intersection_cut = Cut<PointType, OrderType>(
-    //                 INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
-    //             );
-    //             v_partition(node, intersection_cut);
-    //         }
-    //     }
-
-    //     if (node->get_trapezoid().get_top().orientation(seg.get_target()) == 1) {
-    //         if (node->get_trapezoid().seg_intersects_top(&seg)) {
-    //             auto intersection_cut = Cut<PointType, OrderType>(
-    //                 INTERSECTION, &seg, node->get_trapezoid().get_top().get_segment()
-    //             );
-    //             v_partition(node, intersection_cut);
-    //         }
-    //     }
-
-    //     if (i == subdag_roots.size() - 1) {
-    //         if (node->contains_endpoint(&seg, 1)) {
-    //             auto v_cut = Cut<PointType, OrderType>(
-    //                 SOURCE, &seg, nullptr
-    //             );
-    //             v_partition(node, v_cut);
-    //         }
-    //     }
-
-    // }
 
     // make a first pass over affected roots to make
     // v-partition calls.
@@ -376,6 +309,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         auto node = subdag_roots[i];
         int v_part_count = 0;
 
+        // TODO: remove after support for overlapping segments is added
         if (node->get_trapezoid().get_top().has_on(&seg)
         || node->get_trapezoid().get_bottom().has_on(&seg)) {
             std::cout << "aha!\n";
@@ -394,8 +328,11 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 auto next = subdag_roots[i+1];
                 assert(next != nullptr);
 
+                // TODO: add support for common intersection points
+                // TODO: assertions for crossing/meeting segments
+
                 if (next->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()) {
-                auto intersection_cut = Cut<PointType, OrderType>(
+                    auto intersection_cut = Cut<PointType, OrderType>(
                         INTERSECTION, &seg, node->get_trapezoid().get_bottom().get_segment()
                     );
                     v_partition(node, intersection_cut);
@@ -513,7 +450,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 prev->set_right(node);
                 node->set_left(prev);
 
-                auto v_cut = prev->get_trapezoid().get_right();
+                auto& v_cut = prev->get_trapezoid().get_right();
 
                 //if (v_cut.defining_point_cut_comparison(e_cut) == 1) {
                 if (Cut<PointType, OrderType>::v_cut_edge_orientation(v_cut, e_cut) == 1) {

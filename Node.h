@@ -15,6 +15,7 @@ class Node {
         Node<PointType, OrderType>* A = nullptr;
         Node<PointType, OrderType>* B = nullptr;
 
+        // TODO: can save these pointers
         Node<PointType, OrderType>* left;
         Node<PointType, OrderType>* right;
 

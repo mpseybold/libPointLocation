@@ -1,0 +1,1 @@
+/usr/bin/c++   -pg -O3 -DNDEBUG   -pg -rdynamic CMakeFiles/main.dir/main.cpp.o CMakeFiles/main.dir/Point_2D.cpp.o CMakeFiles/main.dir/Cut.cpp.o CMakeFiles/main.dir/BoundingTrap.cpp.o  -o main  -lmpfr -lgmp 
