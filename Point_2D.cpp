@@ -27,12 +27,12 @@ int PointCart::line_orientation(
     Line_2 line = Line_2(source.get_cgal_point(), target.get_cgal_point());
 
     auto side = line.oriented_side(p.get_cgal_point());
-    double x_1 = CGAL::to_double(source.get_cgal_point().x());
-    double y_1 = CGAL::to_double(source.get_cgal_point().y());
-    double x_2 = CGAL::to_double(target.get_cgal_point().x());
-    double y_2 = CGAL::to_double(target.get_cgal_point().y());
-    double p_x = CGAL::to_double(p.get_cgal_point().x());
-    double p_y = CGAL::to_double(p.get_cgal_point().y());
+    // double x_1 = CGAL::to_double(source.get_cgal_point().x());
+    // double y_1 = CGAL::to_double(source.get_cgal_point().y());
+    // double x_2 = CGAL::to_double(target.get_cgal_point().x());
+    // double y_2 = CGAL::to_double(target.get_cgal_point().y());
+    // double p_x = CGAL::to_double(p.get_cgal_point().x());
+    // double p_y = CGAL::to_double(p.get_cgal_point().y());
 
 
 
