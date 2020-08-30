@@ -12,6 +12,9 @@ void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* 
     auto A = new Node<PointType, OrderType>(pos_neg.first);
     auto B = new Node<PointType, OrderType>(pos_neg.second);
 
+    A->set_leaf_below(B);
+    B->set_leaf_above(A);
+
     node->set_A(A);
     node->set_B(B);
     node->set_e(e_cut);

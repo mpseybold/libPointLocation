@@ -696,3 +696,4 @@ bool BoundingTrap<PointType, OrderType>::seg_intersects_bottom(Segment<PointType
 }
 
 template class BoundingTrap<PointCart, int>;
+template class BoundingTrap<PointS2ratss, int>;

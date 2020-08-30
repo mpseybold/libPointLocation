@@ -3,7 +3,7 @@
 // #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 // #include <CGAL/Line_2.h>
 #include "Cut.h"
-#include "Point_2D.h"
+// #include "Point_2D.h"
 #include "Node.h"
 #include "io.h"
 #include "TSD.h"
@@ -18,6 +18,7 @@
 #include <CGAL/Arrangement_2.h>
 #include <list>
 #include <CGAL/Arr_trapezoid_ric_point_location.h>
+// #include "Point_S2ratss.hpp"
 
 typedef CGAL::Arr_segment_traits_2<Kernel>            Traits_2;
 typedef Traits_2::Point_2                             Point_2;
@@ -26,27 +27,27 @@ typedef CGAL::Arrangement_2<Traits_2>                 Arrangement_2;
 typedef CGAL::Arr_trapezoid_ric_point_location<Arrangement_2> Ric;
 
 
-void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<PointCart, int>>& traps) {
-    if (node->is_leaf()) {
-        traps.push_back(node->get_trapezoid());
-    } else {
-        if (node->get_L() != nullptr) {
-            write_leaf_traps(node->get_L(), traps);
-        }
+// void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<PointCart, int>>& traps) {
+//     if (node->is_leaf()) {
+//         traps.push_back(node->get_trapezoid());
+//     } else {
+//         if (node->get_L() != nullptr) {
+//             write_leaf_traps(node->get_L(), traps);
+//         }
 
-        if (node->get_R() != nullptr) {
-            write_leaf_traps(node->get_R(), traps);
-        }
+//         if (node->get_R() != nullptr) {
+//             write_leaf_traps(node->get_R(), traps);
+//         }
 
-        if (node->get_A() != nullptr) {
-            write_leaf_traps(node->get_A(), traps);
-        }
+//         if (node->get_A() != nullptr) {
+//             write_leaf_traps(node->get_A(), traps);
+//         }
 
-        if (node->get_B() != nullptr) {
-            write_leaf_traps(node->get_B(), traps);
-        }
-    }
-}
+//         if (node->get_B() != nullptr) {
+//             write_leaf_traps(node->get_B(), traps);
+//         }
+//     }
+// }
 
 
 int main() {

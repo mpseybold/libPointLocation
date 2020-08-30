@@ -6,6 +6,7 @@
 #include "Cut.h"
 #include "BoundingTrap.h"
 #include <random>
+#include "Point_2D.h"
 
 namespace {
     Line_2 get_defining_line(Cut<PointCart, int> cut) {

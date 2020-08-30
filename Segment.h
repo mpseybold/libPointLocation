@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Point_2D.h"
+#include "Point_S2ratss.h"
 
 template <class PointType, class OrderType>
 class Segment {
@@ -16,7 +17,7 @@ class Segment {
     public:
 
         Segment(PointType s, PointType t, OrderType pri) : source(s), target(t), priority(pri) {
-            if (PointType::v_orientation(s, t) == 1) {
+            if (PointType::orientV(s, t) == 1) {
                 source = s;
                 target = t;
             } else {
@@ -28,12 +29,11 @@ class Segment {
             source_y = CGAL::to_double(source.get_cgal_point().y());
             target_x = CGAL::to_double(target.get_cgal_point().x());
             target_y = CGAL::to_double(target.get_cgal_point().y());
-
             // std::cout << CGAL::to_double(s.get_cgal_point().x()) << " " << CGAL::to_double(s.get_cgal_point().y()) << "\n";
         }
 
-        PointType get_source() { return source; }
-        PointType get_target() { return target; }
+        PointType& get_source() { return source; }
+        PointType& get_target() { return target; }
         OrderType get_priority() { return priority; }
 
         static int slope_comparison(
