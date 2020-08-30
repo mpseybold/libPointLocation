@@ -7,7 +7,6 @@ template <class PointType, class OrderType>
 class Node {
 
     private:
-
         Node<PointType, OrderType>* negative_child; // delete
         Node<PointType, OrderType>* positive_child; // delete
         Node<PointType, OrderType>* L = nullptr;
@@ -19,7 +18,10 @@ class Node {
         Node<PointType, OrderType>* left;
         Node<PointType, OrderType>* right;
 
-        
+        Node<PointType, OrderType>* leaf_above;
+        Node<PointType, OrderType>* leaf_below;
+        Node<PointType, OrderType>* leaf_left;
+        Node<PointType, OrderType>* leaf_right;
 
         DestructionCuts<PointType, OrderType> destruction_cuts;
         Cut<PointType, OrderType> destroying_cut;
@@ -145,6 +147,16 @@ class Node {
 
         void set_left(Node<PointType, OrderType>* _left) { left = _left; }
         void set_right(Node<PointType, OrderType>* _right) { right = _right; }
+
+        void set_leaf_above(Node<PointType, OrderType>* node) { leaf_above = node; }
+        void set_leaf_below(Node<PointType, OrderType>* node) { leaf_below = node; }
+        void set_leaf_left(Node<PointType, OrderType>* node) { leaf_left = node; }
+        void set_leaf_right(Node<PointType, OrderType>* node) { leaf_right = node; }
+
+        Node<PointType, OrderType>* get_leaf_above() { return leaf_above; }
+        Node<PointType, OrderType>* get_leaf_below() { return leaf_below; }
+        Node<PointType, OrderType>* get_leaf_left() { return leaf_left; }
+        Node<PointType, OrderType>* get_leaf_right() { return leaf_right; }
 
         //TODO: Implement this properly 
         DestructionPattern get_dest_pattern() { 

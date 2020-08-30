@@ -13,6 +13,9 @@ void TSD<PointType, OrderType>::v_part_handle_leaf_case(Node<PointType, OrderTyp
     auto L = new Node<PointType, OrderType>(pos_neg.second);
     auto R = new Node<PointType, OrderType>(pos_neg.first);
 
+    L->set_leaf_right(R);
+    R->set_leaf_left(L);
+
     node->set_v_1(v_cut);
     node->set_L(L);
     node->set_R(R);

@@ -19,6 +19,12 @@ class PointCart {
 
     public:
 
+        const static int EXTREME_LEFT = -10000;
+        const static int EXTREME_RIGHT = 10000;
+        const static int EXTREME_TOP = 10000;
+        const static int EXTREME_BOTTOM = -10000;
+        const static int EPS = 1;
+
         PointCart(double x, double y) {
             cgal_point = Point_2(x, y);
         }
@@ -33,20 +39,20 @@ class PointCart {
         // -1 if b is left of a
         // 0 if a and b conincide
         // 1 if b is right of a 
-        static int v_orientation(PointCart p, PointCart other_p);
+        static int orientV(PointCart p, PointCart other_p);
 
         // Determines the oriented side of the line through
         // source and target which contains p
         // -1 negative
         // 1 positive
         // 0 on the line
-        static int line_orientation(
+        static int orientE(
             PointCart source, PointCart target, PointCart p);
 
         // Detmines the oriented side of the vertical
         // line through the intersection of line(s1, t2)
         // and line line(s2, t2) which contains p
-        static int intersection_v_orientation(
+        static int orientV(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
             PointCart p
@@ -55,7 +61,7 @@ class PointCart {
         // Detmines the side of the line through the intersection 
         // of l(s, t) and l(s_1, t_1) contains the intersection of
         // l(s, t) and l(s_2, t_2)
-        static int intersection_orientation(
+        static int orientV(
             PointCart s, PointCart t,
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2
@@ -63,7 +69,7 @@ class PointCart {
 
         // compares vertical lines of intersection of l(s_1, t_1) and l(s_2, t_2)
         // with the intersection of l(s_3, t_3) and l(s_4, t_4)
-        static int intersection_v_orientation(
+        static int orientV(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
             PointCart s_3, PointCart t_3,
@@ -73,7 +79,7 @@ class PointCart {
         // detmines the side of l(s_1, t_1)
         // which contains the intersection
         // of l(s_2, t_2) and l(s_3, t_3)
-        static int intersection_line_orientation(
+        static int orientE(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
             PointCart s_3, PointCart t_3

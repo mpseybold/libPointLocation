@@ -4,25 +4,25 @@ template <class PointType, class OrderType>
 int Cut<PointType, OrderType>::orientation(PointType p) {
     
     if (cut_type == SOURCE) {
-        return PointType::v_orientation(
+        return PointType::orientV(
             segment->get_source(), p
         );
     }
 
     if (cut_type == TARGET) {
-        return PointType::v_orientation(
+        return PointType::orientV(
             segment->get_target(), p
         );
     }
 
     if (cut_type == EDGE) {
-        return PointType::line_orientation(
+        return PointType::orientE(
             segment->get_source(), segment->get_target(), p
         );
     }
 
     if (cut_type == INTERSECTION) {
-        return PointType::intersection_v_orientation(
+        return PointType::orientV(
             segment->get_source(), segment->get_target(),
             intersecting_seg->get_source(), intersecting_seg->get_target(),
             p
@@ -66,7 +66,7 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
 
     switch(other_cut.get_cut_type()) {
         case SOURCE: {
-            return -PointType::intersection_v_orientation(
+            return -PointType::orientV(
                 segment->get_source(), segment->get_target(),
                 intersecting_seg->get_source(), intersecting_seg->get_target(),
                 other_cut.get_segment()->get_source()
@@ -74,7 +74,7 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
             break;
         }
         case TARGET: {
-            return -PointType::intersection_v_orientation(
+            return -PointType::orientV(
                 segment->get_source(), segment->get_target(),
                 intersecting_seg->get_source(), intersecting_seg->get_target(),
                 other_cut.get_segment()->get_target()
@@ -82,7 +82,7 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
             break;
         }
         case INTERSECTION: {
-            return PointType::intersection_v_orientation(
+            return PointType::orientV(
                 other_cut.get_segment()->get_source(), other_cut.get_segment()->get_target(),
                 other_cut.get_intersecting_seg()->get_source(), other_cut.get_intersecting_seg()->get_target(),
                 segment->get_source(), segment->get_target(),
@@ -91,7 +91,7 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
             break;
         }
         case EDGE: {
-            return PointType::intersection_line_orientation(
+            return PointType::orientE(
                 other_cut.get_segment()->get_source(), other_cut.get_segment()->get_target(),
                 segment->get_source(), segment->get_target(),
                 intersecting_seg->get_source(), intersecting_seg->get_target()
@@ -143,3 +143,4 @@ int Cut<PointType, OrderType>::v_cut_edge_orientation(Cut<PointType, OrderType>&
 }
 
 template class Cut<PointCart, int>;
+template class Cut<PointS2ratss, int>;

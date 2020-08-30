@@ -30,7 +30,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             traps.push_back(node->get_B()->get_trapezoid());
         }
 
-        io::write_trapezoids(traps, "refinement_debug.dat");
+        // io::write_trapezoids(traps, "refinement_debug.dat");
     }
 
     
@@ -165,28 +165,40 @@ TSD<PointType, OrderType>::TSD() {
     trapezoid.set_top(
         Cut<PointType, OrderType>(
             EDGE, new Segment<PointType, OrderType>(
-                PointCart(-1000000, -20), PointCart(11000, -20), -1
+                PointType(PointType::EXTREME_LEFT + PointType::EPS, PointType::EXTREME_TOP - PointType::EPS),
+                PointType(PointType::EXTREME_RIGHT - PointType::EPS, PointType::EXTREME_TOP - PointType::EPS),
+                -1
+                // PointCart(-1000000, -20), PointCart(11000, -20), -1
             ), nullptr
         )
     );
     trapezoid.set_bottom(
         Cut<PointType, OrderType>(
             EDGE, new Segment<PointType, OrderType>(
-                PointCart(-200000, -23), PointCart(12000, -23), -1
+                PointType(PointType::EXTREME_LEFT + PointType::EPS, PointType::EXTREME_BOTTOM + PointType::EPS),
+                PointType(PointType::EXTREME_RIGHT - PointType::EPS, PointType::EXTREME_BOTTOM + PointType::EPS),
+                -1
+                // PointCart(-200000, -23), PointCart(12000, -23), -1
             ), nullptr
         )
     );
     trapezoid.set_left(
         Cut<PointType, OrderType>(
             TARGET, new Segment<PointType, OrderType>(
-                PointCart(110, -20), PointCart(164, -20), -1
+                PointType(PointType::EXTREME_LEFT - PointType::EPS, PointType::EXTREME_TOP - PointType::EPS),
+                PointType(PointType::EXTREME_LEFT, PointType::EXTREME_TOP - PointType::EPS),
+                -1
+                // PointCart(110, -20), PointCart(164, -20), -1
             ), nullptr
         )
     );
     trapezoid.set_right(
         Cut<PointType, OrderType>(
             SOURCE, new Segment<PointType, OrderType>(
-                PointCart(168, -20), PointCart(180, -20), -1
+                PointType(PointType::EXTREME_RIGHT - PointType::EPS, PointType::EXTREME_TOP - PointType::EPS),
+                PointType(PointType::EXTREME_RIGHT, PointType::EXTREME_TOP - PointType::EPS),
+                -1
+                // PointCart(168, -20), PointCart(180, -20), -1
             ), nullptr
         )
     );

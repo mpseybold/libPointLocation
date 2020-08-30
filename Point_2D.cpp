@@ -1,7 +1,7 @@
 #include "Point_2D.h"
 
 
-int PointCart::v_orientation(PointCart p, PointCart other_p) {
+int PointCart::orientV(PointCart p, PointCart other_p) {
     
     Point_2 p_cgal = p.get_cgal_point();
     Point_2 other_p_cgal = other_p.get_cgal_point();
@@ -18,7 +18,7 @@ int PointCart::v_orientation(PointCart p, PointCart other_p) {
     return 0;
 }
 
-int PointCart::line_orientation(
+int PointCart::orientE(
     PointCart source, PointCart target, PointCart p) {
 
     // if (source.x() == target.x())
@@ -49,7 +49,7 @@ int PointCart::line_orientation(
     throw std::logic_error("error: failed to compare point with line");
 }
 
-int PointCart::intersection_v_orientation(
+int PointCart::orientV(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
             PointCart p
@@ -83,7 +83,7 @@ int PointCart::intersection_v_orientation(
     return 0;
 }
 
-int PointCart::intersection_line_orientation(
+int PointCart::orientE(
     PointCart s_1, PointCart t_1,
     PointCart s_2, PointCart t_2,
     PointCart s_3, PointCart t_3
@@ -114,7 +114,7 @@ int PointCart::intersection_line_orientation(
     }
 }
 
-int PointCart::intersection_orientation(
+int PointCart::orientV(
             PointCart s, PointCart t,
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2
@@ -156,7 +156,7 @@ int PointCart::intersection_orientation(
     return 0;
 }
 
-int PointCart::intersection_v_orientation(
+int PointCart::orientV(
     PointCart s_1, PointCart t_1,
     PointCart s_2, PointCart t_2,
     PointCart s_3, PointCart t_3,
