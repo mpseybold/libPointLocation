@@ -180,6 +180,11 @@ class Node {
             this->R = R;
             this->A = A;
             this->B = B;
-        } 
+        }
 
+        bool is_flat() {
+            return trapezoid.get_top().has_on(
+                trapezoid.get_bottom().get_segment()
+            );
+        } 
 };

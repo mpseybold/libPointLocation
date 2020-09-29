@@ -25,6 +25,7 @@ endif()
 
 add_executable(Google_Tests_run
   ../Point_2D.cpp
+  ../Point_S2ratss.cpp
   geom_tests.cpp
   ../Cut.cpp
   cut_tests.cpp

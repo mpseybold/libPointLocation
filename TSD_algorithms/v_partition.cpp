@@ -8,6 +8,10 @@ void TSD<PointType, OrderType>::v_part_handle_leaf_case(Node<PointType, OrderTyp
     assert(node->get_R() == nullptr);
     assert(node->is_leaf());
 
+    if (node->is_flat()) {
+        std::cout << "flat node!...\n";
+    }
+
     auto trap = node->get_trapezoid();
     auto pos_neg = trap.destroy(v_cut);
     auto L = new Node<PointType, OrderType>(pos_neg.second);
@@ -30,6 +34,9 @@ void TSD<PointType, OrderType>::v_part_handle_V_case(Node<PointType, OrderType>*
     assert(node->get_e().get_cut_type() == NO_CUT);
     assert(node->get_v_1().get_cut_type() != NO_CUT && node->get_v_1().get_cut_type() != EDGE);
     assert(node->get_v_2().get_cut_type() == NO_CUT);
+    // std::vector<BoundingTrap<PointType, OrderType>> problems = std::vector<BoundingTrap<PointType, OrderType>>();
+    // problems.push_back(node->get_trapezoid());
+    // io::write_trapezoids(problems, "plotting/problematic_traps.dat");
     assert(v_cut.defining_point_cut_comparison(node->get_v_1()) == 1);
 
     auto r_trap = node->get_R()->get_trapezoid();

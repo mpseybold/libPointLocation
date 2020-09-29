@@ -79,6 +79,10 @@ class BoundingTrap {
 
         bool contains_segment(Segment<PointType, OrderType>* seg);
 
+        bool intersect_seg_trap(Segment<PointType, OrderType>* seg);
+        bool intersect_seg_biangle(Segment<PointType, OrderType>* seg);
+        bool intersect_seg_triangle(Segment<PointType, OrderType>* seg);
+
         bool intersects_segment(Segment<PointType, OrderType>* seg);
 
         bool contains_defining_point(Cut<PointType, OrderType> cut) { return true; }
@@ -88,4 +92,6 @@ class BoundingTrap {
         bool seg_intersects_top(Segment<PointType, OrderType>* seg);
 
         bool seg_intersects_bottom(Segment<PointType, OrderType>* seg);
+
+        bool is_degen();
 };
