@@ -1,7 +1,7 @@
 #include "TSD.h"
 // #include "io.h"
 
-#define VERBOSITY_LEVEL 1
+#define VERBOSITY_LEVEL 2
 
 
 // Returns the next priority descendants of 'node'
@@ -13,8 +13,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
 
-    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 151097 
-    && node->get_priority() > 70000) {
+    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 2) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
 
         if (node->get_L() != nullptr) {
@@ -30,7 +29,8 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             traps.push_back(node->get_B()->get_trapezoid());
         }
 
-        // io::write_trapezoids(traps, "refinement_debug.dat");
+        io::write_trapezoids(traps, "refinement_debug.dat");
+        std::cout << "wrote refinement traps...\n";
     }
 
     
@@ -108,7 +108,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                 //     }
                 // }
             }
-        } else {
+        } else if (slope_comp < 0) {
             if (node->get_B()->get_trapezoid().intersects_segment(seg))
                 intersecting_descendants[1] = node->get_B();
             // If A intersects the region to the right of
@@ -150,6 +150,11 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                     }
                 }
             }
+        } else {
+            if (node->get_A()->get_trapezoid().intersects_segment(seg))
+                intersecting_descendants[1] = node->get_A();
+            if (node->get_B()->get_trapezoid().intersects_segment(seg))
+                intersecting_descendants[1] = node->get_B();
         }
     }
 

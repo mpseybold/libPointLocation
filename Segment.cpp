@@ -6,5 +6,5 @@ bool Segment<PointType, OrderType>::operator==(Segment<PointType, OrderType>& ot
     PointType::orientV(target, other_seg.get_target()) == 0;
 }
 
-// template class Segment<PointCart, int>;
-// template class Segment<PointS2ratss, int>;
+template class Segment<PointCart, int>;
+template class Segment<PointS2ratss, int>;
