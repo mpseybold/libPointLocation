@@ -5,6 +5,7 @@
 // #include "geom.h"
 #include "BoundingTrap.h"
 #include <stack>
+#include <list>
 #include "io.h"
 
 template <class PointType, class OrderType>
@@ -41,6 +42,8 @@ class TSD {
         std::vector<Node<PointType, OrderType>*> subdag_roots;
         std::vector<Node<PointType, OrderType>*> visited_nodes;
         std::vector<Node<PointType, OrderType>*> partition_visited_nodes;
+
+        std::list<Cut<PointType, OrderType>> v_cuts;
 
     public:
 

@@ -54,6 +54,7 @@ class BoundingTrap {
         }
 
         void set_type(TrapType _type) { type = _type; }
+        TrapType get_type() { return type; }
 
         Cut<PointType, OrderType>& get_top() { return top; }
         Cut<PointType, OrderType>& get_bottom() { return bottom; }
@@ -78,7 +79,7 @@ class BoundingTrap {
         static BoundingTrap<PointType, OrderType> merge(BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2);
 
         bool contains_segment(Segment<PointType, OrderType>* seg);
-
+        bool intersect_corner(Segment<PointType, OrderType>* seg);
         bool intersect_seg_trap(Segment<PointType, OrderType>* seg);
         bool intersect_seg_biangle(Segment<PointType, OrderType>* seg);
         bool intersect_seg_triangle(Segment<PointType, OrderType>* seg);

@@ -27,6 +27,12 @@ void TSD<PointType, OrderType>::v_part_handle_leaf_case(Node<PointType, OrderTyp
 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::v_part_handle_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut) {
+    assert(node != nullptr);
+
+    if (node->is_flat()) {
+        return;
+    }
+
     assert(node->get_A() == nullptr);
     assert(node->get_B() == nullptr);
     assert(node->get_L() != nullptr);
