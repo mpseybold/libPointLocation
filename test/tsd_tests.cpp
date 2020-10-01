@@ -386,23 +386,34 @@ void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<Point
 TEST(TSDTests, leafInsertTest) {
     auto tsd = TSD<PointCart, int>();
 
-    Segment<PointCart, int> seg_1 = Segment<PointCart, int>(
-        PointCart(30, 50), PointCart(50, 50), 2
-    );
-
     Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
         PointCart(10, 50), PointCart(60, 50), 1
-    );
-
-    Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
-        PointCart(40, 80), PointCart(40, 10), 3
     );
     Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
         PointCart(0, 50), PointCart(100, 50), 4
     );
     Segment<PointCart, int> seg_5 = Segment<PointCart, int>(
-        PointCart(41, 80), PointCart(41, 10), 5
+        PointCart(1, 50), PointCart(99, 50), 5
     );
+    Segment<PointCart, int> seg_6 = Segment<PointCart, int>(
+        PointCart(2, 50), PointCart(98, 50), 6
+    );
+    Segment<PointCart, int> seg_7 = Segment<PointCart, int>(
+        PointCart(3, 50), PointCart(97, 50), 7
+    );
+    Segment<PointCart, int> seg_8 = Segment<PointCart, int>(
+        PointCart(4, 50), PointCart(96, 50), 8
+    );
+    Segment<PointCart, int> seg_1 = Segment<PointCart, int>(
+        PointCart(30, 50), PointCart(50, 50), 2
+    );
+
+    Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
+        PointCart(40, 80), PointCart(40, 10), 3
+    );
+    // Segment<PointCart, int> seg_5 = Segment<PointCart, int>(
+    //     PointCart(41, 80), PointCart(41, 10), 5
+    // );
     // Segment<PointCart, int> seg_6 = Segment<PointCart, int>(
     //     PointCart(3, 98), PointCart(97, 3), 6
     // );
@@ -471,13 +482,14 @@ TEST(TSDTests, leafInsertTest) {
 
     tsd.insert_segment(seg_2);
     tsd.insert_segment(seg_1);
-    tsd.affected_subdag_roots(&seg_3);
-    std::cout << tsd.get_subdag_roots().size() << "\n";
-    // tsd.insert_segment(seg_4);
-    // tsd.insert_segment(seg_5);
-    // tsd.insert_segment(seg_6);
-    // tsd.insert_segment(seg_7);
-    // tsd.insert_segment(seg_8);
+    tsd.insert_segment(seg_3);
+    // tsd.affected_subdag_roots(&seg_3);
+    // std::cout << tsd.get_subdag_roots().size() << "\n";
+    tsd.insert_segment(seg_4);
+    tsd.insert_segment(seg_5);
+    tsd.insert_segment(seg_6);
+    tsd.insert_segment(seg_7);
+    tsd.insert_segment(seg_8);
     // tsd.insert_segment(seg_9);
     // tsd.insert_segment(seg_10);
     // tsd.insert_segment(seg_11);

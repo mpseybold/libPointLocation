@@ -170,12 +170,8 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
 
         delete old_R;
     } else {
-        // auto seg = e_cut.get_segment();
-        // auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
-        // traps.push_back(node->get_trapezoid());
-        // io::write_trapezoids(traps, "debug.dat");
-        // bool right_test = node->get_R()->get_trapezoid().intersects_segment(e_cut.get_segment());
-        // bool left_test = !node->get_L()->get_trapezoid().intersects_segment(e_cut.get_segment());
+        if (node->is_flat())
+            return;
         assert(false);
     }
 }

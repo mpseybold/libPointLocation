@@ -51,7 +51,6 @@ typedef CGAL::Arr_trapezoid_ric_point_location<Arrangement_2> Ric;
 
 
 int main() {
-    
     auto new_calidonia = io::read_segments<PointCart, int>("new-caledonia-200601.plot.lonlat");
     
     TSD<PointCart, int> tsd = TSD<PointCart, int>();

@@ -36,8 +36,8 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
     
     if (node->get_L() != nullptr) 
         if (node->get_L()->get_trapezoid().intersects_segment(seg)) {
-            auto trap = node->get_L()->get_trapezoid();
-            auto val = trap.intersects_segment(seg);
+            // auto trap = node->get_L()->get_trapezoid();
+            // auto val = trap.intersects_segment(seg);
             intersecting_descendants[0] = node->get_L();
         }
     
@@ -327,11 +327,25 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         int v_part_count = 0;
 
         // TODO: remove after support for overlapping segments is added
-        if (node->get_trapezoid().get_top().has_on(&seg)
-        || node->get_trapezoid().get_bottom().has_on(&seg)) {
-            std::cout << "aha!\n";
-            return;
-        }
+        // if (node->get_trapezoid().get_top().has_on(&seg)
+        // || node->get_trapezoid().get_bottom().has_on(&seg)) {
+        //     std::cout << "aha!\n";
+        //     return;
+        // }
+        auto trapezoid = node->get_trapezoid();
+        // if (!node->is_flat() && (trapezoid.get_top().has_on(seg) 
+        // || trapezoid.get_bottom().has_on(seg)) && trapezoid.intersect_corner(seg)) {
+        //     auto right_cut = trapezoid.get_right();
+        //     auto left_cut = trapezoid.get_left();
+        //     auto aux_cut = Cut<PointType, OrderType>(EDGE, seg, nullptr);
+        //     if (right_cut.get_type() == INTERSECTION 
+        //     && right_cut.defining_point_cut_comparison(aux_cut) == 0) {
+        //         auto right_seg_cut = Cut<PointType, OrderType>(EDGE, right_cut.get_segment(), nullptr);
+        //         auto right_int_seg_cut = Cut<PointType, OrderType>(EDGE, right_cut.get_intersecting_seg(), nullptr);
+
+        //     }
+        // }
+
 
         if (i == 0) {
             if (node->contains_endpoint(&seg, 0)) {
@@ -446,43 +460,48 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     for (int i = 0; i < subdag_roots.size(); ++i) {
         auto node = subdag_roots[i];
         partition(node, e_cut);
-        
-        if (i > 0) {
-            auto prev = subdag_roots[i-1];
+        if (!node->is_flat()) {
 
-            // if (i == 3 && VERBOSITY_LEVEL >= 2) {
-            //     io::write_trapezoids({subdag_roots[i-1]->get_trapezoid(), subdag_roots[i]->get_trapezoid()}, "merge_debug.dat");
-            // }
+            if (i > 0) {
+                auto prev = subdag_roots[i-1];
 
-            bool right_left_match = prev->get_trapezoid().get_right() == node->get_trapezoid().get_left();
-            bool top_match = prev->get_trapezoid().get_top() == node->get_trapezoid().get_top();
-            bool bottom_match = prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom();
+                // if (i == 3 && VERBOSITY_LEVEL >= 2) {
+                //     io::write_trapezoids({subdag_roots[i-1]->get_trapezoid(), subdag_roots[i]->get_trapezoid()}, "merge_debug.dat");
+                // }
 
+                bool right_left_match = prev->get_trapezoid().get_right() == node->get_trapezoid().get_left();
+                bool top_match = prev->get_trapezoid().get_top() == node->get_trapezoid().get_top();
+                bool bottom_match = prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom();
+                bool not_pinched_trapezoids = 
+                !(prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() && prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom() 
+                && prev->get_trapezoid().get_bottom().has_on(prev->get_trapezoid().get_top().get_segment()));
 
-            if (prev->get_trapezoid().get_right() == node->get_trapezoid().get_left() &&
-            (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
-            prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom())) {
+                if (prev->get_trapezoid().get_right() == node->get_trapezoid().get_left() &&
+                (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
+                prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom())
+                && not_pinched_trapezoids) {
 
-                // set the pointers for v_merge
-                prev->set_right(node);
-                node->set_left(prev);
+                    // set the pointers for v_merge
+                    prev->set_right(node);
+                    node->set_left(prev);
 
-                auto& v_cut = prev->get_trapezoid().get_right();
+                    auto& v_cut = prev->get_trapezoid().get_right();
 
-                //if (v_cut.defining_point_cut_comparison(e_cut) == 1) {
-                if (Cut<PointType, OrderType>::v_cut_edge_orientation(v_cut, e_cut) == 1) {
-                    // merge below the segment
-                    if (merge_indices.size() > 0 && merge_indices.back().end_index == i-1 && merge_indices.back().side == -1) {
-                        merge_indices.back().end_index = i;
+                    //if (v_cut.defining_point_cut_comparison(e_cut) == 1) {
+                    if (Cut<PointType, OrderType>::v_cut_edge_orientation(v_cut, e_cut) == 1) {
+                        // merge below the segment
+                        if (merge_indices.size() > 0 && merge_indices.back().end_index == i-1 && merge_indices.back().side == -1) {
+                            merge_indices.back().end_index = i;
+                        } else {
+                            merge_indices.push_back(MergeIndices(i-1, i, -1));
+                        }
                     } else {
-                        merge_indices.push_back(MergeIndices(i-1, i, -1));
-                    }
-                } else {
-                    // merge above segment
-                    if (merge_indices.size() > 0 && merge_indices.back().end_index == i-1 && merge_indices.back().side == 1) {
-                        merge_indices.back().end_index = i;
-                    } else {
-                        merge_indices.push_back(MergeIndices(i-1, i, 1));
+                        // merge above segment
+                        if (merge_indices.size() > 0 && merge_indices.back().end_index == i-1 && merge_indices.back().side == 1) {
+                            merge_indices.back().end_index = i;
+                        } else {
+                            merge_indices.push_back(MergeIndices(i-1, i, 1));
+                        }
                     }
                 }
             }

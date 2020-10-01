@@ -306,6 +306,24 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_triangle(Segment<PointTyp
 }
 
 template <class PointType, class OrderType>
+bool BoundingTrap<PointType, OrderType>::intersect_corner(Segment<PointType, OrderType>* seg) {
+    if (left.get_cut_type() != INTERSECTION && right.get_cut_type() != INTERSECTION)
+        return false;
+
+    auto aux_cut = Cut<PointType, OrderType>(EDGE, seg, nullptr);
+
+    if (left.get_cut_type() == INTERSECTION) 
+        if (left.defining_point_cut_comparison(aux_cut) == 0)
+            return true;
+    
+    if (right.get_cut_type() == INTERSECTION) 
+        if (right.defining_point_cut_comparison(aux_cut) == 0)
+            return true;
+    
+    return false;
+}
+
+template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, OrderType>* seg) {
 
     Cut<PointType, OrderType> left_cut = left.get_cut_type() == NO_CUT 
