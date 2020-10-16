@@ -9,27 +9,27 @@ template <class PointType, class OrderType>
 
 class DestructionCuts {
     private:
-        Cut<PointType, OrderType> v_1;
-        Cut<PointType, OrderType> v_2;
-        Cut<PointType, OrderType> e;
+        Cut<PointType, OrderType>* v_1 = nullptr;
+        Cut<PointType, OrderType>* v_2 = nullptr;
+        Cut<PointType, OrderType>* e = nullptr;
 
     public:
         DestructionCuts() {
-            v_1 = Cut<PointType, OrderType>();
-            v_2 = Cut<PointType, OrderType>();
-            e = Cut<PointType, OrderType>();
+            v_1 = nullptr;
+            v_2 = nullptr;
+            e = nullptr;
         }
 
-        void set_v_1(Cut<PointType, OrderType> cut) {
-            assert(cut.get_cut_type() != EDGE && cut.get_cut_type() != NO_CUT);
+        void set_v_1(Cut<PointType, OrderType>* cut) {
+            assert(cut->get_cut_type() != EDGE && cut != nullptr);
             v_1 = cut;
         }
-        void set_v_2(Cut<PointType, OrderType> cut) {
-            assert(cut.get_cut_type() != EDGE && cut.get_cut_type() != NO_CUT);
+        void set_v_2(Cut<PointType, OrderType>* cut) {
+            assert(cut->get_cut_type() != EDGE && cut != nullptr);
             v_2 = cut;
         }
-        void set_e(Cut<PointType, OrderType> cut) {
-            assert(cut.get_cut_type() == EDGE);
+        void set_e(Cut<PointType, OrderType>* cut) {
+            assert(cut->get_cut_type() == EDGE);
             e = cut;
         }
 
@@ -37,9 +37,9 @@ class DestructionCuts {
             if (no_cuts())
                 return NO_DESTRUCTION;
 
-            if (v_1.get_cut_type() != NO_CUT) {
-                if (v_2.get_cut_type() != NO_CUT) {
-                    if (e.get_cut_type() != NO_CUT) {
+            if (v_1 != nullptr) {
+                if (v_2 != nullptr) {
+                    if (e != nullptr) {
                         return VVE;
                     } else {
                         return VV;
@@ -48,41 +48,41 @@ class DestructionCuts {
                     return V;
                 }
             } else {
-                if (v_2.get_cut_type() != NO_CUT) {
-                    if (e.get_cut_type() != NO_CUT) {
+                if (v_2 != nullptr) {
+                    if (e != nullptr) {
                         return EV;
                     } else {
                         throw std::logic_error("v_2 cannot be the only destruction cut");
                     }   
-                } else if (e.get_cut_type() != NO_CUT) {
+                } else if (e != nullptr) {
                     return E;
                 }
             }
         }
 
-        Cut<PointType, OrderType>& get_v_1() { return v_1; }
-        Cut<PointType, OrderType>& get_v_2() { return v_2; }
-        Cut<PointType, OrderType>& get_e() { return e; }
+        Cut<PointType, OrderType>* get_v_1() { return v_1; }
+        Cut<PointType, OrderType>* get_v_2() { return v_2; }
+        Cut<PointType, OrderType>* get_e() { return e; }
 
-        void clear_e() { e = Cut<PointType, OrderType>(); }
-        void clear_v_1() { v_1 = Cut<PointType, OrderType>(); }
-        void clear_v_2() { v_2 = Cut<PointType, OrderType>(); }
+        void clear_e() { e = nullptr; }
+        void clear_v_1() { v_1 = nullptr; }
+        void clear_v_2() { v_2 = nullptr; }
 
         bool no_cuts() {
-            return v_1.get_cut_type() == NO_CUT &&
-            v_2.get_cut_type() == NO_CUT &&
-            e.get_cut_type() == NO_CUT;
+            return v_1 == nullptr &&
+            v_2 == nullptr &&
+            e == nullptr;
         }
 
         OrderType priority() {
             if (no_cuts()) 
                 return 100000;
             
-            if (e.get_cut_type() != NO_CUT)
-                return e.get_priority();
-            if (v_1.get_cut_type() != NO_CUT)
-                return v_1.get_priority();
-            if (v_2.get_cut_type() != NO_CUT)
-                return v_2.get_priority();
+            if (e != nullptr)
+                return e->get_priority();
+            if (v_1 != nullptr)
+                return v_1->get_priority();
+            if (v_2 != nullptr)
+                return v_2->get_priority();
         }
 };

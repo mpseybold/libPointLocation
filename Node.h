@@ -24,7 +24,7 @@ class Node {
         Node<PointType, OrderType>* leaf_right;
 
         DestructionCuts<PointType, OrderType> destruction_cuts;
-        Cut<PointType, OrderType> destroying_cut;
+        // Cut<PointType, OrderType> destroying_cut;
         BoundingTrap<PointType, OrderType> trapezoid;
 
         bool visited = false;
@@ -43,9 +43,9 @@ class Node {
 
         DestructionCuts<PointType, OrderType>& get_destruction_cuts() { return destruction_cuts; }
 
-        void set_v_1(Cut<PointType, OrderType> cut) { destruction_cuts.set_v_1(cut); }
-        void set_v_2(Cut<PointType, OrderType> cut) { destruction_cuts.set_v_2(cut); }
-        void set_e(Cut<PointType, OrderType> cut) { destruction_cuts.set_e(cut); }
+        void set_v_1(Cut<PointType, OrderType>* cut) { destruction_cuts.set_v_1(cut); }
+        void set_v_2(Cut<PointType, OrderType>* cut) { destruction_cuts.set_v_2(cut); }
+        void set_e(Cut<PointType, OrderType>* cut) { destruction_cuts.set_e(cut); }
 
         void clear_e() { destruction_cuts.clear_e(); }
         void clear_v_1() { destruction_cuts.clear_v_1(); }
@@ -89,9 +89,9 @@ class Node {
             set_v_2(other->get_v_2());
         }
 
-        Cut<PointType, OrderType>& get_v_1() { return destruction_cuts.get_v_1(); }
-        Cut<PointType, OrderType>& get_v_2() { return destruction_cuts.get_v_2(); }
-        Cut<PointType, OrderType>& get_e() { return destruction_cuts.get_e(); }
+        Cut<PointType, OrderType>* get_v_1() { return destruction_cuts.get_v_1(); }
+        Cut<PointType, OrderType>* get_v_2() { return destruction_cuts.get_v_2(); }
+        Cut<PointType, OrderType>* get_e() { return destruction_cuts.get_e(); }
 
         bool is_leaf() { return destruction_cuts.no_cuts(); }
 
@@ -115,7 +115,7 @@ class Node {
         }
 
         bool contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint) {
-            assert(seg !=  nullptr);
+            assert(seg != nullptr);
             return trapezoid.contains_endpoint(seg, endpoint);
         }
 
@@ -126,7 +126,7 @@ class Node {
         bool seg_intersects_top(Segment<PointType, OrderType>* seg) { return trapezoid.seg_intersects_top(seg); }
         bool seg_intersects_bottom(Segment<PointType, OrderType>* seg) { return trapezoid.seg_intersects_bottom(seg); }
 
-        Cut<PointType, OrderType>& get_cut() { return destroying_cut; }
+        // Cut<PointType, OrderType>& get_cut() { return destroying_cut; }
         BoundingTrap<PointType, OrderType>& get_trapezoid() { return trapezoid; }
         Node<PointType, OrderType>* get_negative_child() { return negative_child; }
         Node<PointType, OrderType>* get_positive_child() { return positive_child; }
@@ -183,8 +183,8 @@ class Node {
         }
 
         bool is_flat() {
-            return trapezoid.get_top().has_on(
-                trapezoid.get_bottom().get_segment()
+            return trapezoid.get_top()->has_on(
+                trapezoid.get_bottom()->get_segment()
             );
         } 
 };

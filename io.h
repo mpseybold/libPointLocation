@@ -46,19 +46,19 @@ namespace {
 namespace io {
     void write_trapezoid(BoundingTrap<PointCart, int> trap, std::fstream& file) {
         std::vector<Cut<PointCart, int>> cuts = std::vector<Cut<PointCart, int>>();
-        cuts.push_back(trap.get_bottom());
-        if (trap.get_right().get_cut_type() != NO_CUT)
-            cuts.push_back(trap.get_right());
-        cuts.push_back(trap.get_top());
-        if (trap.get_left().get_cut_type() != NO_CUT)
-            cuts.push_back(trap.get_left());
+        cuts.push_back(*trap.get_bottom());
+        if (trap.get_right() != nullptr)
+            cuts.push_back(*(trap.get_right()));
+        cuts.push_back(*(trap.get_top()));
+        if (trap.get_left() != nullptr)
+            cuts.push_back(*(trap.get_left()));
 
-        auto top_seg = trap.get_top().get_segment();
+        auto top_seg = trap.get_top()->get_segment();
 
         if (top_seg->get_source().x() == top_seg->get_target().x())
             return;
 
-        auto bottom_seg = trap.get_bottom().get_segment();
+        auto bottom_seg = trap.get_bottom()->get_segment();
 
         if (bottom_seg->get_source().x() == bottom_seg->get_target().x())
             return;

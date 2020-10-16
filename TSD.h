@@ -16,24 +16,24 @@ class TSD {
         Node<PointType, OrderType>* root;
         std::vector<Segment<PointType, OrderType>> segments;
 
-        void v_part_handle_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);
-        void v_part_handle_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);
-        void v_part_handle_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);
-        void v_part_handle_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);
-        void v_part_handle_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);
-        void v_part_handle_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);
+        void v_part_handle_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
+        void v_part_handle_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
+        void v_part_handle_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
+        void v_part_handle_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
+        void v_part_handle_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
+        void v_part_handle_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
 
         Node<PointType, OrderType>* v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
         Node<PointType, OrderType>* v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
         Node<PointType, OrderType>* v_merge_equal_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
 
-        void partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);
-        void partition_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);
-        void partition_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);
-        void partition_VV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);
-        void partition_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);
-        void partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);        
-        void partition_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut);
+        void partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+        void partition_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+        void partition_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+        void partition_VV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+        void partition_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+        void partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);        
+        void partition_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
         
         void search_refinement(Segment<PointType, OrderType>* seg, Node<PointType, OrderType>* node);
 
@@ -44,6 +44,8 @@ class TSD {
         std::vector<Node<PointType, OrderType>*> partition_visited_nodes;
 
         std::list<Cut<PointType, OrderType>> v_cuts;
+
+        int leaf_count;
 
     public:
 
@@ -60,11 +62,13 @@ class TSD {
 
         Node<PointType, OrderType>* v_merge(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
 
-        void v_partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& v_cut);        
+        void v_partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);        
 
         Node<PointType, OrderType>* merge(Node<PointType, OrderType>* below, Node<PointType, OrderType>* above);
 
-        void partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& cut);
+        void partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut);
+
+        int get_leaf_count() { return leaf_count; }
 };
 
 #include "TSD.cpp"

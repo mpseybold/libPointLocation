@@ -3,9 +3,13 @@
 
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
+void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
     assert(node != nullptr);
-    assert(e_cut.get_cut_type() == EDGE);
+    assert(e_cut != nullptr);
+    assert(e_cut->get_cut_type() == EDGE);
+
+    if (node->is_flat())
+        std::cout << "edge part flat\n";
 
     auto trap = node->get_trapezoid();
     auto pos_neg = trap.destroy(e_cut);
@@ -20,10 +24,12 @@ void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* 
     node->set_e(e_cut);
     node->toggle_partition_visited();
     partition_visited_nodes.push_back(node);
+
+    leaf_count++;
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
+void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
     // assert(node != nullptr);
     // assert(e_cut.get_cut_type() == EDGE);
     // assert(node->get_A() != nullptr);
@@ -129,19 +135,20 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
-    assert(e_cut.get_cut_type() == EDGE);
+void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
+    assert(e_cut != nullptr);
+    assert(e_cut->get_cut_type() == EDGE);
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_A() == nullptr);
     assert(node->get_B() == nullptr);
-    assert(node->get_e().get_cut_type() == NO_CUT);
-    assert(node->get_v_1().get_cut_type() != NO_CUT && node->get_v_1().get_cut_type() != EDGE);
-    assert(node->get_v_2().get_cut_type() == NO_CUT);
+    assert(node->get_e() == nullptr);
+    assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
+    assert(node->get_v_2() == nullptr);
 
 
-    if (node->get_L()->get_trapezoid().intersects_segment(e_cut.get_segment()) 
-    && !node->get_R()->get_trapezoid().intersects_segment(e_cut.get_segment())) {
+    if (node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment()) 
+    && !node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment())) {
     // if (node->get_v_1().orientation(e_cut.get_segment()->get_target()) < 1) {
 
         partition(node->get_L(), e_cut);
@@ -156,8 +163,8 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
 
         delete old_L;
 
-    } else if (node->get_R()->get_trapezoid().intersects_segment(e_cut.get_segment()) 
-    && !node->get_L()->get_trapezoid().intersects_segment(e_cut.get_segment())) {
+    } else if (node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment()) 
+    && !node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment())) {
     // } else {
 
         partition(node->get_R(), e_cut);
@@ -177,16 +184,17 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
-    assert(e_cut.get_cut_type() == EDGE);
+void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
+    assert(e_cut != nullptr);
+    assert(e_cut->get_cut_type() == EDGE);
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_A() != nullptr);
     assert(node->get_B() == nullptr);
-    assert(node->get_e().get_cut_type() == NO_CUT);
-    assert(node->get_v_1().get_cut_type() != NO_CUT && node->get_v_1().get_cut_type() != EDGE);
-    assert(node->get_v_2().get_cut_type() != NO_CUT && node->get_v_2().get_cut_type() != EDGE);
-    assert(node->get_A()->get_trapezoid().intersects_segment(e_cut.get_segment()));
+    assert(node->get_e() == nullptr);
+    assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
+    assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
+    assert(node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()));
 
     auto old_A = node->get_A();
 
@@ -199,22 +207,22 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
+void TSD<PointType, OrderType>::partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
 
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
+void TSD<PointType, OrderType>::partition_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
 
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& e_cut) {
+void TSD<PointType, OrderType>::partition_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
 
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>& cut) {
+void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut) {
     //TODO: Implement this function.
 
     assert(node != nullptr);

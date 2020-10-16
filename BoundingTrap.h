@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cut.h"
+#include <list>
 
 enum TrapType { BRTL, BTL, BRT, NONE };
 
@@ -9,64 +10,88 @@ class BoundingTrap {
 
     private:
     
-        Cut<PointType, OrderType> top, bottom, left, right;
+        Cut<PointType, OrderType>* top = nullptr;
+        Cut<PointType, OrderType>* bottom = nullptr;
+        Cut<PointType, OrderType>* left = nullptr;
+        Cut<PointType, OrderType>* right = nullptr;
 
         TrapType type;
 
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> 
-        vertical_destruction(Cut<PointType, OrderType> cut);
+        vertical_destruction(Cut<PointType, OrderType>* cut);
 
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> 
-        edge_destruction(Cut<PointType, OrderType> cut);
+        edge_destruction(Cut<PointType, OrderType>* cut);
 
         int trap_cut_region(Segment<PointType, OrderType>* seg, int endpoint);
         std::pair<int, int> trap_cut_regions(Segment<PointType, OrderType>* seg);
 
+        Cut<PointType, OrderType>& _top() { return *top; }
+        Cut<PointType, OrderType>& _bottom() { return *bottom; }
+        Cut<PointType, OrderType>& _left() { return *left; }
+        Cut<PointType, OrderType>& _right() { return *right; }
+
     public:
 
         BoundingTrap(
-            Cut<PointType, OrderType> bottom,
-            Cut<PointType, OrderType> right,
-            Cut<PointType, OrderType> top,
-            Cut<PointType, OrderType> left
-        ) : top(top), bottom(bottom), left(left), right(right){ 
-            if (left.get_cut_type() == NO_CUT) {
-                assert(right.get_cut_type() != NO_CUT);
-                assert(top.get_cut_type() != NO_CUT);
-                assert(bottom.get_cut_type() != NO_CUT);
+            Cut<PointType, OrderType>* _bottom,
+            Cut<PointType, OrderType>* _right,
+            Cut<PointType, OrderType>* _top,
+            Cut<PointType, OrderType>* _left
+        ) : top(_top), bottom(_bottom), left(_left), right(_right){ 
+            if (left == nullptr) {
+            // if ((*left).get_cut_type() == NO_CUT) {
+                // assert((*right).get_cut_type() != NO_CUT);
+                // assert((*top).get_cut_type() != NO_CUT);
+                // assert((*bottom).get_cut_type() != NO_CUT);
+                assert(right != nullptr);
+                assert(top != nullptr);
+                assert(bottom != nullptr);
                 type = BRT;
-            } else if (right.get_cut_type() == NO_CUT) {
-                assert(left.get_cut_type() != NO_CUT);
-                assert(top.get_cut_type() != NO_CUT);
-                assert(bottom.get_cut_type() != NO_CUT);
+            } else if (right == nullptr) {
+            // } else if ((*right).get_cut_type() == NO_CUT) {
+                // assert((*left).get_cut_type() != NO_CUT);
+                // assert((*top).get_cut_type() != NO_CUT);
+                // assert((*bottom).get_cut_type() != NO_CUT);
+                assert(left != nullptr);
+                assert(top != nullptr);
+                assert(bottom != nullptr);
                 type = BTL;
             } else {
-                assert(left.get_cut_type() != NO_CUT);
-                assert(right.get_cut_type() != NO_CUT);
-                assert(top.get_cut_type() != NO_CUT);
-                assert(bottom.get_cut_type() != NO_CUT);
+                // assert((*left).get_cut_type() != NO_CUT);
+                // assert((*right).get_cut_type() != NO_CUT);
+                // assert((*top).get_cut_type() != NO_CUT);
+                // assert((*bottom).get_cut_type() != NO_CUT);
+                assert(left != nullptr);
+                assert(right != nullptr);
+                assert(top != nullptr);
+                assert(bottom != nullptr);
                 type = BRTL;
             } 
         }
 
         BoundingTrap() { 
             type = TrapType::NONE;
+            left = nullptr;
+            right = nullptr;
+            top = nullptr;
+            bottom = nullptr;
         }
 
         void set_type(TrapType _type) { type = _type; }
         TrapType get_type() { return type; }
 
-        Cut<PointType, OrderType>& get_top() { return top; }
-        Cut<PointType, OrderType>& get_bottom() { return bottom; }
-        Cut<PointType, OrderType>& get_left() { return left; }
-        Cut<PointType, OrderType>& get_right() { return right; }
+        Cut<PointType, OrderType>* get_top() { return top; }
+        Cut<PointType, OrderType>* get_bottom() { return bottom; }
+        Cut<PointType, OrderType>* get_left() { return left; }
+        Cut<PointType, OrderType>* get_right() { return right; }
 
-        void set_top(Cut<PointType, OrderType> cut) { top = cut; }
-        void set_bottom(Cut<PointType, OrderType> cut) { bottom = cut; }
-        void set_right(Cut<PointType, OrderType> cut) { right = cut; }
-        void set_left(Cut<PointType, OrderType> cut) { left = cut; }
+        void set_top(Cut<PointType, OrderType>* cut) { top = cut; }
+        void set_bottom(Cut<PointType, OrderType>* cut) { bottom = cut; }
+        void set_right(Cut<PointType, OrderType>* cut) { right = cut; }
+        void set_left(Cut<PointType, OrderType>* cut) { left = cut; }
 
-        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(Cut<PointType, OrderType> cut);
+        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(Cut<PointType, OrderType>* cut);
 
         static BoundingTrap<PointType, OrderType> vertical_merge(
             BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
