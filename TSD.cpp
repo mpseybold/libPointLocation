@@ -322,6 +322,15 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     affected_subdag_roots(&seg);
 
+    //debug
+
+    auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
+    for (auto node: subdag_roots) {
+        traps.push_back(node->get_trapezoid());
+    }
+    io::write_trapezoids(traps, "subdag_roots.dat");
+    //end debug
+
     auto e_cut = new Cut<PointType, OrderType>(
         EDGE, &seg, nullptr
     );

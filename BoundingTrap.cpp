@@ -362,10 +362,12 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
                 return true;
             }
         } else {
-            if (top->has_seg_on_neg_side(seg) && top->has_seg_on_neg_side(seg)) {
+            if (top->has_seg_on_neg_side(seg) && top->has_seg_on_pos_side(seg)) {
                 if (top_intersection->defining_point_cut_comparison(*left_cut) == 1
                 && top_intersection->defining_point_cut_comparison(*right_cut) == -1) {
                     return true;
+                } else {
+                    return false;
                 }
             }
         }
@@ -936,7 +938,7 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, Or
 
     bottom_test = bottom->orientation(p) == 1
     || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 1)
-    || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 0 && *(bottom->get_segment()) < *seg);;
+    || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 0 && *(bottom->get_segment()) < *seg);
 
     if (right == nullptr)
         right_test = true;
