@@ -388,19 +388,19 @@ TEST(TSDTests, overlappingTests) {
     auto tsd = TSD<PointCart, int>();
 
     Segment<PointCart, int> seg_1 = Segment<PointCart, int>(
-        PointCart(10, 10), PointCart(90, 10), 1
+        PointCart(10, 50), PointCart(90, 50), 1
     );
 
     Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
-        PointCart(20, 10), PointCart(80, 10), 2
+        PointCart(15, 55), PointCart(85, 45), 2
     );
 
     Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
-        PointCart(50, 90), PointCart(50, 5), 3
+        PointCart(30, 70), PointCart(70, 30), 3
     );
 
     Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
-        PointCart(50, 100), PointCart(50, 0), 4
+        PointCart(20, 85), PointCart(80, 15), 4
     );
 
     tsd.insert_segment(seg_1);
@@ -408,7 +408,11 @@ TEST(TSDTests, overlappingTests) {
     tsd.insert_segment(seg_3);
     // tsd.insert_segment(seg_4);
 
-    ASSERT_EQ(tsd.get_leaf_count(), 12);
+    auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    write_leaf_traps(tsd.get_root(), traps);
+    io::write_trapezoids(traps, "leaf_insert.dat");
+
+    ASSERT_EQ(tsd.get_leaf_count(), 18);
 }
 
 TEST(TSDTests, leafInsertTest) {
@@ -474,41 +478,41 @@ TEST(TSDTests, leafInsertTest) {
     //     PointCart(3, 89), PointCart(99.999, 89), 14
     // );
 
-    std::mt19937 generator (1235);
-    std::uniform_real_distribution<double> dis(0.0, 1.0);
+    // std::mt19937 generator (1235);
+    // std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    auto segments = std::vector<Segment<PointCart, int>>();
+    // auto segments = std::vector<Segment<PointCart, int>>();
 
-    std::cout << "start...\n";
-    for (int i = 1; i <= 16; ++i) {
+    // std::cout << "start...\n";
+    // for (int i = 1; i <= 16; ++i) {
 
-        // std::cout << i << std::endl;
+    //     // std::cout << i << std::endl;
         
-        PointCart s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
-        PointCart t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+    //     PointCart s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+    //     PointCart t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
 
-        while (s.x() == t.x() && s.y() == t.y())
-            t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+    //     while (s.x() == t.x() && s.y() == t.y())
+    //         t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
 
-        auto seg = new Segment<PointCart, int>(s, t, i); 
+    //     auto seg = new Segment<PointCart, int>(s, t, i); 
 
-        // std::cout << seg->get_source().x() << " " << seg->get_source().y()
-        //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+    //     // std::cout << seg->get_source().x() << " " << seg->get_source().y()
+    //     //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
 
-        if (i == 100) {
-            std::cout << seg->get_source().x() << " " << seg->get_source().y()
-            << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
-            tsd.affected_subdag_roots(seg);
-            std::vector<BoundingTrap<PointCart, int>> roots = std::vector<BoundingTrap<PointCart, int>>();
-            for (auto node: tsd.get_subdag_roots()) {
-                roots.push_back(node->get_trapezoid());
-            }
-            io::write_trapezoids(roots, "plotting/roots.dat");
-            // tsd.insert_segment(*seg);
-        } else {
-            tsd.insert_segment(*seg);
-        }
-    }
+    //     if (i == 100) {
+    //         std::cout << seg->get_source().x() << " " << seg->get_source().y()
+    //         << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+    //         tsd.affected_subdag_roots(seg);
+    //         std::vector<BoundingTrap<PointCart, int>> roots = std::vector<BoundingTrap<PointCart, int>>();
+    //         for (auto node: tsd.get_subdag_roots()) {
+    //             roots.push_back(node->get_trapezoid());
+    //         }
+    //         io::write_trapezoids(roots, "plotting/roots.dat");
+    //         // tsd.insert_segment(*seg);
+    //     } else {
+    //         tsd.insert_segment(*seg);
+    //     }
+    // }
     // std::cout << "end...\n";
 
     // tsd.insert_segment(seg_2);
@@ -529,19 +533,19 @@ TEST(TSDTests, leafInsertTest) {
     // tsd.insert_segment(seg_14);
     // tsd.affected_subdag_roots(&seg_12);
 
-    auto subdag_traps = std::vector<BoundingTrap<PointCart,int>>();
-    for (auto node: tsd.get_subdag_roots()) {
-        subdag_traps.push_back(node->get_trapezoid());
-    }
+    // auto subdag_traps = std::vector<BoundingTrap<PointCart,int>>();
+    // for (auto node: tsd.get_subdag_roots()) {
+    //     subdag_traps.push_back(node->get_trapezoid());
+    // }
 
-    io::write_trapezoids(subdag_traps, "plotting/subdag_roots_2.dat");
+    // io::write_trapezoids(subdag_traps, "plotting/subdag_roots_2.dat");
 
-    ASSERT_FALSE(tsd.get_root()->is_leaf());
-    ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
+    // ASSERT_FALSE(tsd.get_root()->is_leaf());
+    // ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
 
-    auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    // auto traps = std::vector<BoundingTrap<PointCart, int>>();
 
-    write_leaf_traps(tsd.get_root(), traps);
+    // write_leaf_traps(tsd.get_root(), traps);
 
-    io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
+    // io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
 }
