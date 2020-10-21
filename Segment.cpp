@@ -7,4 +7,4 @@ bool Segment<PointType, OrderType>::operator==(Segment<PointType, OrderType>& ot
 }
 
 template class Segment<PointCart, int>;
-template class Segment<PointS2ratss, int>;
+// template class Segment<PointS2ratss, int>;

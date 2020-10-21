@@ -1,17 +1,17 @@
 #include "Cut.h"
 
 template <class PointType, class OrderType>
-int Cut<PointType, OrderType>::orientation(PointType p) {
+int Cut<PointType, OrderType>::orientation(PointType p, bool shear) {
     
     if (cut_type == SOURCE) {
         return PointType::orientV(
-            segment->get_source(), p
+            segment->get_source(), p, shear
         );
     }
 
     if (cut_type == TARGET) {
         return PointType::orientV(
-            segment->get_target(), p
+            segment->get_target(), p, shear
         );
     }
 
@@ -25,7 +25,7 @@ int Cut<PointType, OrderType>::orientation(PointType p) {
         return PointType::orientV(
             segment->get_source(), segment->get_target(),
             intersecting_seg->get_source(), intersecting_seg->get_target(),
-            p
+            p, shear
         );
     }
 
@@ -53,22 +53,22 @@ bool Cut<PointType, OrderType>::operator== (Cut<PointType, OrderType>& other_cut
 
 template <class PointType, class OrderType>
 int Cut<PointType, OrderType>::defining_point_cut_comparison(
-    Cut<PointType, OrderType> other_cut) {
+    Cut<PointType, OrderType> other_cut, bool shear) {
     
     assert(cut_type != EDGE);
 
     if (cut_type == SOURCE)
-        return other_cut.orientation(segment->get_source());
+        return other_cut.orientation(segment->get_source(), shear);
 
     if (cut_type == TARGET)
-        return other_cut.orientation(segment->get_target());
+        return other_cut.orientation(segment->get_target(), shear);
 
     switch(other_cut.get_cut_type()) {
         case SOURCE: {
             return -PointType::orientV(
                 segment->get_source(), segment->get_target(),
                 intersecting_seg->get_source(), intersecting_seg->get_target(),
-                other_cut.get_segment()->get_source()
+                other_cut.get_segment()->get_source(), shear
             );
             break;
         }
@@ -76,7 +76,7 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
             return -PointType::orientV(
                 segment->get_source(), segment->get_target(),
                 intersecting_seg->get_source(), intersecting_seg->get_target(),
-                other_cut.get_segment()->get_target()
+                other_cut.get_segment()->get_target(), shear
             );
             break;
         }
@@ -85,7 +85,8 @@ int Cut<PointType, OrderType>::defining_point_cut_comparison(
                 other_cut.get_segment()->get_source(), other_cut.get_segment()->get_target(),
                 other_cut.get_intersecting_seg()->get_source(), other_cut.get_intersecting_seg()->get_target(),
                 segment->get_source(), segment->get_target(),
-                intersecting_seg->get_source(), intersecting_seg->get_target()
+                intersecting_seg->get_source(), intersecting_seg->get_target(),
+                shear
             );
             break;
         }
@@ -142,4 +143,4 @@ int Cut<PointType, OrderType>::v_cut_edge_orientation(Cut<PointType, OrderType>&
 }
 
 template class Cut<PointCart, int>;
-template class Cut<PointS2ratss, int>;
+// template class Cut<PointS2ratss, int>;

@@ -309,24 +309,53 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_triangle(Segment<PointTyp
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::intersect_corner(Segment<PointType, OrderType>* seg) {
-    if ((left == nullptr || left->get_cut_type() != INTERSECTION) && (right == nullptr || right->get_cut_type() != INTERSECTION))
+    if (top->has_on(seg) || bottom->has_on(seg))
         return false;
 
-    auto aux_cut = Cut<PointType, OrderType>(EDGE, seg, nullptr);
+    auto left_cut = left != nullptr ? *left :
+    Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
+    auto right_cut = right != nullptr ? *right :
+    Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
+    
+    auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
+    auto bottom_int = Cut<PointType, OrderType>(INTERSECTION, bottom->get_segment(), seg);
 
-    if (left->get_cut_type() == INTERSECTION) 
-        if (left->defining_point_cut_comparison(aux_cut) == 0)
+    // test top left corner
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *top->get_segment()) != 0 &&
+        top_int.defining_point_cut_comparison(left_cut, false) == 0 &&
+        top->orientation(seg->get_target()) > -1 &&
+        left_cut.orientation(seg->get_source(), false) < 1)
             return true;
-    
-    if (right->get_cut_type() == INTERSECTION) 
-        if (right->defining_point_cut_comparison(aux_cut) == 0)
+
+    // test bottom left corner
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom->get_segment()) != 0 &&
+        bottom_int.defining_point_cut_comparison(left_cut, false) == 0 &&
+        bottom->orientation(seg->get_target()) < 1 &&
+        left_cut.orientation(seg->get_source(), false) < 1)
             return true;
-    
+
+    // test top right corner
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *top->get_segment()) != 0 &&
+        top_int.defining_point_cut_comparison(right_cut, false) == 0 &&
+        top->orientation(seg->get_source()) > -1 &&
+        right_cut.orientation(seg->get_target(), false) > -1)
+            return true;
+
+    // test bottom right corner
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom->get_segment()) != 0 &&
+        bottom_int.defining_point_cut_comparison(right_cut, false) == 0 &&
+        bottom->orientation(seg->get_source()) < 1 &&
+        right_cut.orientation(seg->get_target(), false) > -1)
+            return true;
+
     return false;
 }
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, OrderType>* seg) {
+
+    if (intersect_corner(seg))
+        return false;
 
     Cut<PointType, OrderType> _left_cut = left == nullptr 
     ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
@@ -351,8 +380,8 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
     );
     auto bottom_intersection = &b_intersection;
 
-    if (left_cut->orientation(seg->get_source()) == 0 && right_cut->orientation(seg->get_target()) == 0)
-        return true;
+    // if (left_cut->orientation(seg->get_source()) == 0 && right_cut->orientation(seg->get_target()) == 0)
+    //     return true;
 
     // First handle 'flat' trapezoids.
     if (top->has_on(bottom->get_segment())) {
@@ -1023,4 +1052,4 @@ bool BoundingTrap<PointType, OrderType>::is_degen() {
 }
 
 template class BoundingTrap<PointCart, int>;
-template class BoundingTrap<PointS2ratss, int>;
+// template class BoundingTrap<PointS2ratss, int>;

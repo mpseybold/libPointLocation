@@ -1,7 +1,7 @@
 #include "Point_2D.h"
 
 
-int PointCart::orientV(PointCart p, PointCart other_p) {
+int PointCart::orientV(PointCart p, PointCart other_p, bool shear) {
     
     Point_2 p_cgal = p.get_cgal_point();
     Point_2 other_p_cgal = other_p.get_cgal_point();
@@ -10,10 +10,12 @@ int PointCart::orientV(PointCart p, PointCart other_p) {
         return -1;
     if (p_cgal.x() < other_p_cgal.x())
         return 1;
-    if (p_cgal.y() < other_p_cgal.y())
-        return -1;
-    if (p_cgal.y() > other_p_cgal.y())
-        return 1;
+    if (shear) {
+        if (p_cgal.y() < other_p_cgal.y())
+            return -1;
+        if (p_cgal.y() > other_p_cgal.y())
+            return 1;
+    }
 
     return 0;
 }
@@ -52,7 +54,7 @@ int PointCart::orientE(
 int PointCart::orientV(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
-            PointCart p
+            PointCart p, bool shear
         ) {
 
     Line_2 line1 = Line_2(s_1.get_cgal_point(), t_1.get_cgal_point());
@@ -75,11 +77,12 @@ int PointCart::orientV(
         return -1;
     if (p.x() > ip.x())
         return 1;
-    if (p.y() < ip.y())
-        return 1;
-    if (p.y() > ip.y())
-        return -1;
-    
+    if (shear) {
+        if (p.y() < ip.y())
+            return 1;
+        if (p.y() > ip.y())
+            return -1;
+    }
     return 0;
 }
 
@@ -117,7 +120,8 @@ int PointCart::orientE(
 int PointCart::orientV(
             PointCart s, PointCart t,
             PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2
+            PointCart s_2, PointCart t_2,
+            bool shear
         ) {
 
     Line_2 line = Line_2(s.get_cgal_point(), t.get_cgal_point());
@@ -148,11 +152,12 @@ int PointCart::orientV(
         return -1;
     if (ip_2.x() > ip_1.x())
         return 1;
-    if (ip_2.y() > ip_1.y())
-        return -1;
-    if (ip_2.y() < ip_1.y())
-        return 1;
-
+    if (shear) {
+        if (ip_2.y() > ip_1.y())
+            return -1;
+        if (ip_2.y() < ip_1.y())
+            return 1;
+    }
     return 0;
 }
 
@@ -160,7 +165,8 @@ int PointCart::orientV(
     PointCart s_1, PointCart t_1,
     PointCart s_2, PointCart t_2,
     PointCart s_3, PointCart t_3,
-    PointCart s_4, PointCart t_4
+    PointCart s_4, PointCart t_4,
+    bool shear
 ) {
     Line_2 line_1 = Line_2(s_1.get_cgal_point(), t_1.get_cgal_point());
     Line_2 line_2 = Line_2(s_2.get_cgal_point(), t_2.get_cgal_point());
@@ -190,11 +196,12 @@ int PointCart::orientV(
         return 1;
     if (ip_1.x() > ip_2.x())
         return -1;
-    if (ip_1.y() < ip_2.y())
-        return -1;
-    if (ip_1.y() > ip_2.y())
-        return 1;
-
+    if (shear) {
+        if (ip_1.y() < ip_2.y())
+            return -1;
+        if (ip_1.y() > ip_2.y())
+            return 1;
+    }
     return 0;
 }
 
