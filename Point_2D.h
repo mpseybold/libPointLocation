@@ -39,7 +39,7 @@ class PointCart {
         // -1 if b is left of a
         // 0 if a and b conincide
         // 1 if b is right of a 
-        static int orientV(PointCart p, PointCart other_p);
+        static int orientV(PointCart p, PointCart other_p, bool shear=true);
 
         // Determines the oriented side of the line through
         // source and target which contains p
@@ -55,7 +55,7 @@ class PointCart {
         static int orientV(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
-            PointCart p
+            PointCart p, bool shear=true
         );
         
         // Detmines the side of the line through the intersection 
@@ -64,7 +64,8 @@ class PointCart {
         static int orientV(
             PointCart s, PointCart t,
             PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2
+            PointCart s_2, PointCart t_2,
+            bool shear=true
         );
 
         // compares vertical lines of intersection of l(s_1, t_1) and l(s_2, t_2)
@@ -73,7 +74,8 @@ class PointCart {
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2,
             PointCart s_3, PointCart t_3,
-            PointCart s_4, PointCart t_4
+            PointCart s_4, PointCart t_4,
+            bool shear=true
         );
 
         // detmines the side of l(s_1, t_1)

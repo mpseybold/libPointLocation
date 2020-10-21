@@ -40,7 +40,7 @@ class Cut {
 
         OrderType get_priority() { return segment->get_priority(); }
 
-        int orientation(PointType p);
+        int orientation(PointType p, bool shear=true);
 
         int orientation(Segment<PointType, OrderType>* seg, int endpoint) {
             assert(cut_type == EDGE);
@@ -57,7 +57,7 @@ class Cut {
             return orientation(p);
         }
 
-        int defining_point_cut_comparison(Cut<PointType, OrderType> other_cut);
+        int defining_point_cut_comparison(Cut<PointType, OrderType> other_cut, bool shear=true);
 
         //TODO: implement this properly
         bool intersects_segment(Segment<PointType, OrderType>* seg) { return true; }
