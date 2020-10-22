@@ -57,6 +57,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
         assert(right->is_leaf());
         delete left;
         delete right;
+        leaf_count--;
         return new_node;
     }
     

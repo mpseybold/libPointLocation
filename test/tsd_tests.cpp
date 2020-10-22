@@ -392,21 +392,21 @@ TEST(TSDTests, overlappingTests) {
     );
 
     Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
-        PointCart(15, 55), PointCart(85, 45), 2
+        PointCart(15, 50), PointCart(85, 50), 3
     );
 
     Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
-        PointCart(30, 70), PointCart(70, 30), 3
+        PointCart(30, 70), PointCart(70, 30), 2
     );
 
     Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
-        PointCart(20, 85), PointCart(80, 15), 4
+        PointCart(20, 80), PointCart(80, 20), 4
     );
 
     tsd.insert_segment(seg_1);
-    tsd.insert_segment(seg_2);
     tsd.insert_segment(seg_3);
-    // tsd.insert_segment(seg_4);
+    tsd.insert_segment(seg_2);
+    tsd.insert_segment(seg_4);
 
     auto traps = std::vector<BoundingTrap<PointCart, int>>();
     write_leaf_traps(tsd.get_root(), traps);

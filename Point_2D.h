@@ -16,6 +16,8 @@ class PointCart {
 
     private:
         Point_2 cgal_point;
+        double X;
+        double Y;
 
     public:
 
@@ -26,6 +28,8 @@ class PointCart {
         const static int EPS = 1;
 
         PointCart(double x, double y) {
+            X = x;
+            Y = y;
             cgal_point = Point_2(x, y);
         }
 

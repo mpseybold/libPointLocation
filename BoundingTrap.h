@@ -105,6 +105,7 @@ class BoundingTrap {
 
         bool contains_segment(Segment<PointType, OrderType>* seg);
         bool intersect_corner(Segment<PointType, OrderType>* seg);
+        bool through_corner(Segment<PointType, OrderType>* seg);
         bool intersect_seg_trap(Segment<PointType, OrderType>* seg);
         bool intersect_seg_biangle(Segment<PointType, OrderType>* seg);
         bool intersect_seg_triangle(Segment<PointType, OrderType>* seg);
