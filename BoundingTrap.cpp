@@ -71,11 +71,33 @@ BoundingTrap<PointType, OrderType>::edge_destruction(Cut<PointType, OrderType>* 
         case BRTL: {
             // TODO: add some assertions for safety
 
-            new_trap_pos =
-            BoundingTrap<PointType, OrderType>(cut, right, top, left);
+            if (Segment<PointType, OrderType>::slope_comparison(*cut->get_segment(), *cut->get_segment()) != 0) {
+                auto intersection = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), cut->get_segment());
 
-            new_trap_neg =
-            BoundingTrap<PointType, OrderType>(bottom, right, cut, left);
+                if (left != nullptr && intersection.defining_point_cut_comparison(*left) == 0) {
+                    new_trap_pos = BoundingTrap<PointType, OrderType>(cut, right, top, nullptr);
+                } else if (right != nullptr && intersection.defining_point_cut_comparison(*right) == 0) {
+                    new_trap_pos = BoundingTrap<PointType, OrderType>(cut, nullptr, top, left);
+                } else {
+                    new_trap_pos = BoundingTrap<PointType, OrderType>(cut, right, top, left);
+                }
+            } else {
+                new_trap_pos = BoundingTrap<PointType, OrderType>(cut, right, top, left);
+            }
+
+            if (Segment<PointType, OrderType>::slope_comparison(*bottom->get_segment(), *cut->get_segment()) != 0) {
+                auto intersection = Cut<PointType, OrderType>(INTERSECTION, bottom->get_segment(), cut->get_segment());
+
+                if (left != nullptr && intersection.defining_point_cut_comparison(*left) == 0) {
+                    new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, right, cut, nullptr);
+                } else if (right != nullptr && intersection.defining_point_cut_comparison(*right) == 0) {
+                    new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, nullptr, cut, left);
+                } else {
+                    new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, right, cut, left);
+                }
+            } else {
+                new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, right, cut, left);
+            }
 
             break;
         }
@@ -304,6 +326,42 @@ std::pair<int, int> BoundingTrap<PointType, OrderType>::trap_cut_regions(Segment
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::intersect_seg_triangle(Segment<PointType, OrderType>* seg) {
+    return false;
+}
+
+template <class PointType, class OrderType>
+bool BoundingTrap<PointType, OrderType>::through_corner(Segment<PointType, OrderType>* seg) {
+    if (top->has_on(seg) || bottom->has_on(seg))
+        return false;
+
+    auto left_cut = left != nullptr ? *left :
+    Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
+    auto right_cut = right != nullptr ? *right :
+    Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
+    
+    auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
+    auto bottom_int = Cut<PointType, OrderType>(INTERSECTION, bottom->get_segment(), seg);
+
+    // test top left
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *top->get_segment()) != 0 &&
+        top_int.defining_point_cut_comparison(left_cut) == 0)
+        return true;
+
+    // test top right
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *top->get_segment()) != 0 &&
+        top_int.defining_point_cut_comparison(right_cut) == 0)
+        return true;
+
+    // test bottom left
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom->get_segment()) != 0 &&
+        bottom_int.defining_point_cut_comparison(left_cut) == 0)
+        return true;
+
+    // test bottom right
+    if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom->get_segment()) != 0 &&
+        bottom_int.defining_point_cut_comparison(right_cut) == 0)
+        return true;
+
     return false;
 }
 
