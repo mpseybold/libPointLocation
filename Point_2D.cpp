@@ -95,6 +95,7 @@ int PointCart::orientE(
     Line_2 line_2 = Line_2(s_2.get_cgal_point(), t_2.get_cgal_point());
     Line_2 line_3 = Line_2(s_3.get_cgal_point(), t_3.get_cgal_point());
 
+
     auto intersection = CGAL::intersection(line_2, line_3);
     Point_2 ip;
 

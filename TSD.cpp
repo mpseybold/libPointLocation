@@ -33,6 +33,15 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
         std::cout << "wrote refinement traps...\n";
     }
 
+    auto A_right = node->get_A() != nullptr && node->get_A()->get_trapezoid().get_right() != nullptr ?
+    *(node->get_A()->get_trapezoid().get_right()) : 
+    Cut<PointType, OrderType>(INTERSECTION, 
+    node->get_A()->get_trapezoid().get_top()->get_segment(), node->get_A()->get_trapezoid().get_bottom()->get_segment());
+
+    auto B_right = node->get_B() != nullptr && node->get_B()->get_trapezoid().get_right() != nullptr ?
+    *(node->get_B()->get_trapezoid().get_right()) : 
+    Cut<PointType, OrderType>(INTERSECTION, 
+    node->get_B()->get_trapezoid().get_top()->get_segment(), node->get_B()->get_trapezoid().get_bottom()->get_segment());
     
     if (node->get_L() != nullptr) 
         if (node->get_L()->get_trapezoid().intersects_segment(seg)) {
@@ -60,10 +69,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             // nodes' trapezoid, we don't check for the intersection
             // here to ensure the nodes are reported in the
             // correct order.
-            if (node->get_A()->get_trapezoid().get_right()
-            ->defining_point_cut_comparison(
-                *(node->get_B()->get_trapezoid().get_right())
-            ) > -1) {
+            if (A_right.defining_point_cut_comparison(B_right) > -1) {
                 if (node->get_B()->get_trapezoid().intersects_segment(seg)) {
                     intersecting_descendants[2] = node->get_B();
                 }
@@ -73,17 +79,15 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                     auto seg_intersection = Cut<PointType, OrderType>(
                         INTERSECTION, seg, node->get_e()->get_segment()
                     );
-                    if (seg_intersection.defining_point_cut_comparison(
-                        *(node->get_A()->get_trapezoid().get_right())
-                    ) == -1) {
+                    if (seg_intersection.defining_point_cut_comparison(A_right) == -1) {
                         if (node->get_B()->get_trapezoid().intersects_segment(seg))
                             intersecting_descendants[2] = node->get_B();
                     }
                 } else {
                     if ((node->get_B()->get_trapezoid().contains_endpoint(seg, 0)
-                        && node->get_A()->get_trapezoid().get_right()->orientation(seg->get_source()) == -1)
+                        && A_right.orientation(seg->get_source()) == -1)
                         || (node->get_B()->get_trapezoid().contains_endpoint(seg, 1)
-                        && node->get_A()->get_trapezoid().get_right()->orientation(seg->get_target()) == -1)
+                        && A_right.orientation(seg->get_target()) == -1)
                     ) {
                         if (node->get_B()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_B();
@@ -115,12 +119,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             // nodes' trapezoid, we don't check for the intersection
             // here to ensure the nodes are reported in the
             // correct order.
-            if (node->get_A()->get_trapezoid().get_right() != nullptr &&
-                node->get_B()->get_trapezoid().get_right() != nullptr &&
-                node->get_A()->get_trapezoid().get_right()
-            ->defining_point_cut_comparison(
-                *(node->get_B()->get_trapezoid().get_right())
-            ) < 1) {
+            if (A_right.defining_point_cut_comparison(B_right) < 1) {
                 if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
                     intersecting_descendants[2] = node->get_A();
                 }
@@ -139,9 +138,9 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                     }
                 } else {
                     if ((node->get_A()->get_trapezoid().contains_endpoint(seg, 0)
-                        && node->get_B()->get_trapezoid().get_right()->orientation(seg->get_source()) == -1)
+                        && B_right.orientation(seg->get_source()) == -1)
                         || (node->get_A()->get_trapezoid().contains_endpoint(seg, 1)
-                        && node->get_B()->get_trapezoid().get_right()->orientation(seg->get_target()) == -1)
+                        && B_right.orientation(seg->get_target()) == -1)
                     ) {
                         if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_A();
@@ -477,6 +476,10 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 v_part_count++;
             }
         }
+    }
+
+    if (seg.get_priority() == 16) {
+        std::cout << "hello\n";
     }
 
     // second pass over affected roots
