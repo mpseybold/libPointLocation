@@ -484,7 +484,7 @@ TEST(TSDTests, leafInsertTest) {
     // auto segments = std::vector<Segment<PointCart, int>>();
 
     // std::cout << "start...\n";
-    // for (int i = 1; i <= 16; ++i) {
+    // for (int i = 1; i <= 18; ++i) {
 
     //     // std::cout << i << std::endl;
         
@@ -498,7 +498,9 @@ TEST(TSDTests, leafInsertTest) {
 
     //     // std::cout << seg->get_source().x() << " " << seg->get_source().y()
     //     //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
-
+    //     if (i == 16) {
+    //         std::cout << "hello\n";
+    //     }
     //     if (i == 100) {
     //         std::cout << seg->get_source().x() << " " << seg->get_source().y()
     //         << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";

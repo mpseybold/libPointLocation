@@ -194,6 +194,8 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
     assert(node->get_e() == nullptr);
     assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
     assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
+    if (!node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()))
+        std::cout << "hello\n";
     assert(node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()));
 
     auto old_A = node->get_A();
