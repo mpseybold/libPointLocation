@@ -214,245 +214,245 @@
     // ASSERT_TRUE(e_merge_result.get_top() == top_cut);
 // }
 
-TEST(BoundingTrapTests, segmentIntersectionTests) {
-    Segment<PointCart, int> left_seg = Segment<PointCart, int>(
-        PointCart(-1, 0.5), PointCart(0, 0.5), 1
-    );
-    Segment<PointCart, int> right_seg = Segment<PointCart, int>(
-        PointCart(1, 0.5), PointCart(2, 0.5), 1
-    );
-    Segment<PointCart, int> top_seg = Segment<PointCart, int>(
-        PointCart(-2, 1), PointCart(6, 1), 1
-    );
-    Segment<PointCart, int> bottom_seg = Segment<PointCart, int>(
-        PointCart(-3, 0), PointCart(7, 0), 1
-    );
+// TEST(BoundingTrapTests, segmentIntersectionTests) {
+//     Segment<PointCart, int> left_seg = Segment<PointCart, int>(
+//         PointCart(-1, 0.5), PointCart(0, 0.5), 1
+//     );
+//     Segment<PointCart, int> right_seg = Segment<PointCart, int>(
+//         PointCart(1, 0.5), PointCart(2, 0.5), 1
+//     );
+//     Segment<PointCart, int> top_seg = Segment<PointCart, int>(
+//         PointCart(-2, 1), PointCart(6, 1), 1
+//     );
+//     Segment<PointCart, int> bottom_seg = Segment<PointCart, int>(
+//         PointCart(-3, 0), PointCart(7, 0), 1
+//     );
 
-    auto left_cut = new Cut<PointCart, int>(
-        TARGET, &left_seg, nullptr
-    );
-    auto right_cut = new Cut<PointCart, int>(
-        SOURCE, &right_seg, nullptr
-    );
-    auto top_cut = new Cut<PointCart, int>(
-        EDGE, &top_seg, nullptr
-    );
-    auto bottom_cut = new Cut<PointCart, int>(
-        EDGE, &bottom_seg, nullptr
-    );
+//     auto left_cut = new Cut<PointCart, int>(
+//         TARGET, &left_seg, nullptr
+//     );
+//     auto right_cut = new Cut<PointCart, int>(
+//         SOURCE, &right_seg, nullptr
+//     );
+//     auto top_cut = new Cut<PointCart, int>(
+//         EDGE, &top_seg, nullptr
+//     );
+//     auto bottom_cut = new Cut<PointCart, int>(
+//         EDGE, &bottom_seg, nullptr
+//     );
 
-    BoundingTrap<PointCart, int> trap = BoundingTrap<PointCart, int>(
-        bottom_cut, right_cut, top_cut, left_cut
-    );
+//     BoundingTrap<PointCart, int> trap = BoundingTrap<PointCart, int>(
+//         bottom_cut, right_cut, top_cut, left_cut
+//     );
 
-    Segment<PointCart, int> non_intersecting_1 = Segment<PointCart, int>(
-        PointCart(-5, 10), PointCart(-5, 5), 1
-    );
-    Segment<PointCart, int> intersecting_1 = Segment<PointCart, int>(
-        PointCart(0.5, 10), PointCart(0.5, -10), 1
-    );
+//     Segment<PointCart, int> non_intersecting_1 = Segment<PointCart, int>(
+//         PointCart(-5, 10), PointCart(-5, 5), 1
+//     );
+//     Segment<PointCart, int> intersecting_1 = Segment<PointCart, int>(
+//         PointCart(0.5, 10), PointCart(0.5, -10), 1
+//     );
 
-    Segment<PointCart, int> non_intersecting_2 = Segment<PointCart, int>(
-        PointCart(0.1, 1.0001), PointCart(0.9, 1.00001), 1
-    );
-    Segment<PointCart, int> intersecting_2 = Segment<PointCart, int>(
-        PointCart(0.1, 0.5), PointCart(1.5, 0.5), 1
-    );
+//     Segment<PointCart, int> non_intersecting_2 = Segment<PointCart, int>(
+//         PointCart(0.1, 1.0001), PointCart(0.9, 1.00001), 1
+//     );
+//     Segment<PointCart, int> intersecting_2 = Segment<PointCart, int>(
+//         PointCart(0.1, 0.5), PointCart(1.5, 0.5), 1
+//     );
 
-    Segment<PointCart, int> non_intersecting_3 = Segment<PointCart, int>(
-        PointCart(0.5, 1), PointCart(1, 2), 1
-    );
+//     Segment<PointCart, int> non_intersecting_3 = Segment<PointCart, int>(
+//         PointCart(0.5, 1), PointCart(1, 2), 1
+//     );
 
-    Segment<PointCart, int> intersecting_3 = Segment<PointCart, int>(
-        PointCart(0, 1), PointCart(0, 0), 1
-    );
+//     Segment<PointCart, int> intersecting_3 = Segment<PointCart, int>(
+//         PointCart(0, 1), PointCart(0, 0), 1
+//     );
 
-    Segment<PointCart, int> intersecting_4 = Segment<PointCart, int>(
-        PointCart(0, 0.4), PointCart(0, 0), 1
-    );
+//     Segment<PointCart, int> intersecting_4 = Segment<PointCart, int>(
+//         PointCart(0, 0.4), PointCart(0, 0), 1
+//     );
 
-    Segment<PointCart, int> intersecting_5 = Segment<PointCart, int>(
-        PointCart(1, 1), PointCart(1, 0.5), 1
-    );
+//     Segment<PointCart, int> intersecting_5 = Segment<PointCart, int>(
+//         PointCart(1, 1), PointCart(1, 0.5), 1
+//     );
 
-    Segment<PointCart, int> intersecting_6 = Segment<PointCart,int>(
-        PointCart(0, 0.4), PointCart(0, 0.2), 1
-    );
+//     Segment<PointCart, int> intersecting_6 = Segment<PointCart,int>(
+//         PointCart(0, 0.4), PointCart(0, 0.2), 1
+//     );
 
-    Segment<PointCart, int> non_intersecting_4 = Segment<PointCart, int>(
-        PointCart(0.5, 0), PointCart(1, -1), 1
-    );
+//     Segment<PointCart, int> non_intersecting_4 = Segment<PointCart, int>(
+//         PointCart(0.5, 0), PointCart(1, -1), 1
+//     );
 
-    Segment<PointCart, int> non_intersecting_5 = Segment<PointCart, int>(
-        PointCart(0, 1), PointCart(0, 0.8), 1
-    );
+//     Segment<PointCart, int> non_intersecting_5 = Segment<PointCart, int>(
+//         PointCart(0, 1), PointCart(0, 0.8), 1
+//     );
 
-    Segment<PointCart, int> non_intersecting_6 = Segment<PointCart, int>(
-        PointCart(1, 0.5), PointCart(1, 0), 1
-    );
+//     Segment<PointCart, int> non_intersecting_6 = Segment<PointCart, int>(
+//         PointCart(1, 0.5), PointCart(1, 0), 1
+//     );
 
-    Segment<PointCart, int> not_sure = Segment<PointCart, int>(
-        PointCart(0.5, 1), PointCart(1.5, 1), 1
-    );
+//     Segment<PointCart, int> not_sure = Segment<PointCart, int>(
+//         PointCart(0.5, 1), PointCart(1.5, 1), 1
+//     );
 
-    ASSERT_FALSE(trap.intersects_segment(&non_intersecting_1));
-    ASSERT_FALSE(trap.intersects_segment(&non_intersecting_2));
-    ASSERT_FALSE(trap.intersects_segment(&non_intersecting_3));
-    ASSERT_FALSE(trap.intersects_segment(&non_intersecting_4));
-    ASSERT_FALSE(trap.intersects_segment(&non_intersecting_5));
-    ASSERT_FALSE(trap.intersects_segment(&non_intersecting_6));
+//     ASSERT_FALSE(trap.intersects_segment(&non_intersecting_1));
+//     ASSERT_FALSE(trap.intersects_segment(&non_intersecting_2));
+//     ASSERT_FALSE(trap.intersects_segment(&non_intersecting_3));
+//     ASSERT_FALSE(trap.intersects_segment(&non_intersecting_4));
+//     ASSERT_FALSE(trap.intersects_segment(&non_intersecting_5));
+//     ASSERT_FALSE(trap.intersects_segment(&non_intersecting_6));
 
-    ASSERT_TRUE(trap.intersects_segment(&intersecting_1));
-    ASSERT_TRUE(trap.intersects_segment(&intersecting_2));
-    // ASSERT_TRUE(trap.intersects_segment(&intersecting_3));
-    // ASSERT_TRUE(trap.intersects_segment(&intersecting_4));
-    // ASSERT_TRUE(trap.intersects_segment(&intersecting_5));
-    ASSERT_TRUE(trap.intersects_segment(&intersecting_6));
+//     ASSERT_TRUE(trap.intersects_segment(&intersecting_1));
+//     ASSERT_TRUE(trap.intersects_segment(&intersecting_2));
+//     // ASSERT_TRUE(trap.intersects_segment(&intersecting_3));
+//     // ASSERT_TRUE(trap.intersects_segment(&intersecting_4));
+//     // ASSERT_TRUE(trap.intersects_segment(&intersecting_5));
+//     ASSERT_TRUE(trap.intersects_segment(&intersecting_6));
 
-    Segment<PointCart, int> top_seg_degen = Segment<PointCart, int>(
-        PointCart(0, 2), PointCart(0, -1), 1
-    );
+//     Segment<PointCart, int> top_seg_degen = Segment<PointCart, int>(
+//         PointCart(0, 2), PointCart(0, -1), 1
+//     );
 
-    auto top_cut_degen = new Cut<PointCart, int>(
-        EDGE, &top_seg_degen, nullptr
-    );
+//     auto top_cut_degen = new Cut<PointCart, int>(
+//         EDGE, &top_seg_degen, nullptr
+//     );
 
-    // BoundingTrap<PointCart, int> degen_trap = BoundingTrap<PointCart, int>(
-    //     bottom_cut, nullptr, 
-    //     top_cut_degen, left_cut
-    // );
+//     // BoundingTrap<PointCart, int> degen_trap = BoundingTrap<PointCart, int>(
+//     //     bottom_cut, nullptr, 
+//     //     top_cut_degen, left_cut
+//     // );
 
-    // Segment<PointCart, int> intersecting_degen_1 = Segment<PointCart, int>(
-    //     PointCart(-3, 0.4), PointCart(3, 0.4), 1
-    // );
+//     // Segment<PointCart, int> intersecting_degen_1 = Segment<PointCart, int>(
+//     //     PointCart(-3, 0.4), PointCart(3, 0.4), 1
+//     // );
 
-    // Segment<PointCart, int> intersecting_degen_2 = Segment<PointCart, int>(
-    //     PointCart(0, 0.4), PointCart(0, 0.2), 1
-    // );
+//     // Segment<PointCart, int> intersecting_degen_2 = Segment<PointCart, int>(
+//     //     PointCart(0, 0.4), PointCart(0, 0.2), 1
+//     // );
 
-    // Segment<PointCart, int> intersecting_degen_3 = Segment<PointCart, int>(
-    //     PointCart(-2, 0.4), PointCart(0, 0.4), 1
-    // );
-    // Segment<PointCart, int> intersecting_degen_4 = Segment<PointCart, int>(
-    //     PointCart(0, 4), PointCart(0, -4), 1
-    // );
+//     // Segment<PointCart, int> intersecting_degen_3 = Segment<PointCart, int>(
+//     //     PointCart(-2, 0.4), PointCart(0, 0.4), 1
+//     // );
+//     // Segment<PointCart, int> intersecting_degen_4 = Segment<PointCart, int>(
+//     //     PointCart(0, 4), PointCart(0, -4), 1
+//     // );
 
-    // Segment<PointCart, int> non_intersecting_degen_1 = Segment<PointCart, int>(
-    //     PointCart(-3, 0.6), PointCart(3, 0.6), 1
-    // );
+//     // Segment<PointCart, int> non_intersecting_degen_1 = Segment<PointCart, int>(
+//     //     PointCart(-3, 0.6), PointCart(3, 0.6), 1
+//     // );
 
-    // Segment<PointCart, int> non_intersecting_degen_2 = Segment<PointCart, int>(
-    //     PointCart(-3, 0.5), PointCart(3, 0.5), 1
-    // );
+//     // Segment<PointCart, int> non_intersecting_degen_2 = Segment<PointCart, int>(
+//     //     PointCart(-3, 0.5), PointCart(3, 0.5), 1
+//     // );
 
-    // Segment<PointCart, int> non_intersecting_degen_3 = Segment<PointCart, int>(
-    //     PointCart(0, 0.8), PointCart(0, 0.6), 1
-    // );
+//     // Segment<PointCart, int> non_intersecting_degen_3 = Segment<PointCart, int>(
+//     //     PointCart(0, 0.8), PointCart(0, 0.6), 1
+//     // );
 
-    // Segment<PointCart, int> non_intersecting_degen_4 = Segment<PointCart, int>(
-    //     PointCart(-2, 0.5), PointCart(0, 0.5), 1
-    // );
-
-
-    // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_1));
-    // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_2));
-    // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_3));
-    // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_4));
-    // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_1));
-    // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_2));
-    // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_3));
-    // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_4));
-}
-
-TEST(BoundingTrapTests, intersectSegTrapTests) {
-
-    Segment<PointCart, int> query_seg_0 = Segment<PointCart, int>(
-        PointCart(-10, 1), PointCart(10, 1), 5
-    );
-
-    Segment<PointCart, int> top_seg = Segment<PointCart, int>(
-        PointCart(0, 1), PointCart(1, 1), 1
-    );
-
-    Segment<PointCart, int> bottom_seg = Segment<PointCart, int>(
-        PointCart(0, 0), PointCart(1, 0), 2
-    );
-
-    Segment<PointCart, int> left_seg = Segment<PointCart, int>(
-        PointCart(-1, 0.5), PointCart(0, 0.5), 3
-    );
-
-    Segment<PointCart, int> right_seg = Segment<PointCart, int>(
-        PointCart(1, 0.5), PointCart(2, 0.5), 4
-    );
-
-    auto bottom_cut = new Cut<PointCart, int>(
-        EDGE, &bottom_seg, nullptr
-    );
-
-    auto top_cut = new Cut<PointCart, int>(
-        EDGE, &top_seg, nullptr
-    );
-
-    auto left_cut = new Cut<PointCart, int>(
-        TARGET, &left_seg, nullptr
-    );
-
-    auto right_cut = new Cut<PointCart, int>(
-        SOURCE, &right_seg, nullptr
-    );
-
-    BoundingTrap<PointCart, int> trap = BoundingTrap<PointCart, int>(
-        bottom_cut, right_cut, top_cut, left_cut
-    );
-
-    Segment<PointCart, int> query_seg_1 = Segment<PointCart, int>(
-        PointCart(-10, 0), PointCart(10, 0), 5
-    );
-
-    Segment<PointCart, int> query_seg_2 = Segment<PointCart, int>(
-        PointCart(-10, 1), PointCart(10, 1), 5
-    );
+//     // Segment<PointCart, int> non_intersecting_degen_4 = Segment<PointCart, int>(
+//     //     PointCart(-2, 0.5), PointCart(0, 0.5), 1
+//     // );
 
 
-    ASSERT_TRUE(bottom_seg < query_seg_1);
-    ASSERT_TRUE(trap.intersect_seg_trap(&query_seg_0));
-    ASSERT_TRUE(trap.intersect_seg_trap(&query_seg_1));
-    ASSERT_FALSE(trap.intersect_seg_trap(&query_seg_2));
+//     // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_1));
+//     // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_2));
+//     // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_3));
+//     // ASSERT_FALSE(degen_trap.intersects_segment(&non_intersecting_degen_4));
+//     // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_1));
+//     // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_2));
+//     // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_3));
+//     // ASSERT_TRUE(degen_trap.intersects_segment(&intersecting_degen_4));
+// }
 
-    // Testing triangles
-    Segment<PointCart, int> tri_top_seg = Segment<PointCart, int>(
-        PointCart(0, 1), PointCart(2, -1), 7
-    );
+// TEST(BoundingTrapTests, intersectSegTrapTests) {
 
-    auto tri_top_cut = new Cut<PointCart, int>(
-        EDGE, &tri_top_seg, nullptr
-    );
+//     Segment<PointCart, int> query_seg_0 = Segment<PointCart, int>(
+//         PointCart(-10, 1), PointCart(10, 1), 5
+//     );
 
-    BoundingTrap<PointCart, int> triangle = BoundingTrap<PointCart, int>(
-        bottom_cut, nullptr, tri_top_cut, left_cut
-    );
+//     Segment<PointCart, int> top_seg = Segment<PointCart, int>(
+//         PointCart(0, 1), PointCart(1, 1), 1
+//     );
 
-    ASSERT_TRUE(triangle.intersect_seg_trap(&query_seg_1));
-    ASSERT_FALSE(triangle.intersect_seg_trap(&query_seg_2));
+//     Segment<PointCart, int> bottom_seg = Segment<PointCart, int>(
+//         PointCart(0, 0), PointCart(1, 0), 2
+//     );
 
-    // Testing segment through corner case
+//     Segment<PointCart, int> left_seg = Segment<PointCart, int>(
+//         PointCart(-1, 0.5), PointCart(0, 0.5), 3
+//     );
 
-    Segment<PointCart, int> intersecting_seg = Segment<PointCart, int>(
-        PointCart(0, -1), PointCart(2, 1), 10
-    );
+//     Segment<PointCart, int> right_seg = Segment<PointCart, int>(
+//         PointCart(1, 0.5), PointCart(2, 0.5), 4
+//     );
 
-    auto new_right_cut = new Cut<PointCart, int>(
-        INTERSECTION, &bottom_seg, &intersecting_seg 
-    );
+//     auto bottom_cut = new Cut<PointCart, int>(
+//         EDGE, &bottom_seg, nullptr
+//     );
 
-    BoundingTrap<PointCart, int> corner_trap = BoundingTrap<PointCart, int>(
-        bottom_cut, new_right_cut, top_cut, left_cut
-    );
+//     auto top_cut = new Cut<PointCart, int>(
+//         EDGE, &top_seg, nullptr
+//     );
 
-    Segment<PointCart, int> query_seg_4 = Segment<PointCart, int>(
-        PointCart(-1, -2), PointCart(3, 2), 11
-    );
+//     auto left_cut = new Cut<PointCart, int>(
+//         TARGET, &left_seg, nullptr
+//     );
 
-    ASSERT_FALSE(corner_trap.intersect_seg_trap(&query_seg_4));
-}
+//     auto right_cut = new Cut<PointCart, int>(
+//         SOURCE, &right_seg, nullptr
+//     );
+
+//     BoundingTrap<PointCart, int> trap = BoundingTrap<PointCart, int>(
+//         bottom_cut, right_cut, top_cut, left_cut
+//     );
+
+//     Segment<PointCart, int> query_seg_1 = Segment<PointCart, int>(
+//         PointCart(-10, 0), PointCart(10, 0), 5
+//     );
+
+//     Segment<PointCart, int> query_seg_2 = Segment<PointCart, int>(
+//         PointCart(-10, 1), PointCart(10, 1), 5
+//     );
+
+
+//     ASSERT_TRUE(bottom_seg < query_seg_1);
+//     ASSERT_TRUE(trap.intersect_seg_trap(&query_seg_0));
+//     ASSERT_TRUE(trap.intersect_seg_trap(&query_seg_1));
+//     ASSERT_FALSE(trap.intersect_seg_trap(&query_seg_2));
+
+//     // Testing triangles
+//     Segment<PointCart, int> tri_top_seg = Segment<PointCart, int>(
+//         PointCart(0, 1), PointCart(2, -1), 7
+//     );
+
+//     auto tri_top_cut = new Cut<PointCart, int>(
+//         EDGE, &tri_top_seg, nullptr
+//     );
+
+//     BoundingTrap<PointCart, int> triangle = BoundingTrap<PointCart, int>(
+//         bottom_cut, nullptr, tri_top_cut, left_cut
+//     );
+
+//     ASSERT_TRUE(triangle.intersect_seg_trap(&query_seg_1));
+//     ASSERT_FALSE(triangle.intersect_seg_trap(&query_seg_2));
+
+//     // Testing segment through corner case
+
+//     Segment<PointCart, int> intersecting_seg = Segment<PointCart, int>(
+//         PointCart(0, -1), PointCart(2, 1), 10
+//     );
+
+//     auto new_right_cut = new Cut<PointCart, int>(
+//         INTERSECTION, &bottom_seg, &intersecting_seg 
+//     );
+
+//     BoundingTrap<PointCart, int> corner_trap = BoundingTrap<PointCart, int>(
+//         bottom_cut, new_right_cut, top_cut, left_cut
+//     );
+
+//     Segment<PointCart, int> query_seg_4 = Segment<PointCart, int>(
+//         PointCart(-1, -2), PointCart(3, 2), 11
+//     );
+
+//     ASSERT_FALSE(corner_trap.intersect_seg_trap(&query_seg_4));
+// }

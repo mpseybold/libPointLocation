@@ -30,19 +30,9 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
         }
 
         io::write_trapezoids(traps, "refinement_debug.dat");
-        std::cout << "wrote refinement traps...\n";
+        // std::cout << "wrote refinement traps...\n";
     }
 
-    auto A_right = node->get_A() != nullptr && node->get_A()->get_trapezoid().get_right() != nullptr ?
-    *(node->get_A()->get_trapezoid().get_right()) : 
-    Cut<PointType, OrderType>(INTERSECTION, 
-    node->get_A()->get_trapezoid().get_top()->get_segment(), node->get_A()->get_trapezoid().get_bottom()->get_segment());
-
-    auto B_right = node->get_B() != nullptr && node->get_B()->get_trapezoid().get_right() != nullptr ?
-    *(node->get_B()->get_trapezoid().get_right()) : 
-    Cut<PointType, OrderType>(INTERSECTION, 
-    node->get_B()->get_trapezoid().get_top()->get_segment(), node->get_B()->get_trapezoid().get_bottom()->get_segment());
-    
     if (node->get_L() != nullptr) 
         if (node->get_L()->get_trapezoid().intersects_segment(seg)) {
             // auto trap = node->get_L()->get_trapezoid();
@@ -52,6 +42,11 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
     
     if (node->get_B() != nullptr) {
         assert(node->get_A() != nullptr);
+
+        auto A_right = *(node->get_A()->get_trapezoid().get_right());
+
+        auto B_right = *(node->get_B()->get_trapezoid().get_right());
+
         Cut<PointType, OrderType>* edge_cut = node
         ->get_destruction_cuts()
         .get_e();
@@ -359,6 +354,9 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         //     std::cout << "about to continue...\n";
         //     continue; 
         // }
+
+        if (i == 12 && seg.get_priority() == 23)
+            std::cout << "hello\n";
     
         if (i == 0) {
             if (node->contains_endpoint(&seg, 0)) {
@@ -506,10 +504,20 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 !(prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() && prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom() 
                 && prev->get_trapezoid().get_bottom()->has_on(prev->get_trapezoid().get_top()->get_segment()));
 
+                bool thread_through = (Segment<PointType, OrderType>::slope_comparison(
+                    *(prev->get_trapezoid().get_top()->get_segment()), *(prev->get_trapezoid().get_bottom()->get_segment())) != 0
+                    && (Cut<PointType, OrderType>(INTERSECTION, prev->get_trapezoid().get_top()->get_segment(), prev->get_trapezoid().get_bottom()->get_segment()))
+                    .defining_point_cut_comparison(*(prev->get_trapezoid().get_right())) == 0)
+                    ||  (Segment<PointType, OrderType>::slope_comparison(
+                    *(node->get_trapezoid().get_top()->get_segment()), *(node->get_trapezoid().get_bottom()->get_segment())) != 0
+                    && (Cut<PointType, OrderType>(INTERSECTION, node->get_trapezoid().get_top()->get_segment(), node->get_trapezoid().get_bottom()->get_segment()))
+                    .defining_point_cut_comparison(*(node->get_trapezoid().get_left())) == 0);
+
+
                 if (prev->get_trapezoid().get_right() == node->get_trapezoid().get_left() &&
                 (prev->get_trapezoid().get_top() == node->get_trapezoid().get_top() || 
                 prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_bottom())
-                && not_pinched_trapezoids) {
+                && (not_pinched_trapezoids && !thread_through)) {
 
                     // set the pointers for v_merge
                     prev->set_right(node);
