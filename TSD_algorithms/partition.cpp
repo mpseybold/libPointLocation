@@ -179,6 +179,10 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     } else {
         if (node->is_flat())
             return;
+        if (node->get_R()->get_trapezoid().intersect_corner(e_cut->get_segment()))
+            std::cout << "right corner\n";
+        if (node->get_L()->get_trapezoid().intersect_corner(e_cut->get_segment()))
+            std::cout << "left corner\n";
         assert(false);
     }
 }

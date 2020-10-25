@@ -38,34 +38,30 @@ class BoundingTrap {
             Cut<PointType, OrderType>* _right,
             Cut<PointType, OrderType>* _top,
             Cut<PointType, OrderType>* _left
-        ) : top(_top), bottom(_bottom), left(_left), right(_right){ 
-            if (left == nullptr) {
-            // if ((*left).get_cut_type() == NO_CUT) {
-                // assert((*right).get_cut_type() != NO_CUT);
-                // assert((*top).get_cut_type() != NO_CUT);
-                // assert((*bottom).get_cut_type() != NO_CUT);
-                assert(right != nullptr);
-                assert(top != nullptr);
-                assert(bottom != nullptr);
+        ) : top(_top), bottom(_bottom), left(_left), right(_right) { 
+
+            assert(top != nullptr);
+            assert(bottom != nullptr);
+            assert(left != nullptr);
+            assert(right != nullptr);
+
+            int slope_comp = Segment<PointType, OrderType>::slope_comparison(
+                *top->get_segment(), *bottom->get_segment()); 
+
+            auto aux_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
+
+            // if (slope_comp == 0) {
+            //     if (left == nullptr || right == nullptr) {
+            //         std::cout << "not good...\n"
+            //     }
+            //     assert(left != nullptr && right != nullptr);
+            // }
+
+            if (slope_comp != 0 && aux_int.defining_point_cut_comparison(*left) == 0) {
                 type = BRT;
-            } else if (right == nullptr) {
-            // } else if ((*right).get_cut_type() == NO_CUT) {
-                // assert((*left).get_cut_type() != NO_CUT);
-                // assert((*top).get_cut_type() != NO_CUT);
-                // assert((*bottom).get_cut_type() != NO_CUT);
-                assert(left != nullptr);
-                assert(top != nullptr);
-                assert(bottom != nullptr);
+            } else if (slope_comp != 0 && aux_int.defining_point_cut_comparison(*right) == 0) {
                 type = BTL;
             } else {
-                // assert((*left).get_cut_type() != NO_CUT);
-                // assert((*right).get_cut_type() != NO_CUT);
-                // assert((*top).get_cut_type() != NO_CUT);
-                // assert((*bottom).get_cut_type() != NO_CUT);
-                assert(left != nullptr);
-                assert(right != nullptr);
-                assert(top != nullptr);
-                assert(bottom != nullptr);
                 type = BRTL;
             } 
         }
@@ -79,10 +75,13 @@ class BoundingTrap {
         }
 
         void set_type(TrapType _type) { type = _type; }
-        TrapType get_type() { return type; }
+        TrapType get_type() { return type; };
 
         Cut<PointType, OrderType>* get_top() { return top; }
-        Cut<PointType, OrderType>* get_bottom() { return bottom; }
+        Cut<PointType, OrderType>* get_bottom() { 
+            if (bottom == nullptr)
+                std::cout << "hmmm...\n";
+            return bottom; }
         Cut<PointType, OrderType>* get_left() { return left; }
         Cut<PointType, OrderType>* get_right() { return right; }
 

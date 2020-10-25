@@ -92,6 +92,9 @@ namespace io {
         std::fstream file;
         file.open(filename, std::fstream::out | std::fstream::trunc);
 
+        if (filename == "node_trap.dat")
+            std::cout << "hello\n";
+
         for (auto& trap: traps) {
             write_trapezoid(trap, file);
         }
