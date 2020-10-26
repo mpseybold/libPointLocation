@@ -416,7 +416,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
             auto top_int = top_slope_comp != 0 ? new Cut<PointType, OrderType>(INTERSECTION, node->get_trapezoid().get_top()->get_segment(), &seg)
             : nullptr;
-            auto bottom_int = top_slope_comp != 0 ? new Cut<PointType, OrderType>(INTERSECTION, node->get_trapezoid().get_top()->get_segment(), &seg)
+            auto bottom_int = bottom_slope_comp != 0 ? new Cut<PointType, OrderType>(INTERSECTION, node->get_trapezoid().get_bottom()->get_segment(), &seg)
             : nullptr;
 
             if (top_int != nullptr && (!top_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) == 1 
