@@ -340,6 +340,10 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         auto node = subdag_roots[i];
         int v_part_count = 0;
 
+        if (i == 18 && seg.get_priority() == 69) {
+            io::write_trapezoids({subdag_roots[i-1]->get_trapezoid(), subdag_roots[i]->get_trapezoid(), subdag_roots[i+1]->get_trapezoid()}, "merge_debug.dat");
+        }
+
         // TODO: remove after support for overlapping segments is added
         // if (node->get_trapezoid().get_top().has_on(&seg)
         // || node->get_trapezoid().get_bottom().has_on(&seg)) {
@@ -355,8 +359,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         //     continue; 
         // }
 
-        if (seg.get_priority() ==  71)
-            std::cout << "hello\n";
     
         if (i == 0) {
             if (node->contains_endpoint(&seg, 0)) {
@@ -409,38 +411,75 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             // io::write_trapezoids(debug_nodes, "debug_nodes.dat");
             // end debug code
 
-            if (prev->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()
-            && !node->through_common_corner(prev, &seg)) {
-                auto intersection_cut = new Cut<PointType, OrderType>(
-                    INTERSECTION, &seg, node->get_trapezoid().get_bottom()->get_segment()
-                );
-                v_partition(node, intersection_cut);
-                v_part_count++;
+            int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*node->get_trapezoid().get_top()->get_segment(), seg);
+            int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*node->get_trapezoid().get_bottom()->get_segment(), seg);
+
+            auto top_int = top_slope_comp != 0 ? new Cut<PointType, OrderType>(INTERSECTION, node->get_trapezoid().get_top()->get_segment(), &seg)
+            : nullptr;
+            auto bottom_int = top_slope_comp != 0 ? new Cut<PointType, OrderType>(INTERSECTION, node->get_trapezoid().get_top()->get_segment(), &seg)
+            : nullptr;
+
+            if (top_int != nullptr && (!top_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) == 1 
+            || !top_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) == -1))
+                top_int = nullptr;
+
+            if (bottom_int != nullptr && (!bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) == 1 
+            || !bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) == -1))
+                bottom_int = nullptr;
+
+            Cut<PointType, OrderType>* leftmost = nullptr;
+            Cut<PointType, OrderType>* rightmost = nullptr;
+
+            if (top_int != nullptr) {
+                if (bottom_int == nullptr || top_int->defining_point_cut_comparison(*bottom_int) == -1) {
+                    leftmost = top_int;
+                } else if (bottom_int != nullptr) {
+                    leftmost = bottom_int;
+                    rightmost = top_int;
+                }
+            } else if (bottom_int != nullptr) {
+                leftmost = bottom_int;
             }
-            if (next->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()
-            && !node->through_common_corner(next, &seg)) {
-                auto intersection_cut = new Cut<PointType, OrderType>(
-                    INTERSECTION, &seg, node->get_trapezoid().get_top()->get_segment()
-                );
-                v_partition(node, intersection_cut);
-                v_part_count++;
+
+            if (leftmost != nullptr) {
+                v_partition(node, leftmost);
             }
-            if (prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()
-            && !node->through_common_corner(prev, &seg)) {
-                auto intersection_cut = new Cut<PointType, OrderType>(
-                    INTERSECTION, &seg, node->get_trapezoid().get_top()->get_segment()
-                );
-                v_partition(node, intersection_cut);
-                v_part_count++;
+
+            if (rightmost != nullptr) {
+                v_partition(node, rightmost);
             }
-            if (next->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()
-            && !node->through_common_corner(next, &seg)) {
-                auto intersection_cut = new Cut<PointType, OrderType>(
-                    INTERSECTION, &seg, node->get_trapezoid().get_bottom()->get_segment()
-                );
-                v_partition(node, intersection_cut);
-                v_part_count++;
-            }
+            // if (prev->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()
+            // && !node->through_common_corner(prev, &seg)) {
+            //     auto intersection_cut = new Cut<PointType, OrderType>(
+            //         INTERSECTION, &seg, node->get_trapezoid().get_bottom()->get_segment()
+            //     );
+            //     v_partition(node, intersection_cut);
+            //     v_part_count++;
+            // }
+            // if (next->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()
+            // && !node->through_common_corner(next, &seg)) {
+            //     auto intersection_cut = new Cut<PointType, OrderType>(
+            //         INTERSECTION, &seg, node->get_trapezoid().get_top()->get_segment()
+            //     );
+            //     v_partition(node, intersection_cut);
+            //     v_part_count++;
+            // }
+            // if (prev->get_trapezoid().get_bottom() == node->get_trapezoid().get_top()
+            // && !node->through_common_corner(prev, &seg)) {
+            //     auto intersection_cut = new Cut<PointType, OrderType>(
+            //         INTERSECTION, &seg, node->get_trapezoid().get_top()->get_segment()
+            //     );
+            //     v_partition(node, intersection_cut);
+            //     v_part_count++;
+            // }
+            // if (next->get_trapezoid().get_top() == node->get_trapezoid().get_bottom()
+            // && !node->through_common_corner(next, &seg)) {
+            //     auto intersection_cut = new Cut<PointType, OrderType>(
+            //         INTERSECTION, &seg, node->get_trapezoid().get_bottom()->get_segment()
+            //     );
+            //     v_partition(node, intersection_cut);
+            //     v_part_count++;
+            // }
         }
 
         if (i == subdag_roots.size() - 1) {
@@ -490,9 +529,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             if (i > 0) {
                 auto prev = subdag_roots[i-1];
 
-                // if (i == 3 && VERBOSITY_LEVEL >= 2) {
-                //     io::write_trapezoids({subdag_roots[i-1]->get_trapezoid(), subdag_roots[i]->get_trapezoid()}, "merge_debug.dat");
-                // }
 
                 bool right_left_match = prev->get_trapezoid().get_right() == node->get_trapezoid().get_left();
                 bool top_match = prev->get_trapezoid().get_top() == node->get_trapezoid().get_top();
