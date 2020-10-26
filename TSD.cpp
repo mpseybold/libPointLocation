@@ -1,7 +1,7 @@
 #include "TSD.h"
 // #include "io.h"
 
-#define VERBOSITY_LEVEL 2
+#define VERBOSITY_LEVEL 1
 
 
 // Returns the next priority descendants of 'node'
@@ -326,7 +326,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         traps.push_back(node->get_trapezoid());
     }
     io::write_trapezoids(traps, "leaves.dat");
-    //end debug
+    // end debug
 
 
     auto e_cut = new Cut<PointType, OrderType>(
@@ -355,7 +355,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         //     continue; 
         // }
 
-        if (i == 12 && seg.get_priority() == 23)
+        if (seg.get_priority() == 20)
             std::cout << "hello\n";
     
         if (i == 0) {
@@ -476,9 +476,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         }
     }
 
-    if (seg.get_priority() == 16) {
-        std::cout << "hello\n";
-    }
 
     // second pass over affected roots
     // to make edge partition calls

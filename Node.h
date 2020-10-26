@@ -116,7 +116,7 @@ class Node {
 
         bool contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint) {
             assert(seg != nullptr);
-            return trapezoid.contains_endpoint(seg, endpoint);
+            return trapezoid.contains_endpoint_strict(seg, endpoint);
         }
 
         bool intersects_segment(Segment<PointType, OrderType>* seg) {

@@ -115,6 +115,8 @@ class BoundingTrap {
 
         bool contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint);
 
+        bool contains_endpoint_strict(Segment<PointType, OrderType>* seg, int endpoint);
+
         bool seg_intersects_top(Segment<PointType, OrderType>* seg);
 
         bool seg_intersects_bottom(Segment<PointType, OrderType>* seg);
