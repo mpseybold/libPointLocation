@@ -153,13 +153,6 @@ template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_merge(
     BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
 ) { 
-
-    if (!(trap_1.get_top() != trap_2.get_top())) {
-        std::cout << "here is a problem\n";
-    }
-    if (trap_1.get_top() != trap_2.get_top()) {
-        std::cout << "hello\n";
-    }
     assert(trap_1.get_top() == trap_2.get_top());
     assert(trap_1.get_bottom() == trap_2.get_bottom());
     assert(trap_1.get_right() == trap_2.get_left());

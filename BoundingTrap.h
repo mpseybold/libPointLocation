@@ -49,7 +49,8 @@ class BoundingTrap {
             && bottom->get_segment()->get_source().x() != bottom->get_segment()->get_target().x()
             && Segment<PointType, OrderType>::slope_comparison(*top->get_segment(), *bottom->get_segment()) != 0) {
                 auto intersection = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
-                assert(intersection.defining_point_cut_comparison(*left) < 1 || intersection.defining_point_cut_comparison(*right) > -1);
+                if (!(intersection.defining_point_cut_comparison(*left) < 1 || intersection.defining_point_cut_comparison(*right) > -1))
+                    assert(intersection.defining_point_cut_comparison(*left) < 1 || intersection.defining_point_cut_comparison(*right) > -1);
             }
 
             int slope_comp = Segment<PointType, OrderType>::slope_comparison(
