@@ -1066,6 +1066,41 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, Or
 }
 
 template <class PointType, class OrderType>
+bool BoundingTrap<PointType, OrderType>::contains_endpoint_strict(Segment<PointType, OrderType>* seg, int endpoint) {
+    assert(endpoint == 0 || endpoint == 1);
+    assert(seg != nullptr);
+    PointType p = endpoint == 0 ? seg->get_source()
+    : seg->get_target();
+
+    PointType other_p = endpoint == 0 ? seg->get_target()
+    : seg->get_source();
+
+    bool bottom_test, right_test, top_test, left_test;
+
+    bottom_test = bottom->orientation(p) == 1
+    || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 1)
+    || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 0 && *(bottom->get_segment()) < *seg);
+
+    if (right == nullptr)
+        right_test = true;
+    else {
+        right_test = right->orientation(p) == -1;
+    }
+
+    top_test = top->orientation(p) == -1
+    || (top->orientation(p) == 0 && top->orientation(other_p) == -1)
+    || (top->orientation(p) == 0 && top->orientation(other_p) == 0 && *seg < *(top->get_segment()));
+
+    if (left == nullptr) {
+        left_test = true;
+    } else {
+        left_test = left->orientation(p) == 1;
+    }
+
+    return bottom_test && right_test && top_test && left_test;
+}
+
+template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::seg_intersects_top(Segment<PointType, OrderType>* seg) {
     
     if (!(top->has_seg_on_pos_side(seg) && top->has_seg_on_neg_side(seg)))
