@@ -478,7 +478,7 @@ TEST(TSDTests, leafInsertTest) {
     //     PointCart(3, 89), PointCart(99.999, 89), 14
     // );
 
-    std::mt19937 generator (1234);
+    std::mt19937 generator (1235);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
     auto segments = std::vector<Segment<PointCart, int>>();
