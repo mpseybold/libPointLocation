@@ -478,26 +478,41 @@ TEST(TSDTests, leafInsertTest) {
     //     PointCart(3, 89), PointCart(99.999, 89), 14
     // );
 
-    std::mt19937 generator (1235);
+    std::mt19937 generator (1234);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
     auto segments = std::vector<Segment<PointCart, int>>();
 
     std::cout << "start...\n";
-    for (int i = 1; i <= 50; ++i) {
+    for (int i = 1; i <= 100; ++i) {
 
-        // std::cout << i << std::endl;
-        
-        PointCart s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
-        PointCart t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+        std::cout << i << std::endl;
+        PointCart s = PointCart(0, 0);
+        PointCart t = PointCart(0, 0);
 
-        while (s.x() == t.x() && s.y() == t.y())
+        bool segment_exists = true;
+
+        while (segment_exists) {
+            s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
             t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+            while (s.x() == t.x() && s.y() == t.y())
+                t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+            auto temp = Segment<PointCart, int>(s, t, i);
+
+            bool found_seg = false;
+            for (auto s: segments)
+                if (s == temp) {
+                    std::cout << "OOPS\n";
+                    found_seg = true;
+                }
+            segment_exists = found_seg;
+        }
+
 
         auto seg = new Segment<PointCart, int>(s, t, i); 
-
-        std::cout << seg->get_source().x() << " " << seg->get_source().y()
-            << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+        segments.push_back(*seg);
+        // std::cout << seg->get_source().x() << " " << seg->get_source().y()
+        //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
         if (i == 21) {
             std::cout << "hello\n";
         }

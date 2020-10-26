@@ -154,7 +154,7 @@ BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_
     BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
 ) { 
 
-    if (!(trap_1.get_top() == trap_2.get_top())) {
+    if (!(trap_1.get_top() != trap_2.get_top())) {
         std::cout << "here is a problem\n";
     }
     if (trap_1.get_top() != trap_2.get_top()) {
@@ -724,308 +724,6 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, OrderType>* seg) {
     return intersect_seg_trap(seg);
-//     Cut<PointType, OrderType> left_cut = left.get_cut_type() == NO_CUT 
-//     ? Cut<PointType, OrderType>(INTERSECTION, top.get_segment(), bottom.get_segment())
-//     : left;
-
-//     Cut<PointType, OrderType> right_cut = right.get_cut_type() == NO_CUT 
-//     ? Cut<PointType, OrderType>(INTERSECTION, top.get_segment(), bottom.get_segment())
-//     : right;
-
-//     Cut<PointType, OrderType> seg_cut = Cut<PointType, OrderType>(
-//         EDGE, seg, nullptr
-//     );
-
-//     Cut<PointType, OrderType> top_intersection = Cut<PointType, OrderType>(
-//         INTERSECTION, seg, top.get_segment()
-//     );
-//     Cut<PointType, OrderType> bottom_intersection = Cut<PointType, OrderType>(
-//         INTERSECTION, seg, bottom.get_segment()
-//     );
-
-//     if (left_cut.orientation(seg->get_source()) == 0 && right_cut.orientation(seg->get_target()) == 0)
-//         return true;
-
-//     // int source_region = trap_cut_region(seg->get_source());
-//     // int target_region = trap_cut_region(seg->get_target());
-//     auto regions = trap_cut_regions(seg);
-//     int source_region = regions.first;
-//     int target_region = regions.second;
-
-//     if ((source_region <= 3 && source_region > 0) && (target_region <= 3 && target_region > 0))
-//         return false;
-
-//     if ((source_region - 1) % 3 == 0 && (target_region - 1) % 3 == 0)
-//         return false;
-
-//     if ((source_region % 3 == 0 && source_region != 0) && (target_region % 3 == 0 && target_region != 0))
-//         return false;
-
-//     if (source_region - 7 >= 0 && target_region - 7 >= 0)
-//         return false;
-
-//     if (source_region == 5 || target_region == 5)
-//         return true;
-
-//     if (source_region == 4 && target_region == 6)
-//         return true;
-
-//     if (source_region == 2 && target_region == 8)
-//         return true;
-
-//     if (target_region == 2 && source_region == 8)
-//         return true;
-
-//     // handle degenerate cases where the segment lies
-//     // on the top or bottom boundary
-//     if (bottom.has_on(seg) || top.has_on(seg)) {
-//         if (source_region == 4 && target_region != 4 && target_region != 0)
-//             return true;
-//     }
-
-
-
-//     bool intersects_via_top =
-//     top.has_seg_on_pos_side(seg) && top.has_seg_on_neg_side(seg) ? 
-//     (top_intersection.defining_point_cut_comparison(left_cut) == 1 &&
-//         top_intersection.defining_point_cut_comparison(right_cut) == -1) :
-//     false;
-
-//     if ((top.has_seg_on_pos_side(seg) && top.has_seg_on_neg_side(seg))
-//     && (top_intersection.defining_point_cut_comparison(left_cut) == 0 && top_intersection.defining_point_cut_comparison(right_cut) < 1)) {
-//         intersects_via_top = top.orientation(seg->get_target()) == -1;
-//     }
-
-//     if ((top.has_seg_on_pos_side(seg) && top.has_seg_on_neg_side(seg))
-//     && (top_intersection.defining_point_cut_comparison(left_cut) > -1 && top_intersection.defining_point_cut_comparison(right_cut) == 0)) {
-//         intersects_via_top = top.orientation(seg->get_source()) == -1;
-//     }
-
-//     bool intersects_via_bottom =
-//     (bottom.has_seg_on_pos_side(seg) && bottom.has_seg_on_neg_side(seg)) ? 
-//     (bottom_intersection.defining_point_cut_comparison(left_cut) == 1 &&
-//         bottom_intersection.defining_point_cut_comparison(right_cut) == -1) :
-//     false;
-
-//     if ((bottom.has_seg_on_pos_side(seg) && bottom.has_seg_on_neg_side(seg))
-//     && (bottom_intersection.defining_point_cut_comparison(left_cut) == 0 && bottom_intersection.defining_point_cut_comparison(right_cut) < 1)) {
-//         intersects_via_bottom = bottom.orientation(seg->get_target()) == 1;
-//     }
-
-//     if ((bottom.has_seg_on_pos_side(seg) && bottom.has_seg_on_neg_side(seg))
-//     && (bottom_intersection.defining_point_cut_comparison(left_cut) > -1 && bottom_intersection.defining_point_cut_comparison(right_cut) == 0)) {
-//         intersects_via_bottom = bottom.orientation(seg->get_source()) == 1;
-//     }
-
-//     bool intersects_via_left = false;
-//     if (left_cut.has_seg_on_pos_side(seg) && left_cut.has_seg_on_neg_side(seg)) {
-//         if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment()) == 0) {      
-//             int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment());
-//             assert(top_slope_comp != 0);
-//             bool top_test = top_slope_comp == 1
-//             ? top_intersection.defining_point_cut_comparison(left_cut) == -1
-//             : top_intersection.defining_point_cut_comparison(left_cut) == 1;
-
-//             int bottom_test = top_intersection.defining_point_cut_comparison(bottom) == 1;
-//             intersects_via_left = top_test && bottom_test;
-//             // if (top_intersection.defining_point_cut_comparison(left_cut) == 1 && top_intersection.defining_point_cut_comparison(right_cut) == -1) {
-//             //     intersects_via_left = true;
-//             // }
-//         }
-//         else if (Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment()) == 0) {
-//             int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment());
-//             assert(bottom_slope_comp != 0);
-//             bool bottom_test = bottom_slope_comp == 1
-//             ? bottom_intersection.defining_point_cut_comparison(left_cut) == 1
-//             : bottom_intersection.defining_point_cut_comparison(left_cut) == -1;
-
-//             int top_test = bottom_intersection.defining_point_cut_comparison(top) == -1;
-//             intersects_via_left = top_test && bottom_test;
-//             // if (bottom_intersection.defining_point_cut_comparison(left_cut) == 1 && bottom_intersection.defining_point_cut_comparison(right_cut) == -1) {
-//             //     intersects_via_left = true;
-//             // }
-//         }
-//         else if (bottom_intersection.defining_point_cut_comparison(left_cut) * top_intersection.defining_point_cut_comparison(left_cut) == -1) {
-//             int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment());
-//             int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment());
-//             bool bottom_test = bottom_slope_comp == 1
-//             ? bottom_intersection.defining_point_cut_comparison(left_cut) == 1
-//             : bottom_intersection.defining_point_cut_comparison(left_cut) == -1;
-
-//             bool top_test = top_slope_comp == 1
-//             ? top_intersection.defining_point_cut_comparison(left_cut) == -1
-//             : top_intersection.defining_point_cut_comparison(left_cut) == 1;
-
-//             intersects_via_left = top_test && bottom_test;
-//             // intersects_via_left = true;
-//         }
-//     }
-
-//     bool intersects_via_right = false;
-//     if (right_cut.has_seg_on_pos_side(seg) && right_cut.has_seg_on_neg_side(seg)) {
-//         if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment()) == 0) {
-//             int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment());
-//             assert(top_slope_comp != 0);
-//             switch(top_slope_comp) {
-//                 case 1: {
-//                     if (top_intersection.defining_point_cut_comparison(right_cut) == -1 
-//                     && top_intersection.defining_point_cut_comparison(bottom) == 1) {
-//                         intersects_via_right = true;
-//                     }
-//                     break;
-//                 }
-//                 case -1: {
-//                     if (top_intersection.defining_point_cut_comparison(right_cut) == 1
-//                     && top_intersection.defining_point_cut_comparison(bottom) == 1) {
-//                         intersects_via_right = true;
-//                     }
-//                     break;
-//                 }
-//             }
-//             // if (top_intersection.defining_point_cut_comparison(left_cut) == 1 && top_intersection.defining_point_cut_comparison(right_cut) == -1) {
-//             //     intersects_via_left = true;
-//             // }
-//         }
-//         else if (Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment()) == 0) {
-//             int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment());
-//             assert(bottom_slope_comp != 0);
-//             switch(bottom_slope_comp) {
-//                 case 1: {
-//                     if (bottom_intersection.defining_point_cut_comparison(right_cut) == 1 
-//                     && bottom_intersection.defining_point_cut_comparison(top) == -1) {
-//                         intersects_via_right = true;
-//                     }
-//                     break;
-//                 }
-//                 case -1: {
-//                     if (bottom_intersection.defining_point_cut_comparison(right_cut) == -1
-//                     && bottom_intersection.defining_point_cut_comparison(top) == -1) {
-//                         intersects_via_right = true;
-//                     }
-//                     break;
-//                 }
-//             }
-//             // if (bottom_intersection.defining_point_cut_comparison(left_cut) == 1 && bottom_intersection.defining_point_cut_comparison(right_cut) == -1) {
-//             //     intersects_via_left = true;
-//             // }
-//         }
-//         else {
-//             bool top_test;
-//             bool bottom_test;
-//             int top_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment());
-//             int bottom_slope_comp = Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment());
-
-//             top_test = top_slope_comp == 1 
-//             ? top_intersection.defining_point_cut_comparison(right_cut) == -1
-//             : top_intersection.defining_point_cut_comparison(right_cut) == 1;
-
-//             bottom_test = bottom_slope_comp == 1
-//             ? bottom_intersection.defining_point_cut_comparison(right_cut) == 1
-//             : bottom_intersection.defining_point_cut_comparison(right_cut) == -1;
-            
-//             intersects_via_right = top_test && bottom_test;
-//         }
-//         // else if (bottom_intersection.defining_point_cut_comparison(left_cut) * top_intersection.defining_point_cut_comparison(left_cut) == -1) {
-//         //     intersects_via_left = true;
-//         // }
-//     }
-
-
-
-//     if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment()) != 0 
-//     && bottom_intersection.defining_point_cut_comparison(right_cut) == 0) {
-//         if (bottom.orientation(seg->get_source()) == -1) {
-//             return false;
-//         }
-//     }
-
-//     if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom.get_segment()) != 0 
-//     && bottom_intersection.defining_point_cut_comparison(left_cut) == 0) {
-//         if (bottom.orientation(seg->get_target()) == -1) {
-//             return false;
-//         }
-//     }
-
-//     if (Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment()) != 0 && top_intersection.defining_point_cut_comparison(right_cut) == 0) {
-//         if (top.orientation(seg->get_source()) == 1) {
-//             return false;
-//         }
-//     }
-
-//     if (Segment<PointType, OrderType>::slope_comparison(*seg, *top.get_segment()) != 0 && top_intersection.defining_point_cut_comparison(left_cut) == 0) {
-//         if (top.orientation(seg->get_target()) == 1) {
-//             return false;
-//         }
-//     }
-
-
-//     if (intersects_via_bottom || intersects_via_top || intersects_via_left || intersects_via_right)
-//         return true;
-//     else
-//         return false;
-
-//     // if (source_region != 0 && target_region != 0)
-//     //     return false;
-
-//     if (top.has_on(seg)) {
-//         if (left_cut.has_seg_on_pos_side(seg) && right_cut.has_seg_on_neg_side(seg))
-//             return seg < top.get_segment();
-//         else
-//             return false;
-//     }
-
-//     if (bottom.has_on(seg)) {
-//         if (left_cut.has_seg_on_pos_side(seg) && right_cut.has_seg_on_neg_side(seg))
-//             return !(seg < bottom.get_segment());
-//         else
-//             return false;
-//     }
-
-//     if (top.orientation(seg->get_source()) == 0) {
-//         bool tgt_below_top = top.orientation(seg->get_target()) == -1;
-//         bool src_right_of_left = left_cut.orientation(seg->get_source()) > -1;
-//         bool src_left_of_right = right_cut.orientation(seg->get_source()) == -1;
-        
-//         if (tgt_below_top && src_right_of_left && src_left_of_right)
-//             return true;
-//         else
-//             return false;
-//     }
-
-//     if (top.orientation(seg->get_target()) == 0) {
-//         bool src_below_top = top.orientation(seg->get_source()) == -1;
-//         bool tgt_right_of_left = left_cut.orientation(seg->get_source()) == 1;
-//         bool tgt_left_of_right = right_cut.orientation(seg->get_source()) < 1;
-        
-//         if (src_below_top && tgt_right_of_left && tgt_left_of_right)
-//             return true;
-//         else
-//             return false;
-//     }
-
-//     if (bottom.orientation(seg->get_source()) == 0) {
-//         bool tgt_above_bottom = bottom.orientation(seg->get_target()) == 1;
-//         bool src_right_of_left = left_cut.orientation(seg->get_source()) > -1;
-//         bool src_left_of_right = right_cut.orientation(seg->get_source()) == -1;
-        
-//         if (tgt_above_bottom && src_right_of_left && src_left_of_right)
-//             return true;
-//         else
-//             return false;
-//     }
-
-//     if (bottom.orientation(seg->get_target()) == 0) {
-//         bool src_above_bottom = bottom.orientation(seg->get_source()) == 1;
-//         bool tgt_right_of_left = left_cut.orientation(seg->get_target()) == 1;
-//         bool tgt_left_of_right = right_cut.orientation(seg->get_target()) < 1;
-        
-//         if (src_above_bottom && tgt_right_of_left && tgt_left_of_right)
-//             return true;
-//         else
-//             return false;
-//     }
-
-//     return false;
 }
 
 template <class PointType, class OrderType>
@@ -1159,6 +857,42 @@ bool BoundingTrap<PointType, OrderType>::seg_intersects_bottom(Segment<PointType
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::is_degen() {
     return top->has_on(bottom->get_segment());
+}
+
+template <class PointType, class OrderType>
+bool BoundingTrap<PointType, OrderType>::through_common_corner(BoundingTrap<PointType, OrderType>& other, Segment<PointType, OrderType>* seg) {
+
+    if (bottom == other.get_top()) {
+
+        if (Segment<PointType, OrderType>::slope_comparison(*bottom->get_segment(), *seg) == 0)
+            assert(false);
+
+        auto bottom_int = Cut<PointType, OrderType>(INTERSECTION, bottom->get_segment(), seg);
+
+        if (bottom_int.defining_point_cut_comparison(*right) == 0)
+            return true;
+
+        if (bottom_int.defining_point_cut_comparison(*left) == 0)
+            return true;
+         
+
+    } else if (top == other.get_bottom()) {
+
+        if (Segment<PointType, OrderType>::slope_comparison(*top->get_segment(), *seg) == 0)
+             assert(false);
+
+        auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
+
+        if (top_int.defining_point_cut_comparison(*right) == 0)
+            return true;
+
+        if (top_int.defining_point_cut_comparison(*right) == 0)
+            return true;
+
+    }
+
+    return false;
+
 }
 
 template class BoundingTrap<PointCart, int>;
