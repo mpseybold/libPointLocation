@@ -41,8 +41,8 @@ void TSD<PointType, OrderType>::v_part_handle_V_case(Node<PointType, OrderType>*
     // std::vector<BoundingTrap<PointType, OrderType>> problems = std::vector<BoundingTrap<PointType, OrderType>>();
     // problems.push_back(node->get_trapezoid());
     // io::write_trapezoids(problems, "problematic_traps.dat");
-    // if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1))
-    //     std::cout << "hello\n";
+    if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1))
+        std::cout << "hello\n";
     assert(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1);
 
     auto r_trap = node->get_R()->get_trapezoid();

@@ -122,4 +122,6 @@ class BoundingTrap {
         bool seg_intersects_bottom(Segment<PointType, OrderType>* seg);
 
         bool is_degen();
+
+        bool through_common_corner(BoundingTrap<PointType, OrderType>& other, Segment<PointType, OrderType>* seg);
 };

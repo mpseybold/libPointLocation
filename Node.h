@@ -186,5 +186,9 @@ class Node {
             return trapezoid.get_top()->has_on(
                 trapezoid.get_bottom()->get_segment()
             );
-        } 
+        }
+
+        bool through_common_corner(Node<PointType, OrderType>* other_node, Segment<PointType, OrderType>* seg) {
+            return trapezoid.through_common_corner(other_node->get_trapezoid(), seg);
+        }
 };
