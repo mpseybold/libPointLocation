@@ -179,10 +179,10 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     } else {
         if (node->is_flat())
             return;
-        if (node->get_R()->get_trapezoid().intersect_corner(e_cut->get_segment()))
-            std::cout << "right corner\n";
-        if (node->get_L()->get_trapezoid().intersect_corner(e_cut->get_segment()))
-            std::cout << "left corner\n";
+        if (node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment()))
+            std::cout << "right\n";
+        if (node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment()))
+            std::cout << "left\n";
         assert(false);
     }
 }
@@ -198,7 +198,8 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
     assert(node->get_e() == nullptr);
     assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
     assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
-    assert(node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()));
+    if (!node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()))
+        assert(node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()));
 
     auto old_A = node->get_A();
 

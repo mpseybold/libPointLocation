@@ -153,7 +153,8 @@ template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_merge(
     BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
 ) { 
-    assert(trap_1.get_top() == trap_2.get_top());
+    if (trap_1.get_top() != trap_2.get_top())
+        assert(trap_1.get_top() == trap_2.get_top());
     assert(trap_1.get_bottom() == trap_2.get_bottom());
     assert(trap_1.get_right() == trap_2.get_left());
     return BoundingTrap<PointType, OrderType>(
@@ -375,8 +376,6 @@ bool BoundingTrap<PointType, OrderType>::intersect_corner(Segment<PointType, Ord
     if (top->has_on(seg) || bottom->has_on(seg))
         return false;
 
-    if (seg->get_source().x() == seg->get_target().x())
-        return false;
 
     auto left_cut = left != nullptr ? *left :
     Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
@@ -386,32 +385,43 @@ bool BoundingTrap<PointType, OrderType>::intersect_corner(Segment<PointType, Ord
     auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
     auto bottom_int = Cut<PointType, OrderType>(INTERSECTION, bottom->get_segment(), seg);
 
+    // TODO: find out why this exists
+    // update: figured it out, sort of
+    if (seg->get_source().x() == seg->get_target().x()) {
+        auto e_cut = Cut<PointType, OrderType>(EDGE, seg, nullptr);
+        if (left_cut.defining_point_cut_comparison(e_cut) == 0 &&
+        right_cut.defining_point_cut_comparison(e_cut) == 0 &&
+        !top->has_on(seg) && !bottom->has_on(seg))
+            return false;
+    }
+
+
     // test top left corner
     if (Segment<PointType, OrderType>::slope_comparison(*seg, *top->get_segment()) != 0 &&
-        top_int.defining_point_cut_comparison(left_cut, false) == 0 &&
+        top_int.defining_point_cut_comparison(left_cut) == 0 &&
         top->orientation(seg->get_target()) > -1 &&
         left_cut.orientation(seg->get_source()) == -1)
             return true;
 
     // test bottom left corner
     if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom->get_segment()) != 0 &&
-        bottom_int.defining_point_cut_comparison(left_cut, false) == 0 &&
+        bottom_int.defining_point_cut_comparison(left_cut) == 0 &&
         bottom->orientation(seg->get_target()) < 1 &&
-        left_cut.orientation(seg->get_source()) == -1 &&
-        (left_cut.orientation(seg->get_source(), false) == -1 ||
-        bottom_int.orientation(seg->get_source()) == 0))
+        left_cut.orientation(seg->get_source()) == -1) //&&
+        // (left_cut.orientation(seg->get_source(), false) == -1 ||
+        // bottom_int.orientation(seg->get_source()) == 0))
             return true;
 
     // test top right corner
     if (Segment<PointType, OrderType>::slope_comparison(*seg, *top->get_segment()) != 0 &&
-        top_int.defining_point_cut_comparison(right_cut, false) == 0 &&
+        top_int.defining_point_cut_comparison(right_cut) == 0 &&
         top->orientation(seg->get_source()) > -1 &&
         right_cut.orientation(seg->get_target()) == 1)
             return true;
 
     // test bottom right corner
     if (Segment<PointType, OrderType>::slope_comparison(*seg, *bottom->get_segment()) != 0 &&
-        bottom_int.defining_point_cut_comparison(right_cut, false) == 0 &&
+        bottom_int.defining_point_cut_comparison(right_cut) == 0 &&
         bottom->orientation(seg->get_source()) < 1 &&
         right_cut.orientation(seg->get_target()) == 1)
             return true;
