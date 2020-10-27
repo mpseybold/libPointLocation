@@ -484,7 +484,7 @@ TEST(TSDTests, leafInsertTest) {
     auto segments = std::vector<Segment<PointCart, int>>();
 
     std::cout << "start...\n";
-    for (int i = 1; i <= 100; ++i) {
+    for (int i = 1; i <= 400; ++i) {
 
         std::cout << i << std::endl;
         PointCart s = PointCart(0, 0);
@@ -516,7 +516,7 @@ TEST(TSDTests, leafInsertTest) {
         if (i == 21) {
             std::cout << "hello\n";
         }
-        if (i == 100) {
+        if (i == 500) {
             std::cout << seg->get_source().x() << " " << seg->get_source().y()
             << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
             tsd.affected_subdag_roots(seg);

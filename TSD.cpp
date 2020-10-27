@@ -320,12 +320,11 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     affected_subdag_roots(&seg);
 
     //debug
-
-    auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
-    for (auto node: subdag_roots) {
-        traps.push_back(node->get_trapezoid());
-    }
-    io::write_trapezoids(traps, "leaves.dat");
+    // auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
+    // for (auto node: subdag_roots) {
+    //     traps.push_back(node->get_trapezoid());
+    // }
+    // io::write_trapezoids(traps, "leaves.dat");
     // end debug
 
 
@@ -340,8 +339,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         auto node = subdag_roots[i];
         int v_part_count = 0;
 
-        if (i == 1 && seg.get_priority() == 13) {
-            io::write_trapezoids({subdag_roots[i-1]->get_trapezoid(), subdag_roots[i]->get_trapezoid(), subdag_roots[i+1]->get_trapezoid()}, "merge_debug.dat");
+        if (i == 0 && seg.get_priority() == 62) {
+            io::write_trapezoids({subdag_roots[i]->get_trapezoid(), subdag_roots[i+1]->get_trapezoid()}, "merge_debug.dat");
         }
 
         // TODO: remove after support for overlapping segments is added
@@ -384,11 +383,16 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 : nullptr;
 
                 if (top_int != nullptr && (top_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) < 1 
-                || top_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1))
+                || top_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1
+                || node->get_trapezoid().get_top()->orientation(seg.get_source()) == 0
+                || !(node->get_trapezoid().get_top()->has_seg_on_pos_side(&seg) && node->get_trapezoid().get_top()->has_seg_on_neg_side(&seg))))
                     top_int = nullptr;
 
-                if (bottom_int != nullptr && (bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) < 1 
-                || bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1))
+                if (bottom_int != nullptr &&
+                (bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) < 1 
+                || bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1
+                || node->get_trapezoid().get_bottom()->orientation(seg.get_source()) == 0
+                || !(node->get_trapezoid().get_bottom()->has_seg_on_pos_side(&seg) && node->get_trapezoid().get_bottom()->has_seg_on_neg_side(&seg))))
                     bottom_int = nullptr;
 
                 if (top_int != nullptr) {
@@ -537,11 +541,15 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 : nullptr;
 
                 if (top_int != nullptr && (top_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) < 1 
-                || top_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1))
+                || top_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1
+                || node->get_trapezoid().get_top()->orientation(seg.get_target()) == 0
+                || !(node->get_trapezoid().get_top()->has_seg_on_pos_side(&seg) && node->get_trapezoid().get_top()->has_seg_on_neg_side(&seg))))
                     top_int = nullptr;
 
                 if (bottom_int != nullptr && (bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_left()) < 1 
-                || bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1))
+                || bottom_int->defining_point_cut_comparison(*node->get_trapezoid().get_right()) > -1
+                || node->get_trapezoid().get_bottom()->orientation(seg.get_target()) == 0
+                || !(node->get_trapezoid().get_bottom()->has_seg_on_pos_side(&seg) && node->get_trapezoid().get_bottom()->has_seg_on_neg_side(&seg))))
                     bottom_int = nullptr;
 
                 if (top_int != nullptr) {
@@ -569,6 +577,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     auto merge_indices = std::vector<MergeIndices>();
 
     for (int i = 0; i < subdag_roots.size(); ++i) {
+
         auto node = subdag_roots[i];
         partition(node, e_cut);
         if (!node->is_flat()) {
