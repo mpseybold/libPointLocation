@@ -69,6 +69,8 @@ class TSD {
         void partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut);
 
         int get_leaf_count() { return leaf_count; }
+
+        V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node);
 };
 
 #include "TSD.cpp"

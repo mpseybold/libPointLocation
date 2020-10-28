@@ -560,9 +560,9 @@ TEST(TSDTests, leafInsertTest) {
     // ASSERT_FALSE(tsd.get_root()->is_leaf());
     // ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
 
-    // auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    auto traps = std::vector<BoundingTrap<PointCart, int>>();
 
-    // write_leaf_traps(tsd.get_root(), traps);
+    write_leaf_traps(tsd.get_root(), traps);
 
-    // io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
+    io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
 }

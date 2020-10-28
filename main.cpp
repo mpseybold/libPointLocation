@@ -60,7 +60,7 @@ int main() {
 
     auto start_time = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < new_calidonia.size(); ++i) {
-        std::cout << i << "\n";
+        // std::cout << i << "\n";
         // auto segment = new_calidonia[i];
         // std::cout << segment.get_source().x() << " " << segment.get_source().y() 
         // << " " << segment.get_target().x() << " " << segment.get_target().y() << "\n";
@@ -75,10 +75,10 @@ int main() {
     // int ret;
     // ret = getrusage(who, &usage);
     // std::cout << usage.ru_idrss << "\n";
-    // auto traps = std::vector<BoundingTrap<PointCart, int>>();
-    // write_leaf_traps(tsd.get_root(), traps);
-    // std::cout << traps.size() << std::endl;
-    // io::write_trapezoids(traps, "plotting/new_calidonia.dat");
+    auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    write_leaf_traps(tsd.get_root(), traps);
+    std::cout << traps.size() << std::endl;
+    io::write_trapezoids(traps, "plotting/new_calidonia.dat");
 
     // std::vector<BoundingTrap<PointCart, int>> traps; 
     // write_leaf_traps(tsd.get_root(), traps);

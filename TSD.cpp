@@ -228,7 +228,6 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
     search_stack.push(root);
 
     while (!search_stack.empty()) {
-        
         num_visited++;
 
         Node<PointType, OrderType>* top = search_stack.top();
@@ -289,6 +288,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
         node->toggle_visited();
     }
 
+    std::cout << subdag_roots.size() << "\n";
+
     if (VERBOSITY_LEVEL >= 100) {
         std::cout << "number of nodes visited:\t" << num_visited << "\n";
         std::cout << "number of subdag roots:\t" << num_subdag_roots << "\n";
@@ -316,7 +317,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     // TODO: check if move is needed
     segments.push_back(seg);
-
+    std::cout << "search...\n";
     affected_subdag_roots(&seg);
 
     //debug
@@ -334,14 +335,16 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     // make a first pass over affected roots to make
     // v-partition calls.
+    std::cout << "v_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
         auto node = subdag_roots[i];
         int v_part_count = 0;
 
-        if (i == 0 && seg.get_priority() == 62) {
-            io::write_trapezoids({subdag_roots[i]->get_trapezoid(), subdag_roots[i+1]->get_trapezoid()}, "merge_debug.dat");
-        }
+
+        // if (i == 0 && seg.get_priority() == 62) {
+        //     io::write_trapezoids({subdag_roots[i]->get_trapezoid(), subdag_roots[i+1]->get_trapezoid()}, "merge_debug.dat");
+        // }
 
         // TODO: remove after support for overlapping segments is added
         // if (node->get_trapezoid().get_top().has_on(&seg)
@@ -575,9 +578,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // to make edge partition calls
 
     auto merge_indices = std::vector<MergeIndices>();
-
+    std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
-
         auto node = subdag_roots[i];
         partition(node, e_cut);
         if (!node->is_flat()) {
@@ -666,3 +668,11 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& seg) {
     //TODO: implement this properly/test the code
 } 
+
+template <class PointType, class OrderType>
+V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
+    assert(cut->get_cut_type() != EDGE);
+
+    auto trap = node->get_trapezoid();
+
+}
