@@ -9,4 +9,4 @@ gmon.out
 profiler_output.txt
 
 data
-plotting/*
+plotting/leaf_insert.dat
