@@ -9,11 +9,11 @@ class V_Cut {
 
         Cut<PointType, OrderType>* up;
         Cut<PointType, OrderType>* down;
-        std::list<Segment<PointType, OrderType>> segs;
+        std::list<Segment<PointType, OrderType>*> segs;
 
     public:
 
-        V_Cut(CutType type, Segment<PointType, OrderType>* seg, Segment<PointType, OrderType>* int_seg)) {
+        V_Cut(CutType type, Segment<PointType, OrderType>* seg, Segment<PointType, OrderType>* int_seg) {
             assert(type != EDGE);
             auto new_cut = new Cut<PointType, OrderType>(type, seg, int_seg);
             up = new_cut;
@@ -31,4 +31,53 @@ class V_Cut {
     
         void set_up(Cut<PointType, OrderType>* _up) { up = _up; }
         void set_down(Cut<PointType, OrderType>* _down) { down = _down; }
-}
+
+        void insert_intersection(CutType type, 
+            Segment<PointType, OrderType>* seg, 
+            Segment<PointType, OrderType>* int_seg) {
+                
+                assert(seg != nullptr);
+                if (segs.empty() || std::find(segs.begin(), segs.end(), seg) != segs.end()) {
+                    segs.push_back(seg);
+                }
+                if (type == INTERSECTION) {
+                    assert(int_seg != nullptr);
+                    if (std::find(segs.begin(), segs.end(), int_seg) != segs.end()) {
+                        segs.push_back(int_seg);
+                    }
+                }
+                if (seg->get_prioity() < up->get_priority()) {
+                    if (type == INTERSECTION) {
+                        up->set_type(type);
+                        up->set_seg(seg);
+                        up->set_intersecting_seg(int_seg);
+                    } else if ((type == SOURCE && up->orientation(seg, 0) == 1) 
+                        || (type == TARGET && up->orientation(seg, 1) == 1)) {
+                            up->set_type(type);
+                            up->set_seg(seg);
+                            up->set_intersecting_seg(nullptr);
+                    }
+                }
+                if (seg->get_priority() < down->get_priority()) {
+                    if (type == INTERSECTION) {
+                        down->set_type(type);
+                        down->set_seg(seg);
+                        down->set_intersecting_seg(int_seg);
+                    } else if ((type == SOURCE && up->orientation(seg, 0) == -1) 
+                        || (type == TARGET && up->orientation(seg, 1) == -1)) {
+                            down->set_type(type);
+                            down->set_seg(seg);
+                            down->set_intersecting_seg(nullptr);
+                    } 
+                }
+        }
+
+        Cut<PointType, OrderType> get_cut(int side) {
+            if (side == 1)
+                return up;
+            if (side == -1)
+                return down;
+
+            return up;
+        }
+};

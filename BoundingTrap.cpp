@@ -13,53 +13,6 @@ BoundingTrap<PointType, OrderType>::vertical_destruction(Cut<PointType, OrderTyp
             
     new_trap_neg =
         BoundingTrap<PointType, OrderType>(bottom, cut, top, left);
-
-    // switch(type) {
-    //     case BRTL: {
-    //         assert(cut->defining_point_cut_comparison(*left) != -1);
-    //         if (cut->defining_point_cut_comparison(*right) == 1) {
-    //             assert(false);
-    //         }
-    //         assert(cut->defining_point_cut_comparison(*right) != 1);
-
-    //         new_trap_pos =
-    //         BoundingTrap<PointType, OrderType>(bottom, right, top, cut);
-            
-    //         new_trap_neg =
-    //         BoundingTrap<PointType, OrderType>(bottom, cut, top, left);
-            
-    //         break;
-    //     }
-    //     case BRT: {
-    //         assert(cut->defining_point_cut_comparison(*right) != 1);
-    //         assert(cut->defining_point_cut_comparison(
-    //             Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    //         ) != -1);
-
-    //         new_trap_neg = 
-    //         BoundingTrap<PointType, OrderType>(bottom, cut, top, nullptr);
-
-    //         new_trap_pos = 
-    //         BoundingTrap<PointType, OrderType>(bottom, right, top, cut);
-
-    //         break;
-    //     }
-    //     case BTL: {
-    //         assert(cut->defining_point_cut_comparison(*left) != -1);
-    //         assert(cut->defining_point_cut_comparison(
-    //             Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    //         ) != 1);
-
-    //         new_trap_neg = 
-    //         BoundingTrap<PointType,
-    //          OrderType>(bottom, cut, top, left);
-
-    //         new_trap_pos =
-    //         BoundingTrap<PointType, OrderType>(bottom, nullptr, top, cut);    
-
-    //         break;
-    //     }
-    // }
     
     return std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>(
         new_trap_pos, new_trap_neg
@@ -72,6 +25,13 @@ BoundingTrap<PointType, OrderType>::edge_destruction(Cut<PointType, OrderType>* 
     assert(cut != nullptr && cut->get_cut_type() == EDGE);
     
     BoundingTrap<PointType, OrderType> new_trap_pos, new_trap_neg;
+    int top_left_side = left_side;
+    int top_right_side = right_side;
+    int bottom_left_side = left_side;
+    int bottom_right_side = right_side;
+
+
+
 
     new_trap_pos = BoundingTrap<PointType, OrderType>(cut, right, top, left);
     new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, right, cut, left);
@@ -147,6 +107,22 @@ BoundingTrap<PointType, OrderType>::destroy(Cut<PointType, OrderType>* cut) {
         return edge_destruction(cut);
 
     return vertical_destruction(cut);
+}
+
+template <class PointType, class OrderType>
+std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> 
+BoundingTrap<PointType, OrderType>::destroy(V_Cut<PointType, OrderType>* cut, int side) {
+    BoundingTrap<PointType, OrderType> new_trap_pos, new_trap_neg;
+
+    new_trap_pos =
+        BoundingTrap<PointType, OrderType>(bottom, right, top, cut, side, right_side);
+            
+    new_trap_neg =
+        BoundingTrap<PointType, OrderType>(bottom, cut, top, left, left_side, side);
+    
+    return std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>(
+        new_trap_pos, new_trap_neg
+    );
 }
 
 template <class PointType, class OrderType>

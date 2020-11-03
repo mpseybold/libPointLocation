@@ -12,8 +12,11 @@ class BoundingTrap {
     
         Cut<PointType, OrderType>* top = nullptr;
         Cut<PointType, OrderType>* bottom = nullptr;
-        Cut<PointType, OrderType>* left = nullptr;
-        Cut<PointType, OrderType>* right = nullptr;
+        V_Cut<PointType, OrderType>* left = nullptr;
+        V_Cut<PointType, OrderType>* right = nullptr;
+
+        int left_side = 0;
+        int right_side = 0;
 
         TrapType type;
 
@@ -26,19 +29,21 @@ class BoundingTrap {
         int trap_cut_region(Segment<PointType, OrderType>* seg, int endpoint);
         std::pair<int, int> trap_cut_regions(Segment<PointType, OrderType>* seg);
 
-        Cut<PointType, OrderType>& _top() { return *top; }
-        Cut<PointType, OrderType>& _bottom() { return *bottom; }
-        Cut<PointType, OrderType>& _left() { return *left; }
-        Cut<PointType, OrderType>& _right() { return *right; }
+        // Cut<PointType, OrderType>& _top() { return *top; }
+        // Cut<PointType, OrderType>& _bottom() { return *bottom; }
+        // Cut<PointType, OrderType>& _left() { return *left; }
+        // Cut<PointType, OrderType>& _right() { return *right; }
 
     public:
 
         BoundingTrap(
             Cut<PointType, OrderType>* _bottom,
-            Cut<PointType, OrderType>* _right,
+            V_Cut<PointType, OrderType>* _right,
             Cut<PointType, OrderType>* _top,
-            Cut<PointType, OrderType>* _left
-        ) : top(_top), bottom(_bottom), left(_left), right(_right) { 
+            V_Cut<PointType, OrderType>* _left,
+            int _left_side, int _right_side
+        ) : top(_top), bottom(_bottom), left(_left), right(_right),
+        left_side(_left_side), right_side(_right_side) { 
 
             assert(top != nullptr);
             assert(bottom != nullptr);
@@ -49,8 +54,8 @@ class BoundingTrap {
             && bottom->get_segment()->get_source().x() != bottom->get_segment()->get_target().x()
             && Segment<PointType, OrderType>::slope_comparison(*top->get_segment(), *bottom->get_segment()) != 0) {
                 auto intersection = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
-                if (!(intersection.defining_point_cut_comparison(*left) < 1 || intersection.defining_point_cut_comparison(*right) > -1))
-                    assert(intersection.defining_point_cut_comparison(*left) < 1 || intersection.defining_point_cut_comparison(*right) > -1);
+                if (!(intersection.defining_point_cut_comparison(*get_left()) < 1 || intersection.defining_point_cut_comparison(*get_right()) > -1))
+                    assert(intersection.defining_point_cut_comparison(*get_left()) < 1 || intersection.defining_point_cut_comparison(*get_right()) > -1);
             }
 
             int slope_comp = Segment<PointType, OrderType>::slope_comparison(
@@ -90,15 +95,21 @@ class BoundingTrap {
             if (bottom == nullptr)
                 std::cout << "hmmm...\n";
             return bottom; }
-        Cut<PointType, OrderType>* get_left() { return left; }
-        Cut<PointType, OrderType>* get_right() { return right; }
+        Cut<PointType, OrderType>* get_left() { return left.get_cut(left_side); }
+        Cut<PointType, OrderType>* get_right() { return right.get_cut(right_side); }
 
         void set_top(Cut<PointType, OrderType>* cut) { top = cut; }
         void set_bottom(Cut<PointType, OrderType>* cut) { bottom = cut; }
-        void set_right(Cut<PointType, OrderType>* cut) { right = cut; }
-        void set_left(Cut<PointType, OrderType>* cut) { left = cut; }
-
+        void set_right(V_Cut<PointType, OrderType>* cut, int side) { 
+            right_side = side;
+            right = cut; 
+        }
+        void set_left(V_Cut<PointType, OrderType>* cut, int side) { 
+            left_side = side;
+            left = cut; 
+        }
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(Cut<PointType, OrderType>* cut);
+        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(V_Cut<PointType, OrderType>* cut, int side);
 
         static BoundingTrap<PointType, OrderType> vertical_merge(
             BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2

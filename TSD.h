@@ -70,7 +70,7 @@ class TSD {
 
         int get_leaf_count() { return leaf_count; }
 
-        V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node);
+        // V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node);
 };
 
 #include "TSD.cpp"

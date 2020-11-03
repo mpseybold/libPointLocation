@@ -669,10 +669,10 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     //TODO: implement this properly/test the code
 } 
 
-template <class PointType, class OrderType>
-V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
-    assert(cut->get_cut_type() != EDGE);
+// template <class PointType, class OrderType>
+// V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
+//     assert(cut->get_cut_type() != EDGE);
 
-    auto trap = node->get_trapezoid();
+//     auto trap = node->get_trapezoid();
 
-}
+// }

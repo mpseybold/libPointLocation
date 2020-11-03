@@ -35,6 +35,7 @@ class Cut {
 
         Segment<PointType, OrderType>* get_intersecting_seg() { return intersecting_seg; }
 
+        void set_type(CutType _cut_type) { cut_type = _cut_type; }
         void set_seg(Segment<PointType, OrderType>* seg) { segment = seg; }
         void set_intersecting_seg(Segment<PointType, OrderType>* _intersecting_seg) { intersecting_seg = _intersecting_seg; }
 
