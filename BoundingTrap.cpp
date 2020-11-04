@@ -2,17 +2,17 @@
 
 template <class PointType, class OrderType>
 std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>
-BoundingTrap<PointType, OrderType>::vertical_destruction(Cut<PointType, OrderType>* cut) {
+BoundingTrap<PointType, OrderType>::vertical_destruction(V_Cut<PointType, OrderType>* cut, int side) {
     assert(cut->get_cut_type() != EDGE);
     assert(cut != nullptr);
 
     BoundingTrap<PointType, OrderType> new_trap_pos, new_trap_neg;
 
     new_trap_pos =
-        BoundingTrap<PointType, OrderType>(bottom, right, top, cut);
+        BoundingTrap<PointType, OrderType>(bottom, right, top, cut, side, right_side);
             
     new_trap_neg =
-        BoundingTrap<PointType, OrderType>(bottom, cut, top, left);
+        BoundingTrap<PointType, OrderType>(bottom, cut, top, left, left_side, side);
     
     return std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>(
         new_trap_pos, new_trap_neg
@@ -25,16 +25,9 @@ BoundingTrap<PointType, OrderType>::edge_destruction(Cut<PointType, OrderType>* 
     assert(cut != nullptr && cut->get_cut_type() == EDGE);
     
     BoundingTrap<PointType, OrderType> new_trap_pos, new_trap_neg;
-    int top_left_side = left_side;
-    int top_right_side = right_side;
-    int bottom_left_side = left_side;
-    int bottom_right_side = right_side;
 
-
-
-
-    new_trap_pos = BoundingTrap<PointType, OrderType>(cut, right, top, left);
-    new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, right, cut, left);
+    new_trap_pos = BoundingTrap<PointType, OrderType>(cut, right, top, left, left_side, right_side);
+    new_trap_neg = BoundingTrap<PointType, OrderType>(bottom, right, cut, left, left_side, right_side);
 
     // switch(type) {
     //     case BRTL: {
@@ -101,12 +94,13 @@ BoundingTrap<PointType, OrderType>::edge_destruction(Cut<PointType, OrderType>* 
 
 template <class PointType, class OrderType>
 std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>
-BoundingTrap<PointType, OrderType>::destroy(Cut<PointType, OrderType>* cut) {
+BoundingTrap<PointType, OrderType>::destroy(Cut<PointType, OrderType>* cut, 
+V_Cut<PointType, OrderType>* v_cut, int side) {
 
     if (cut->get_cut_type() == EDGE)
         return edge_destruction(cut);
 
-    return vertical_destruction(cut);
+    return vertical_destruction(v_cut, side);
 }
 
 template <class PointType, class OrderType>

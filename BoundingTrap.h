@@ -21,7 +21,7 @@ class BoundingTrap {
         TrapType type;
 
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> 
-        vertical_destruction(Cut<PointType, OrderType>* cut);
+        vertical_destruction(V_Cut<PointType, OrderType>* cut, int side);
 
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> 
         edge_destruction(Cut<PointType, OrderType>* cut);

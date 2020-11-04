@@ -4,6 +4,10 @@
 #define VERBOSITY_LEVEL 1
 
 
+template <class PointType, class OrderType>
+V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
+    
+}
 // Returns the next priority descendants of 'node'
 // whose regions intersect the segment.
 // The nodes are ordered in the output vector in left-to-right

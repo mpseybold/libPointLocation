@@ -16,12 +16,12 @@ class TSD {
         Node<PointType, OrderType>* root;
         std::vector<Segment<PointType, OrderType>> segments;
 
-        void v_part_handle_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
-        void v_part_handle_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
-        void v_part_handle_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
-        void v_part_handle_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
-        void v_part_handle_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
-        void v_part_handle_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);
+        void v_part_handle_E_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
+        void v_part_handle_leaf_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
+        void v_part_handle_V_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
+        void v_part_handle_VE_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
+        void v_part_handle_EV_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
+        void v_part_handle_VVE_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
 
         Node<PointType, OrderType>* v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
         Node<PointType, OrderType>* v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
@@ -70,7 +70,7 @@ class TSD {
 
         int get_leaf_count() { return leaf_count; }
 
-        // V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node);
+        V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node);
 };
 
 #include "TSD.cpp"
