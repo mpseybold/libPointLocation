@@ -6,7 +6,28 @@
 
 template <class PointType, class OrderType>
 V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
+    if (node->get_trapezoid().get_left()
+    ->defining_point_cut_comparison(*cut) == 0)
+        return node->get_trapezoid().get_v_left();
+
+    if (node->get_trapezoid().get_right()
+    ->defining_point_cut_comparison(*cut) == 0)
+        return node->get_trapezoid().get_v_right();
+
+    std::vector<Node<PointType, OrderType>*> nodes{
+        node->get_L(), node->get_R(),
+        node->get_A(), node->get_B()
+    };
+
+    for (auto n: nodes) {
+        if (n != nullptr && n->get_trapezoid().contains_defining_point(cut)) {
+            auto v_cut = find_v_cut(cut, n);
+            if (v_cut != nullptr)
+                return v_cut;
+        }
+    }
     
+    return nullptr;
 }
 // Returns the next priority descendants of 'node'
 // whose regions intersect the segment.

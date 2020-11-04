@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Cut.h"
+#include "V_Cut.h"
 #include <list>
 
 enum TrapType { BRTL, BTL, BRT, NONE };
@@ -98,6 +98,9 @@ class BoundingTrap {
         Cut<PointType, OrderType>* get_left() { return left.get_cut(left_side); }
         Cut<PointType, OrderType>* get_right() { return right.get_cut(right_side); }
 
+        V_Cut<PointType, OrderType>* get_v_left() { return left; }
+        V_Cut<PointType, OrderType>* get_v_right() { return right; }
+
         void set_top(Cut<PointType, OrderType>* cut) { top = cut; }
         void set_bottom(Cut<PointType, OrderType>* cut) { bottom = cut; }
         void set_right(V_Cut<PointType, OrderType>* cut, int side) { 
@@ -143,4 +146,6 @@ class BoundingTrap {
         bool is_degen();
 
         bool through_common_corner(BoundingTrap<PointType, OrderType>& other, Segment<PointType, OrderType>* seg);
+
+        bool contains_defining_point(Cut<PointType, OrderType>* cut);
 };
