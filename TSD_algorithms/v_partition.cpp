@@ -38,8 +38,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_e() == nullptr);
-    assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
-    assert(node->get_v_2() == nullptr);
+    // assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
+    // assert(node->get_v_2() == nullptr);
     // std::vector<BoundingTrap<PointType, OrderType>> problems = std::vector<BoundingTrap<PointType, OrderType>>();
     // problems.push_back(node->get_trapezoid());
     // io::write_trapezoids(problems, "problematic_traps.dat");
@@ -53,7 +53,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     auto R = new Node<PointType, OrderType>(pos_neg.first);
     auto A = new Node<PointType, OrderType>(pos_neg.second);
 
-    v_partition(node->get_R(), v_cut);
+    v_partition(node->get_R(), v_cut, side);
 
     delete node->get_R();
 
@@ -400,19 +400,19 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     switch(pattern) {
         case E:
-            v_part_handle_E_case(node, v_cut);
+            v_part_handle_E_case(node, v_cut, side);
             break;
         case VE:
-            v_part_handle_VE_case(node, v_cut);
+            v_part_handle_VE_case(node, v_cut, side);
             break;
         case V:
-            v_part_handle_V_case(node, v_cut);
+            v_part_handle_V_case(node, v_cut, side);
             break;
         case VVE:
-            v_part_handle_VVE_case(node, v_cut);
+            v_part_handle_VVE_case(node, v_cut, side);
             break;
         case NO_DESTRUCTION:
-            v_part_handle_leaf_case(node, v_cut);
+            v_part_handle_leaf_case(node, v_cut, side);
             break;
     }
 }

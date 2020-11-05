@@ -70,9 +70,9 @@ class BoundingTrap {
             //     assert(left != nullptr && right != nullptr);
             // }
 
-            if (slope_comp != 0 && aux_int.defining_point_cut_comparison(*left) == 0) {
+            if (slope_comp != 0 && aux_int.defining_point_cut_comparison(*get_left()) == 0) {
                 type = BRT;
-            } else if (slope_comp != 0 && aux_int.defining_point_cut_comparison(*right) == 0) {
+            } else if (slope_comp != 0 && aux_int.defining_point_cut_comparison(*get_right()) == 0) {
                 type = BTL;
             } else {
                 type = BRTL;
@@ -95,11 +95,14 @@ class BoundingTrap {
             if (bottom == nullptr)
                 std::cout << "hmmm...\n";
             return bottom; }
-        Cut<PointType, OrderType>* get_left() { return left.get_cut(left_side); }
-        Cut<PointType, OrderType>* get_right() { return right.get_cut(right_side); }
+        Cut<PointType, OrderType>* get_left() { return left->get_cut(left_side); }
+        Cut<PointType, OrderType>* get_right() { return right->get_cut(right_side); }
 
         V_Cut<PointType, OrderType>* get_v_left() { return left; }
         V_Cut<PointType, OrderType>* get_v_right() { return right; }
+
+        int get_left_side() { return left_side; }
+        int get_right_side() { return right_side; }
 
         void set_top(Cut<PointType, OrderType>* cut) { top = cut; }
         void set_bottom(Cut<PointType, OrderType>* cut) { bottom = cut; }
@@ -112,7 +115,7 @@ class BoundingTrap {
             left = cut; 
         }
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(Cut<PointType, OrderType>* cut);
-        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(V_Cut<PointType, OrderType>* cut, int side);
+        std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(V_Cut<PointType, OrderType>* v_cut, int side);
 
         static BoundingTrap<PointType, OrderType> vertical_merge(
             BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2

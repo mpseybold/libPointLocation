@@ -143,7 +143,7 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     assert(node->get_A() == nullptr);
     assert(node->get_B() == nullptr);
     assert(node->get_e() == nullptr);
-    assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
+    // assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
     assert(node->get_v_2() == nullptr);
 
 
@@ -196,8 +196,8 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
     assert(node->get_A() != nullptr);
     assert(node->get_B() == nullptr);
     assert(node->get_e() == nullptr);
-    assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
-    assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
+    // assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
+    // assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
     if (!node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()))
         assert(node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment()));
 

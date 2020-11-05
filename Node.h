@@ -43,8 +43,8 @@ class Node {
 
         DestructionCuts<PointType, OrderType>& get_destruction_cuts() { return destruction_cuts; }
 
-        void set_v_1(Cut<PointType, OrderType>* cut) { destruction_cuts.set_v_1(cut); }
-        void set_v_2(Cut<PointType, OrderType>* cut) { destruction_cuts.set_v_2(cut); }
+        void set_v_1(V_Cut<PointType, OrderType>* cut) { destruction_cuts.set_v_1(cut); }
+        void set_v_2(V_Cut<PointType, OrderType>* cut) { destruction_cuts.set_v_2(cut); }
         void set_e(Cut<PointType, OrderType>* cut) { destruction_cuts.set_e(cut); }
 
         void clear_e() { destruction_cuts.clear_e(); }
@@ -89,8 +89,8 @@ class Node {
             set_v_2(other->get_v_2());
         }
 
-        Cut<PointType, OrderType>* get_v_1() { return destruction_cuts.get_v_1(); }
-        Cut<PointType, OrderType>* get_v_2() { return destruction_cuts.get_v_2(); }
+        V_Cut<PointType, OrderType>* get_v_1() { return destruction_cuts.get_v_1(); }
+        V_Cut<PointType, OrderType>* get_v_2() { return destruction_cuts.get_v_2(); }
         Cut<PointType, OrderType>* get_e() { return destruction_cuts.get_e(); }
 
         bool is_leaf() { return destruction_cuts.no_cuts(); }

@@ -3,7 +3,7 @@
 template <class PointType, class OrderType>
 std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>
 BoundingTrap<PointType, OrderType>::vertical_destruction(V_Cut<PointType, OrderType>* cut, int side) {
-    assert(cut->get_cut_type() != EDGE);
+    // assert(cut->get_cut_type() != EDGE);
     assert(cut != nullptr);
 
     BoundingTrap<PointType, OrderType> new_trap_pos, new_trap_neg;
@@ -94,13 +94,10 @@ BoundingTrap<PointType, OrderType>::edge_destruction(Cut<PointType, OrderType>* 
 
 template <class PointType, class OrderType>
 std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>
-BoundingTrap<PointType, OrderType>::destroy(Cut<PointType, OrderType>* cut, 
-V_Cut<PointType, OrderType>* v_cut, int side) {
+BoundingTrap<PointType, OrderType>::destroy(Cut<PointType, OrderType>* cut) {
 
-    if (cut->get_cut_type() == EDGE)
-        return edge_destruction(cut);
+    return edge_destruction(cut);
 
-    return vertical_destruction(v_cut, side);
 }
 
 template <class PointType, class OrderType>
@@ -128,8 +125,8 @@ BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_
     assert(trap_1.get_bottom() == trap_2.get_bottom());
     assert(trap_1.get_right() == trap_2.get_left());
     return BoundingTrap<PointType, OrderType>(
-        trap_1.get_bottom(), trap_2.get_right(), 
-        trap_1.get_top(), trap_1.get_left()
+        trap_1.get_bottom(), trap_2.get_v_right(), 
+        trap_1.get_top(), trap_1.get_v_left(), trap_1.get_left_side(), trap_2.get_right_side()
     );
 }
 
@@ -140,15 +137,15 @@ BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::edge_merg
     // assert(trap_1.get_left() == trap_2.get_left());
     // assert(trap_1.get_right() == trap_2.get_right());
 
-    Cut<PointType, OrderType>* left_cut = trap_1.get_left() == nullptr ?
-    trap_2.get_left() : trap_1.get_left();
+    V_Cut<PointType, OrderType>* left_cut = trap_1.get_v_left() == nullptr ?
+    trap_2.get_v_left() : trap_1.get_v_left();
 
-    Cut<PointType, OrderType>* right_cut = trap_1.get_right() == nullptr ?
-    trap_1.get_right() : trap_1.get_right();
+    V_Cut<PointType, OrderType>* right_cut = trap_1.get_v_right() == nullptr ?
+    trap_1.get_v_right() : trap_1.get_v_right();
 
     return BoundingTrap<PointType, OrderType>(
         trap_2.get_bottom(), right_cut, 
-        trap_1.get_top(), left_cut
+        trap_1.get_top(), left_cut, trap_1.get_left_side(), trap_1.get_right_side()
     ); 
 }
 
@@ -173,14 +170,14 @@ int BoundingTrap<PointType, OrderType>::trap_cut_region(Segment<PointType, Order
     PointType p = endpoint == 0 ? seg->get_source() : seg->get_target();
     PointType other_p = endpoint == 0 ? seg->get_target() : seg->get_source();
 
-    Cut<PointType, OrderType> _left_cut = left == nullptr 
+    Cut<PointType, OrderType> _left_cut = get_left() == nullptr 
     ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *left;
+    : *get_left();
     auto left_cut = &_left_cut;
 
-    Cut<PointType, OrderType> _right_cut = right == nullptr 
+    Cut<PointType, OrderType> _right_cut = get_right() == nullptr 
     ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *right;
+    : *get_right();
     auto right_cut = &_right_cut;
 
     if (left_cut->orientation(p) < 0 || (left_cut->orientation(p) == 0 && left_cut->orientation(other_p) < 0)) {
@@ -310,9 +307,9 @@ bool BoundingTrap<PointType, OrderType>::through_corner(Segment<PointType, Order
     if (top->has_on(seg) || bottom->has_on(seg))
         return false;
 
-    auto left_cut = left != nullptr ? *left :
+    auto left_cut = get_left() != nullptr ? *get_left() :
     Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
-    auto right_cut = right != nullptr ? *right :
+    auto right_cut = get_right() != nullptr ? *get_right() :
     Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
     
     auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
@@ -347,9 +344,9 @@ bool BoundingTrap<PointType, OrderType>::intersect_corner(Segment<PointType, Ord
         return false;
 
 
-    auto left_cut = left != nullptr ? *left :
+    auto left_cut = get_left() != nullptr ? *get_left() :
     Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
-    auto right_cut = right != nullptr ? *right :
+    auto right_cut = get_right() != nullptr ? *get_right() :
     Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment());
     
     auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
@@ -405,14 +402,14 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
     if (intersect_corner(seg))
         return false;
 
-    Cut<PointType, OrderType> _left_cut = left == nullptr 
+    Cut<PointType, OrderType> _left_cut = get_left() == nullptr 
     ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *left;
+    : *get_left();
     auto left_cut = &_left_cut;
 
-    Cut<PointType, OrderType> _right_cut = right == nullptr
+    Cut<PointType, OrderType> _right_cut = get_right() == nullptr
     ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *right;
+    : *get_right();
     auto right_cut = &_right_cut;
 
     Cut<PointType, OrderType> seg_cut = Cut<PointType, OrderType>(
@@ -667,7 +664,7 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
         return true;
     
 
-    if (right != nullptr && right->get_cut_type() == INTERSECTION) {
+    if (right != nullptr && get_right()->get_cut_type() == INTERSECTION) {
         Cut<PointType, OrderType> _aux_cut = Cut<PointType, OrderType>(
             EDGE, right_cut->get_intersecting_seg(), nullptr
         );
@@ -678,7 +675,7 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
             return seg > right_cut->get_intersecting_seg();
         }
     }
-    if (left != nullptr && left->get_cut_type() == INTERSECTION) {
+    if (left != nullptr && get_left()->get_cut_type() == INTERSECTION) {
         Cut<PointType, OrderType> _aux_cut = Cut<PointType, OrderType>(
             EDGE, left_cut->get_intersecting_seg(), nullptr
         );
@@ -715,22 +712,22 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, Or
     || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 1)
     || (bottom->orientation(p) == 0 && bottom->orientation(other_p) == 0 && *(bottom->get_segment()) < *seg);
 
-    if (right == nullptr)
+    if (get_right() == nullptr)
         right_test = true;
     else {
-        right_test = right->orientation(p) == -1
-        || (right->orientation(p) == 0 && right->orientation(other_p) == -1);
+        right_test = get_right()->orientation(p) == -1
+        || (get_right()->orientation(p) == 0 && get_right()->orientation(other_p) == -1);
     }
 
     top_test = top->orientation(p) == -1
     || (top->orientation(p) == 0 && top->orientation(other_p) == -1)
     || (top->orientation(p) == 0 && top->orientation(other_p) == 0 && *seg < *(top->get_segment()));
 
-    if (left == nullptr) {
+    if (get_left() == nullptr) {
         left_test = true;
     } else {
-        left_test = left->orientation(p) == 1
-        || (left->orientation(p) == 0 && left->orientation(other_p) == 1);
+        left_test = get_left()->orientation(p) == 1
+        || (get_left()->orientation(p) == 0 && get_left()->orientation(other_p) == 1);
     }
 
     return bottom_test && right_test && top_test && left_test;
@@ -755,17 +752,17 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint_strict(Segment<PointT
     if (right == nullptr)
         right_test = true;
     else {
-        right_test = right->orientation(p) == -1;
+        right_test = get_right()->orientation(p) == -1;
     }
 
     top_test = top->orientation(p) == -1
     || (top->orientation(p) == 0 && top->orientation(other_p) == -1)
     || (top->orientation(p) == 0 && top->orientation(other_p) == 0 && *seg < *(top->get_segment()));
 
-    if (left == nullptr) {
+    if (get_left() == nullptr) {
         left_test = true;
     } else {
-        left_test = left->orientation(p) == 1;
+        left_test = get_left()->orientation(p) == 1;
     }
 
     return bottom_test && right_test && top_test && left_test;
@@ -773,58 +770,58 @@ bool BoundingTrap<PointType, OrderType>::contains_endpoint_strict(Segment<PointT
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::seg_intersects_top(Segment<PointType, OrderType>* seg) {
+    return false;
+    // if (!(top->has_seg_on_pos_side(seg) && top->has_seg_on_neg_side(seg)))
+    //     return false;
+
+    // auto _top_intersection = Cut<PointType, OrderType>(
+    //     INTERSECTION, seg, top->get_segment()
+    // );
+    // auto top_intersection = &_top_intersection;
+
+    // auto _left_cut = get_left() == nullptr
+    // ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
+    // : *get_left();
+    // auto left_cut = &_left_cut;
+
+    // auto _right_cut = get_right() == nullptr
+    // ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
+    // : *get_right();
+    // auto right_cut = &_right_cut;
     
-    if (!(top->has_seg_on_pos_side(seg) && top->has_seg_on_neg_side(seg)))
-        return false;
+    // bool intersects_via_top =
+    // (top_intersection->defining_point_cut_comparison(*left_cut) == 1 &&
+    //     top_intersection->defining_point_cut_comparison(*right_cut) == -1);
 
-    auto _top_intersection = Cut<PointType, OrderType>(
-        INTERSECTION, seg, top->get_segment()
-    );
-    auto top_intersection = &_top_intersection;
-
-    auto _left_cut = left == nullptr
-    ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *left;
-    auto left_cut = &_left_cut;
-
-    auto _right_cut = right == nullptr
-    ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *right;
-    auto right_cut = &_right_cut;
-    
-    bool intersects_via_top =
-    (top_intersection->defining_point_cut_comparison(*left_cut) == 1 &&
-        top_intersection->defining_point_cut_comparison(*right_cut) == -1);
-
-    return intersects_via_top;
+    // return intersects_via_top;
 }
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::seg_intersects_bottom(Segment<PointType, OrderType>* seg) {
+    return false;
+    // if (!(bottom->has_seg_on_pos_side(seg) && bottom->has_seg_on_neg_side(seg)))
+    //     return false;
+
+    // auto _bottom_intersection = Cut<PointType, OrderType>(
+    //     INTERSECTION, seg, bottom->get_segment()
+    // );
+    // auto bottom_intersection = &_bottom_intersection;
+
+    // auto _left_cut = left->get_cut_type() == NO_CUT
+    // ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
+    // : *left;
+    // auto left_cut = &_left_cut;
+
+    // auto _right_cut = right->get_cut_type() == NO_CUT
+    // ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
+    // : *right;
+    // auto right_cut = &_right_cut;
     
-    if (!(bottom->has_seg_on_pos_side(seg) && bottom->has_seg_on_neg_side(seg)))
-        return false;
+    // bool intersects_via_bottom =
+    // (bottom_intersection->defining_point_cut_comparison(*left_cut) == 1 &&
+    //     bottom_intersection->defining_point_cut_comparison(*right_cut) == -1);
 
-    auto _bottom_intersection = Cut<PointType, OrderType>(
-        INTERSECTION, seg, bottom->get_segment()
-    );
-    auto bottom_intersection = &_bottom_intersection;
-
-    auto _left_cut = left->get_cut_type() == NO_CUT
-    ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *left;
-    auto left_cut = &_left_cut;
-
-    auto _right_cut = right->get_cut_type() == NO_CUT
-    ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
-    : *right;
-    auto right_cut = &_right_cut;
-    
-    bool intersects_via_bottom =
-    (bottom_intersection->defining_point_cut_comparison(*left_cut) == 1 &&
-        bottom_intersection->defining_point_cut_comparison(*right_cut) == -1);
-
-    return intersects_via_bottom;
+    // return intersects_via_bottom;
 }
 
 template <class PointType, class OrderType>
@@ -842,10 +839,10 @@ bool BoundingTrap<PointType, OrderType>::through_common_corner(BoundingTrap<Poin
 
         auto bottom_int = Cut<PointType, OrderType>(INTERSECTION, bottom->get_segment(), seg);
 
-        if (bottom_int.defining_point_cut_comparison(*right) == 0)
+        if (bottom_int.defining_point_cut_comparison(*get_right()) == 0)
             return true;
 
-        if (bottom_int.defining_point_cut_comparison(*left) == 0)
+        if (bottom_int.defining_point_cut_comparison(*get_left()) == 0)
             return true;
          
 
@@ -856,10 +853,10 @@ bool BoundingTrap<PointType, OrderType>::through_common_corner(BoundingTrap<Poin
 
         auto top_int = Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), seg);
 
-        if (top_int.defining_point_cut_comparison(*right) == 0)
+        if (top_int.defining_point_cut_comparison(*get_right()) == 0)
             return true;
 
-        if (top_int.defining_point_cut_comparison(*right) == 0)
+        if (top_int.defining_point_cut_comparison(*get_right()) == 0)
             return true;
 
     }

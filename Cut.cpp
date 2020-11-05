@@ -55,7 +55,7 @@ template <class PointType, class OrderType>
 int Cut<PointType, OrderType>::defining_point_cut_comparison(
     Cut<PointType, OrderType> other_cut, bool shear) {
     
-    assert(cut_type != EDGE);
+    // assert(cut_type != EDGE);
 
     if (cut_type == SOURCE)
         return other_cut.orientation(segment->get_source(), shear);

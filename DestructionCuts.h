@@ -9,8 +9,8 @@ template <class PointType, class OrderType>
 
 class DestructionCuts {
     private:
-        Cut<PointType, OrderType>* v_1 = nullptr;
-        Cut<PointType, OrderType>* v_2 = nullptr;
+        V_Cut<PointType, OrderType>* v_1 = nullptr;
+        V_Cut<PointType, OrderType>* v_2 = nullptr;
         Cut<PointType, OrderType>* e = nullptr;
 
     public:
@@ -20,12 +20,12 @@ class DestructionCuts {
             e = nullptr;
         }
 
-        void set_v_1(Cut<PointType, OrderType>* cut) {
-            assert(cut->get_cut_type() != EDGE && cut != nullptr);
+        void set_v_1(V_Cut<PointType, OrderType>* cut) {
+            assert(cut->get_cut(0)->get_cut_type() != EDGE && cut != nullptr);
             v_1 = cut;
         }
-        void set_v_2(Cut<PointType, OrderType>* cut) {
-            assert(cut->get_cut_type() != EDGE && cut != nullptr);
+        void set_v_2(V_Cut<PointType, OrderType>* cut) {
+            assert(cut->get_cut(0)->get_cut_type() != EDGE && cut != nullptr);
             v_2 = cut;
         }
         void set_e(Cut<PointType, OrderType>* cut) {
@@ -60,8 +60,8 @@ class DestructionCuts {
             }
         }
 
-        Cut<PointType, OrderType>* get_v_1() { return v_1; }
-        Cut<PointType, OrderType>* get_v_2() { return v_2; }
+        V_Cut<PointType, OrderType>* get_v_1() { return v_1; }
+        V_Cut<PointType, OrderType>* get_v_2() { return v_2; }
         Cut<PointType, OrderType>* get_e() { return e; }
 
         void clear_e() { e = nullptr; }

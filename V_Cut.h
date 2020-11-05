@@ -20,15 +20,16 @@ class V_Cut {
             down = new_cut;
         }
 
-        int defining_point_cut_comparison(Cut<PointType, OrderType>& cut) {
+        int defining_point_cut_comparison(V_Cut<PointType, OrderType>& cut) {
             if (up != nullptr)
-                return up->defning_point_cut_comparison(cut);
+                return up->defining_point_cut_comparison(*cut.get_cut(1));
             else if (down != nullptr)
-                return down->defining_point_cut_comparison(cut);
+                return down->defining_point_cut_comparison(*cut.get_cut(1));
 
             assert(false);
         }
-    
+
+     
         void set_up(Cut<PointType, OrderType>* _up) { up = _up; }
         void set_down(Cut<PointType, OrderType>* _down) { down = _down; }
 
@@ -46,7 +47,7 @@ class V_Cut {
                         segs.push_back(int_seg);
                     }
                 }
-                if (seg->get_prioity() < up->get_priority()) {
+                if (seg->get_priority() < up->get_priority()) {
                     if (type == INTERSECTION) {
                         up->set_type(type);
                         up->set_seg(seg);
@@ -72,12 +73,16 @@ class V_Cut {
                 }
         }
 
-        Cut<PointType, OrderType> get_cut(int side) {
+        Cut<PointType, OrderType>* get_cut(int side) {
             if (side == 1)
                 return up;
             if (side == -1)
                 return down;
 
             return up;
+        }
+
+        OrderType get_priority() {
+            return std::min(up->get_priority(), down->get_priority());
         }
 };

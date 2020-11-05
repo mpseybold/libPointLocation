@@ -62,7 +62,7 @@ class TSD {
 
         Node<PointType, OrderType>* v_merge(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
 
-        void v_partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* v_cut);        
+        void v_partition(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);        
 
         Node<PointType, OrderType>* merge(Node<PointType, OrderType>* below, Node<PointType, OrderType>* above);
 
