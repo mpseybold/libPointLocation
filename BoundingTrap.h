@@ -47,7 +47,8 @@ class BoundingTrap {
 
             assert(top != nullptr);
             assert(bottom != nullptr);
-            assert(left != nullptr);
+            if (left == nullptr)
+                assert(left != nullptr);
             assert(right != nullptr);
 
             if (top->get_segment()->get_source().x() != top->get_segment()->get_target().x() 

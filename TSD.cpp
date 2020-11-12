@@ -282,7 +282,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
         for (int i = 0; i < intersecting_descendants.size(); ++i) {
             Node<PointType, OrderType>* node = intersecting_descendants[i];
             if (node != nullptr && !node->is_visited()) {
-                if (node->get_priority() > seg->get_priority()) {
+                if (node->get_priority() >= seg->get_priority()) {
                     subdag_roots.push_back(node);
                     node->toggle_visited();
                     visited_nodes.push_back(node);
@@ -313,7 +313,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
         node->toggle_visited();
     }
 
-    std::cout << subdag_roots.size() << "\n";
+    // std::cout << subdag_roots.size() << "\n";
 
     if (VERBOSITY_LEVEL >= 100) {
         std::cout << "number of nodes visited:\t" << num_visited << "\n";
@@ -342,7 +342,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     // TODO: check if move is needed
     segments.push_back(seg);
-    std::cout << "search...\n";
+    // std::cout << "search...\n";
     affected_subdag_roots(&seg);
 
     //debug
@@ -360,7 +360,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     // make a first pass over affected roots to make
     // v-partition calls.
-    std::cout << "v_partitions..\n";
+    // std::cout << "v_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
         auto node = subdag_roots[i];
@@ -373,23 +373,25 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     
         if (i == 0) {
+            auto src_cut = new Cut<PointType, OrderType>(
+                SOURCE, &seg, nullptr
+            );
             if (node->contains_endpoint(&seg, 0)) {
-                auto src_cut = new Cut<PointType, OrderType>(
-                    SOURCE, &seg, nullptr
-                );
-
                 auto v_cut = find_v_cut(src_cut, root);
 
                 if (v_cut == nullptr) {
                     v_cut = new V_Cut<PointType, OrderType>(SOURCE, &seg, nullptr);
                 } else {
+                    std::cout << "found cut\n";
                     v_cut->insert_intersection(SOURCE, &seg, nullptr);
                 }
 
                 v_partition(node, v_cut, 1);
                 v_part_count++;
-                delete src_cut;
+            } else if (node->get_trapezoid().get_left()->defining_point_cut_comparison(*src_cut) == 0) {
+                node->get_trapezoid().get_v_left()->insert_intersection(SOURCE, &seg, nullptr);
             }
+            delete src_cut;
             if (i < subdag_roots.size()-1) {
                 auto next = subdag_roots[i+1];
                 assert(next != nullptr);
@@ -503,7 +505,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 auto leftmost_v_cut = find_v_cut(leftmost, root);
 
                 if (leftmost_v_cut == nullptr) {
-                    auto leftmost_v_cut = new V_Cut<PointType, OrderType>(INTERSECTION, leftmost->get_segment(), leftmost->get_intersecting_seg());
+                    leftmost_v_cut = new V_Cut<PointType, OrderType>(INTERSECTION, 
+                    leftmost->get_segment(), leftmost->get_intersecting_seg());
                 } else {
                     leftmost_v_cut->insert_intersection(
                         INTERSECTION, leftmost->get_segment(),
@@ -512,7 +515,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 }
 
                 int side = leftmost == top_int ? -1 : 1;
-
+                delete leftmost;
                 v_partition(node, leftmost_v_cut, side);
             }
 
@@ -593,19 +596,24 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
             }
 
+            auto tgt_cut = new Cut<PointType, OrderType>(
+                TARGET, &seg, nullptr
+            );
             if (node->contains_endpoint(&seg, 1)) {
-                auto tgt_cut = new Cut<PointType, OrderType>(
-                    TARGET, &seg, nullptr
-                );
                 auto v_cut = find_v_cut(tgt_cut, root);
                 if (v_cut == nullptr) {
                     v_cut = new V_Cut<PointType, OrderType>(TARGET, &seg, nullptr);
                 }
                 
-                delete tgt_cut;
                 v_partition(node, v_cut, 1);
                 v_part_count++;
+            } else if (node->get_trapezoid()
+            .get_right()->defining_point_cut_comparison(*tgt_cut) == 0) {
+                node->get_trapezoid().get_v_right()->insert_intersection(
+                    TARGET, &seg, nullptr
+                );
             }
+            delete tgt_cut;
         }
     }
 
@@ -614,7 +622,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // to make edge partition calls
 
     auto merge_indices = std::vector<MergeIndices>();
-    std::cout << "e_partitions..\n";
+    // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
         auto node = subdag_roots[i];
         partition(node, e_cut);
@@ -703,6 +711,43 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& seg) {
     //TODO: implement this properly/test the code
+    affected_subdag_roots(&seg);
+
+    //TODO: Undo merges above and below segment
+
+    for (int i = subdag_roots.size() - 1; i >= 0; --i) {
+        
+        auto node = subdag_roots[i];
+
+        if (i > 0) {
+            auto prev = subdag_roots[i-1];
+            auto A = node->get_A();
+            auto B = node->get_B();
+
+            assert(A != nullptr);
+            assert(B != nullptr);
+
+            auto trap_A = A->get_trapezoid();
+            auto trap_B = B->get_trapezoid();
+
+            if (trap_A.get_left()->defining_point_cut_comparison(trap_B.get_left()) < 0) {
+                v_partition(A, trap_B->get_v_left(), 1);
+                node->set_A(A->get_R());
+                auto left_merge = node->get_left();
+                while (left_merge != nullptr) {
+                    
+                }
+            } else if (trap_A.get_left()->defining_point_cut_comparison(trap_B.get_left()) > 0) {
+                v_partition(B, trap_A->get_v_left(), 1);
+            }
+        }
+    }
+
+    //TODO: make merge calls
+
+    //TODO: make v_merge calls 
+
+
 } 
 
 // template <class PointType, class OrderType>

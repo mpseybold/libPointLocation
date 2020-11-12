@@ -867,10 +867,11 @@ bool BoundingTrap<PointType, OrderType>::through_common_corner(BoundingTrap<Poin
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::contains_defining_point(Cut<PointType, OrderType>* cut) {
-    return top->defining_point_cut_comparison(*cut) < 1 &&
-    bottom->defining_point_cut_comparison(*cut) > -1 &&
-    get_left()->defining_point_cut_comparison(*cut) > -1 &&
-    get_right()->defining_point_cut_comparison(*cut) < 1;
+    assert(cut->get_cut_type() != EDGE);
+    return cut->defining_point_cut_comparison(*top) < 1 &&
+    cut->defining_point_cut_comparison(*bottom) > -1 &&
+    cut->defining_point_cut_comparison(*get_left()) > -1 &&
+    cut->defining_point_cut_comparison(*get_right()) < 1;
 }
 
 template class BoundingTrap<PointCart, int>;

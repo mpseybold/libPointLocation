@@ -15,9 +15,13 @@ class V_Cut {
 
         V_Cut(CutType type, Segment<PointType, OrderType>* seg, Segment<PointType, OrderType>* int_seg) {
             assert(type != EDGE);
+            assert(seg != nullptr);
             auto new_cut = new Cut<PointType, OrderType>(type, seg, int_seg);
             up = new_cut;
             down = new_cut;
+            segs.push_back(seg);
+            if (int_seg != nullptr)
+                segs.push_back(int_seg);
         }
 
         int defining_point_cut_comparison(V_Cut<PointType, OrderType>& cut) {
@@ -36,14 +40,14 @@ class V_Cut {
         void insert_intersection(CutType type, 
             Segment<PointType, OrderType>* seg, 
             Segment<PointType, OrderType>* int_seg) {
-                
+                std::cout << "v_cut size: " << segs.size() << std::endl;
                 assert(seg != nullptr);
-                if (segs.empty() || std::find(segs.begin(), segs.end(), seg) != segs.end()) {
+                if (segs.empty() || std::find(segs.begin(), segs.end(), seg) == segs.end()) {
                     segs.push_back(seg);
                 }
                 if (type == INTERSECTION) {
                     assert(int_seg != nullptr);
-                    if (std::find(segs.begin(), segs.end(), int_seg) != segs.end()) {
+                    if (std::find(segs.begin(), segs.end(), int_seg) == segs.end()) {
                         segs.push_back(int_seg);
                     }
                 }

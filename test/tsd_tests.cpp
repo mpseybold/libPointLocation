@@ -391,28 +391,32 @@ TEST(TSDTests, overlappingTests) {
         PointCart(10, 50), PointCart(90, 50), 1
     );
 
-    Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
-        PointCart(15, 50), PointCart(85, 50), 3
-    );
+    // Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
+    //     PointCart(15, 50), PointCart(85, 50), 3
+    // );
 
     Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
-        PointCart(30, 70), PointCart(70, 30), 2
+        PointCart(90, 50), PointCart(91, 50), 2
     );
 
-    Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
-        PointCart(20, 80), PointCart(80, 20), 4
-    );
+    // Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
+    //     PointCart(30, 70), PointCart(70, 30), 2
+    // );
+
+    // Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
+    //     PointCart(20, 80), PointCart(80, 20), 4
+    // );
 
     tsd.insert_segment(seg_1);
     tsd.insert_segment(seg_3);
-    tsd.insert_segment(seg_2);
-    tsd.insert_segment(seg_4);
+    // tsd.insert_segment(seg_2);
+    // tsd.insert_segment(seg_4);
 
     auto traps = std::vector<BoundingTrap<PointCart, int>>();
     write_leaf_traps(tsd.get_root(), traps);
     io::write_trapezoids(traps, "leaf_insert.dat");
 
-    ASSERT_EQ(tsd.get_leaf_count(), 18);
+    // ASSERT_EQ(tsd.get_leaf_count(), 18);
 }
 
 TEST(TSDTests, leafInsertTest) {
@@ -484,7 +488,7 @@ TEST(TSDTests, leafInsertTest) {
     auto segments = std::vector<Segment<PointCart, int>>();
 
     std::cout << "start...\n";
-    for (int i = 1; i <= 100; ++i) {
+    for (int i = 1; i <= 400; ++i) {
 
         std::cout << i << std::endl;
         PointCart s = PointCart(0, 0);
@@ -560,9 +564,9 @@ TEST(TSDTests, leafInsertTest) {
     // ASSERT_FALSE(tsd.get_root()->is_leaf());
     // ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
 
-    auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    // auto traps = std::vector<BoundingTrap<PointCart, int>>();
 
-    write_leaf_traps(tsd.get_root(), traps);
+    // write_leaf_traps(tsd.get_root(), traps);
 
-    io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
+    // io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
 }

@@ -60,7 +60,7 @@ int main() {
 
     auto start_time = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < new_calidonia.size(); ++i) {
-        // std::cout << i << "\n";
+        std::cout << i << "\n";
         // auto segment = new_calidonia[i];
         // std::cout << segment.get_source().x() << " " << segment.get_source().y() 
         // << " " << segment.get_target().x() << " " << segment.get_target().y() << "\n";
