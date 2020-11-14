@@ -733,6 +733,7 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
             if (trap_A.get_left()->defining_point_cut_comparison(trap_B.get_left()) < 0) {
                 v_partition(A, trap_B->get_v_left(), 1);
                 node->set_A(A->get_R());
+                A = A->get_L();
                 auto left_merge = node->get_left();
                 while (left_merge != nullptr) {
                     
