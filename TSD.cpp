@@ -240,7 +240,7 @@ TSD<PointType, OrderType>::TSD() {
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderType>* seg) {
+void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert) {
 
     int num_visited = 0;
     int num_subdag_roots = 0;
@@ -267,7 +267,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             continue;
         search_stack.pop();
 
-        if (top->is_leaf()) {
+        if (insert && top->is_leaf()) {
             top->toggle_visited();
             num_subdag_roots++;
             subdag_roots.push_back(top);
@@ -282,7 +282,11 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
         for (int i = 0; i < intersecting_descendants.size(); ++i) {
             Node<PointType, OrderType>* node = intersecting_descendants[i];
             if (node != nullptr && !node->is_visited()) {
-                if (node->get_priority() >= seg->get_priority()) {
+                bool condition = insert ? node->get_priority() > seg->get_priority() :
+                node->get_priority() == seg->get_priority();
+                if (condition) {
+                    if (!insert && node->is_leaf())
+                        std::cout << "hello\n";
                     subdag_roots.push_back(node);
                     node->toggle_visited();
                     visited_nodes.push_back(node);
@@ -343,7 +347,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // TODO: check if move is needed
     segments.push_back(seg);
     // std::cout << "search...\n";
-    affected_subdag_roots(&seg);
+    affected_subdag_roots(&seg, true);
 
     //debug
     // auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
@@ -711,42 +715,138 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& seg) {
     //TODO: implement this properly/test the code
-    affected_subdag_roots(&seg);
+    affected_subdag_roots(&seg, false);
 
-    //TODO: Undo merges above and below segment
+    //TODO: Undo merges above and below segment/make v-partition calls
+    int i = subdag_roots.size() - 1;
 
-    for (int i = subdag_roots.size() - 1; i >= 0; --i) {
-        
+    while (i > 0) {
         auto node = subdag_roots[i];
+        auto A = node->get_A();
+        auto B = node->get_B();
+        
+        assert(A != nullptr);
+        assert(B != nullptr);
 
-        if (i > 0) {
-            auto prev = subdag_roots[i-1];
-            auto A = node->get_A();
-            auto B = node->get_B();
+        auto trap_A = A->get_trapezoid();
+        auto trap_B = B->get_trapezoid();
 
-            assert(A != nullptr);
-            assert(B != nullptr);
+        int side = trap_B.get_left()->defining_point_cut_comparison(*trap_A.get_left());
 
-            auto trap_A = A->get_trapezoid();
-            auto trap_B = B->get_trapezoid();
+        if (side != 0) {
+            auto cut = side == 1 ? trap_B.get_v_left() : trap_A.get_v_left();
+            auto descendant = side == 1 ? A : B;
 
-            if (trap_A.get_left()->defining_point_cut_comparison(trap_B.get_left()) < 0) {
-                v_partition(A, trap_B->get_v_left(), 1);
-                node->set_A(A->get_R());
-                A = A->get_L();
-                auto left_merge = node->get_left();
-                while (left_merge != nullptr) {
-                    
-                }
-            } else if (trap_A.get_left()->defining_point_cut_comparison(trap_B.get_left()) > 0) {
-                v_partition(B, trap_A->get_v_left(), 1);
+            v_partition(descendant, cut, side);
+
+            if (side == 1)
+                node->set_A(descendant->get_R());
+            else
+                node->set_B(descendant->get_R());
+            
+
+            int j = i-1;
+
+            auto prev_node = subdag_roots[j];
+            auto prev_A_left = prev_node->get_A()
+                ->get_trapezoid().get_left();
+            auto prev_B_left = prev_node->get_B()
+                ->get_trapezoid().get_left();
+
+            auto prev_desc = descendant->get_L();
+
+            bool condition = 
+            side == prev_B_left->defining_point_cut_comparison(*prev_A_left);
+
+            if (!condition) {
+                if (side == 1)
+                    prev_node->set_A(prev_desc);
+                else
+                    prev_node->set_B(prev_desc);
+            } 
+            
+
+            while (condition) {
+                
+                cut = side == 1 ? 
+                prev_node->get_B()->get_trapezoid().get_v_left() : 
+                prev_node->get_A()->get_trapezoid().get_v_left();
+                
+                v_partition(prev_desc, cut, side);
+                
+                if (side == 1)
+                    prev_node->set_A(prev_desc->get_R());
+                else
+                    prev_node->set_B(prev_desc->get_R());
+
+                auto aux = prev_desc;
+                prev_desc = prev_desc->get_L();
+                delete aux;
+
+                assert(j > 0);
+                j--;
+                prev_node = subdag_roots[j];
+                prev_A_left = prev_node->get_A()
+                    ->get_trapezoid().get_left();
+                prev_B_left = prev_node->get_B()
+                    ->get_trapezoid().get_left();
+
+                condition = 
+                side == prev_B_left->defining_point_cut_comparison(*prev_A_left);
+
+                if (!condition) {
+                    if (side == 1)
+                        prev_node->set_A(prev_desc);
+                    else
+                        prev_node->set_B(prev_desc);
+                } 
             }
-        }
+
+            delete descendant;
+            if (i - j > 3)
+                std::cout << "hello\n";
+            i = j;
+        } else 
+            --i;
     }
 
     //TODO: make merge calls
 
-    //TODO: make v_merge calls 
+    for (int i = subdag_roots.size()-1; i >= 0; --i) {
+        auto node = subdag_roots[i];
+
+        auto pattern = node->get_dest_pattern();
+
+        if (pattern == VE) {
+            node->set_R(merge(node->get_B(), node->get_A()));
+            node->set_A(nullptr);
+            node->set_B(nullptr);
+        } else if (pattern == EV) {
+            node->set_L(merge(node->get_B(), node->get_A()));
+            node->set_A(nullptr);
+            node->set_B(nullptr);
+        } else if (pattern == VVE) {
+            node->set_A(merge(node->get_B(), node->get_A()));
+            node->set_B(nullptr);
+        } 
+
+        node->clear_e();
+    }
+
+    //TODO: make v_merge calls
+
+    for (int i = subdag_roots.size()-1; i >= 0; --i) {
+        auto node = subdag_roots[i];
+        auto pattern = node->get_dest_pattern();
+        if (pattern == VV) {
+            node->set_R(v_merge(node->get_A(), node->get_R()));
+            node->copy_node(v_merge(node->get_L(), node->get_R()));
+        } else if (pattern == V) {
+            node->copy_node(v_merge(node->get_L(), node->get_R()));
+        } else if (pattern != NO_DESTRUCTION) {
+            assert(false);
+        }
+    }
 
 
 } 

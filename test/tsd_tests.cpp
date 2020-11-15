@@ -488,7 +488,7 @@ TEST(TSDTests, leafInsertTest) {
     auto segments = std::vector<Segment<PointCart, int>>();
 
     std::cout << "start...\n";
-    for (int i = 1; i <= 400; ++i) {
+    for (int i = 1; i <= 100; ++i) {
 
         std::cout << i << std::endl;
         PointCart s = PointCart(0, 0);
@@ -523,7 +523,7 @@ TEST(TSDTests, leafInsertTest) {
         if (i == 500) {
             std::cout << seg->get_source().x() << " " << seg->get_source().y()
             << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
-            tsd.affected_subdag_roots(seg);
+            tsd.affected_subdag_roots(seg, true);
             std::vector<BoundingTrap<PointCart, int>> roots = std::vector<BoundingTrap<PointCart, int>>();
             for (auto node: tsd.get_subdag_roots()) {
                 roots.push_back(node->get_trapezoid());
@@ -534,7 +534,9 @@ TEST(TSDTests, leafInsertTest) {
             tsd.insert_segment(*seg);
         }
     }
-    // std::cout << "end...\n";
+
+    tsd.delete_segment(segments[segments.size() - 1]);
+    std::cout << "end...\n";
 
     // tsd.insert_segment(seg_2);
     // tsd.insert_segment(seg_1);

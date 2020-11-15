@@ -10,3 +10,4 @@ profiler_output.txt
 
 data
 plotting/leaf_insert.dat
+plotting/*
