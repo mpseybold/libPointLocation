@@ -68,7 +68,8 @@ class Node {
         };
 
         void copy_node(Node<PointType, OrderType>* other) {
-            assert(other != nullptr);
+            if (other == nullptr)
+                assert(other != nullptr);
             
             copy_cuts(other);
             
@@ -84,9 +85,12 @@ class Node {
 
         void copy_cuts(Node<PointType, OrderType>* other) {
             assert(other != nullptr);
-            set_e(other->get_e());
-            set_v_1(other->get_v_1());
-            set_v_2(other->get_v_2());
+            // if (other->get_e() != nullptr)
+                set_e(other->get_e());
+            // if (other->get_v_1() != nullptr)
+                set_v_1(other->get_v_1());
+            // if (other->get_v_2() != nullptr)
+                set_v_2(other->get_v_2());
         }
 
         V_Cut<PointType, OrderType>* get_v_1() { return destruction_cuts.get_v_1(); }

@@ -43,9 +43,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     // std::vector<BoundingTrap<PointType, OrderType>> problems = std::vector<BoundingTrap<PointType, OrderType>>();
     // problems.push_back(node->get_trapezoid());
     // io::write_trapezoids(problems, "problematic_traps.dat");
-    if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1))
-        std::cout << "hello\n";
-    assert(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1);
+    // if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1))
+    //     std::cout << "hello\n";
+    // assert(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1);
 
     auto r_trap = node->get_R()->get_trapezoid();
     auto pos_neg = r_trap.destroy(v_cut, side);
@@ -59,7 +59,11 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     node->set_R(R);
     node->set_A(A);
-    node->set_v_2(v_cut);
+    if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1)) {
+        node->set_v_2(node->get_v_1());
+        node->set_v_1(v_cut);
+    } else 
+        node->set_v_2(v_cut);
 }
 
 template <class PointType, class OrderType>

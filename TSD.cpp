@@ -38,19 +38,19 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
 
-    if (VERBOSITY_LEVEL >= 2) {
+    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 3) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
 
-        if (node->get_L() != nullptr) {
+        if (node->get_L() != nullptr && node->get_L()->get_trapezoid().intersects_segment(seg)) {
             traps.push_back(node->get_L()->get_trapezoid());
         }
-        if (node->get_R() != nullptr) {
+        if (node->get_R() != nullptr && node->get_R()->get_trapezoid().intersects_segment(seg)) {
             traps.push_back(node->get_R()->get_trapezoid());
         }
-        if (node->get_A() != nullptr) {
+        if (node->get_A() != nullptr && node->get_A()->get_trapezoid().intersects_segment(seg)) {
             traps.push_back(node->get_A()->get_trapezoid());
         }
-        if (node->get_B() != nullptr) {
+        if (node->get_B() != nullptr && node->get_B()->get_trapezoid().intersects_segment(seg)) {
             traps.push_back(node->get_B()->get_trapezoid());
         }
 
@@ -267,7 +267,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             continue;
         search_stack.pop();
 
-        if (insert && top->is_leaf()) {
+        if ((insert && top->is_leaf()) || (!insert && top->get_priority() == seg->get_priority())) {
             top->toggle_visited();
             num_subdag_roots++;
             subdag_roots.push_back(top);
@@ -717,6 +717,11 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     //TODO: implement this properly/test the code
     affected_subdag_roots(&seg, false);
 
+    //DEBUG
+        if (seg.get_priority() == 96)
+            io::write_trapezoids(subdag_roots, "plotting/before_merges.dat");
+    //DEBUG
+
     //TODO: Undo merges above and below segment/make v-partition calls
     int i = subdag_roots.size() - 1;
 
@@ -825,12 +830,18 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
             node->set_L(merge(node->get_B(), node->get_A()));
             node->set_A(nullptr);
             node->set_B(nullptr);
+            node->set_v_1(node->get_v_2());
+            node->clear_v_2();
         } else if (pattern == VVE) {
             node->set_A(merge(node->get_B(), node->get_A()));
             node->set_B(nullptr);
-        } 
+        } else if (pattern == E) {
+            node->copy_node(merge(node->get_B(), node->get_A()));
+        }
 
-        node->clear_e();
+        if (pattern != E)
+            node->clear_e();
+
     }
 
     //TODO: make v_merge calls
@@ -838,12 +849,12 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     for (int i = subdag_roots.size()-1; i >= 0; --i) {
         auto node = subdag_roots[i];
         auto pattern = node->get_dest_pattern();
-        if (pattern == VV) {
+        if (pattern == VV && node->get_priority() == seg.get_priority()) {
             node->set_R(v_merge(node->get_A(), node->get_R()));
             node->copy_node(v_merge(node->get_L(), node->get_R()));
-        } else if (pattern == V) {
+        } else if (pattern == V && node->get_priority() == seg.get_priority()) {
             node->copy_node(v_merge(node->get_L(), node->get_R()));
-        } else if (pattern != NO_DESTRUCTION) {
+        } else if (pattern == V) {
             assert(false);
         }
     }

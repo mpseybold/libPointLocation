@@ -21,15 +21,18 @@ class DestructionCuts {
         }
 
         void set_v_1(V_Cut<PointType, OrderType>* cut) {
-            assert(cut->get_cut(0)->get_cut_type() != EDGE && cut != nullptr);
+            if (cut != nullptr)
+                assert(cut->get_cut(0)->get_cut_type() != EDGE && cut != nullptr);
             v_1 = cut;
         }
         void set_v_2(V_Cut<PointType, OrderType>* cut) {
-            assert(cut->get_cut(0)->get_cut_type() != EDGE && cut != nullptr);
+            if (cut != nullptr)
+                assert(cut->get_cut(0)->get_cut_type() != EDGE && cut != nullptr);
             v_2 = cut;
         }
         void set_e(Cut<PointType, OrderType>* cut) {
-            assert(cut->get_cut_type() == EDGE);
+            if (cut != nullptr)
+                assert(cut->get_cut_type() == EDGE);
             e = cut;
         }
 
@@ -44,8 +47,10 @@ class DestructionCuts {
                     } else {
                         return VV;
                     }
-                } else {
+                } else if ( e == nullptr) {
                     return V;
+                } else {
+                    return VE;
                 }
             } else {
                 if (v_2 != nullptr) {

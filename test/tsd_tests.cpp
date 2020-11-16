@@ -485,7 +485,7 @@ TEST(TSDTests, leafInsertTest) {
     std::mt19937 generator (1235);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    auto segments = std::vector<Segment<PointCart, int>>();
+    auto segments = std::vector<Segment<PointCart, int>*>();
 
     std::cout << "start...\n";
     for (int i = 1; i <= 100; ++i) {
@@ -505,7 +505,7 @@ TEST(TSDTests, leafInsertTest) {
 
             bool found_seg = false;
             for (auto s: segments)
-                if (s == temp) {
+                if (*s == temp) {
                     std::cout << "OOPS\n";
                     found_seg = true;
                 }
@@ -514,7 +514,7 @@ TEST(TSDTests, leafInsertTest) {
 
 
         auto seg = new Segment<PointCart, int>(s, t, i); 
-        segments.push_back(*seg);
+        segments.push_back(seg);
         // std::cout << seg->get_source().x() << " " << seg->get_source().y()
         //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
         if (i == 21) {
@@ -535,7 +535,18 @@ TEST(TSDTests, leafInsertTest) {
         }
     }
 
-    tsd.delete_segment(segments[segments.size() - 1]);
+    tsd.delete_segment(*segments[segments.size() - 1]);
+    tsd.delete_segment(*segments[segments.size() - 2]);
+    tsd.delete_segment(*segments[segments.size() - 3]);
+    tsd.delete_segment(*segments[segments.size() - 4]);
+    tsd.delete_segment(*segments[segments.size() - 5]);
+    tsd.delete_segment(*segments[segments.size() - 6]);
+    tsd.delete_segment(*segments[segments.size() - 7]);
+    tsd.delete_segment(*segments[segments.size() - 8]);
+    tsd.delete_segment(*segments[segments.size() - 9]);
+    tsd.delete_segment(*segments[segments.size() - 10]);
+    tsd.delete_segment(*segments[segments.size() - 11]);
+    tsd.delete_segment(*segments[segments.size() - 12]);
     std::cout << "end...\n";
 
     // tsd.insert_segment(seg_2);

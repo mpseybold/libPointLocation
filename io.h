@@ -99,6 +99,16 @@ namespace io {
         file.close();
     }
 
+    void write_trapezoids(std::vector<Node<PointCart, int>*> nodes, std::string filename) {
+        auto traps = std::vector<BoundingTrap<PointCart, int>> {};
+        
+        for (auto node: nodes) {
+            traps.push_back(node->get_trapezoid());
+        }
+
+        write_trapezoids(traps, filename);
+    }
+
     template <class PointType, class OrderType>
     std::vector<Segment<PointType, OrderType>> read_segments(std::string filename) {
         std::string path = "data/" + filename;

@@ -39,7 +39,12 @@ class Cut {
         void set_seg(Segment<PointType, OrderType>* seg) { segment = seg; }
         void set_intersecting_seg(Segment<PointType, OrderType>* _intersecting_seg) { intersecting_seg = _intersecting_seg; }
 
-        OrderType get_priority() { return segment->get_priority(); }
+        OrderType get_priority() {
+            if (intersecting_seg == nullptr) 
+                return segment->get_priority();
+            else
+                return std::max(segment->get_priority(), intersecting_seg->get_priority()); 
+        }
 
         int orientation(PointType p, bool shear=true);
 
