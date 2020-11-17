@@ -718,7 +718,7 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     affected_subdag_roots(&seg, false);
 
     //DEBUG
-        if (seg.get_priority() == 96)
+        if (seg.get_priority() == 99)
             io::write_trapezoids(subdag_roots, "plotting/before_merges.dat");
     //DEBUG
 
@@ -727,9 +727,15 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
 
     while (i > 0) {
         auto node = subdag_roots[i];
+        if (node->get_e() == nullptr) {
+            --i;
+            continue;
+        }
         auto A = node->get_A();
         auto B = node->get_B();
         
+        auto pattern = node->get_dest_pattern();
+
         assert(A != nullptr);
         assert(B != nullptr);
 

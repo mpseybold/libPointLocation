@@ -488,7 +488,7 @@ TEST(TSDTests, leafInsertTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
     std::cout << "start...\n";
-    for (int i = 1; i <= 100; ++i) {
+    for (int i = 1; i <= 99; ++i) {
 
         std::cout << i << std::endl;
         PointCart s = PointCart(0, 0);
@@ -535,18 +535,10 @@ TEST(TSDTests, leafInsertTest) {
         }
     }
 
-    tsd.delete_segment(*segments[segments.size() - 1]);
-    tsd.delete_segment(*segments[segments.size() - 2]);
-    tsd.delete_segment(*segments[segments.size() - 3]);
-    tsd.delete_segment(*segments[segments.size() - 4]);
-    tsd.delete_segment(*segments[segments.size() - 5]);
-    tsd.delete_segment(*segments[segments.size() - 6]);
-    tsd.delete_segment(*segments[segments.size() - 7]);
-    tsd.delete_segment(*segments[segments.size() - 8]);
-    tsd.delete_segment(*segments[segments.size() - 9]);
-    tsd.delete_segment(*segments[segments.size() - 10]);
-    tsd.delete_segment(*segments[segments.size() - 11]);
-    tsd.delete_segment(*segments[segments.size() - 12]);
+    for (int i = segments.size() - 1; i >= 0; --i) {
+        tsd.delete_segment(*segments[i]);
+    }
+
     std::cout << "end...\n";
 
     // tsd.insert_segment(seg_2);
@@ -577,9 +569,9 @@ TEST(TSDTests, leafInsertTest) {
     // ASSERT_FALSE(tsd.get_root()->is_leaf());
     // ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
 
-    // auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    auto traps = std::vector<BoundingTrap<PointCart, int>>();
 
-    // write_leaf_traps(tsd.get_root(), traps);
+    write_leaf_traps(tsd.get_root(), traps);
 
-    // io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
+    io::write_trapezoids(traps, "plotting/leaf_insert.dat");    
 }
