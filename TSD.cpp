@@ -853,16 +853,56 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     //TODO: make v_merge calls
 
     for (int i = subdag_roots.size()-1; i >= 0; --i) {
+        if (seg.get_priority() == 66 & i == 51)
+            std::cout << "hello\n";
         auto node = subdag_roots[i];
         auto pattern = node->get_dest_pattern();
-        if (pattern == VV && node->get_priority() == seg.get_priority()) {
+        if (pattern == VV && node->get_v_1()->contains(&seg) && node->get_v_2()->contains(&seg)) {
+            auto v_1 = node->get_v_1();
+            auto v_2 = node->get_v_2();
+
             node->set_R(v_merge(node->get_A(), node->get_R()));
             node->copy_node(v_merge(node->get_L(), node->get_R()));
-        } else if (pattern == V && node->get_priority() == seg.get_priority()) {
+
+            if (i > 0) {
+                auto prev = subdag_roots[i-1];
+
+                if (v_2 != prev->get_v_1() && v_2 != prev->get_v_2()) {
+                    v_2->delete_segment(&seg);
+                    if (v_2->is_empty())
+                        delete v_2;
+                }
+
+                if (v_1 != prev->get_v_1() && v_1 != prev->get_v_2()) {
+                    v_1->delete_segment(&seg);
+                    if (v_1->is_empty())
+                        delete v_1;
+                }
+
+            }
+        } else if (pattern == V && node->get_v_1()->contains(&seg)) {
+            auto v_1 = node->get_v_1();
             node->copy_node(v_merge(node->get_L(), node->get_R()));
-        } else if (pattern == V) {
-            assert(false);
+
+            if (i > 0) {
+                auto prev = subdag_roots[i-1];
+                if (v_1 != prev->get_v_1() && v_1 != prev->get_v_2()) {
+                    v_1->delete_segment(&seg);
+                    if (v_1->is_empty())
+                        delete v_1;
+                }
+            }
+        } else {
+            if (node->get_v_1() != nullptr)
+                assert(!node->get_v_1()->contains(&seg));
+            if (node->get_v_2() != nullptr)
+                assert(!node->get_v_2()->contains(&seg));
+            if (node->get_e() != nullptr)
+                assert(node->get_e()->get_segment() != &seg);
         }
+
+        if (node->get_L() != nullptr)
+            std::cout << "problem...\n";
     }
 
 

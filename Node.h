@@ -134,10 +134,10 @@ class Node {
         BoundingTrap<PointType, OrderType>& get_trapezoid() { return trapezoid; }
         Node<PointType, OrderType>* get_negative_child() { return negative_child; }
         Node<PointType, OrderType>* get_positive_child() { return positive_child; }
-        Node<PointType, OrderType>* get_L() { return L; }
-        Node<PointType, OrderType>* get_R() { return R; }
-        Node<PointType, OrderType>* get_A() { return A; }
-        Node<PointType, OrderType>* get_B() { return B; }
+        Node<PointType, OrderType>*& get_L() { return L; }
+        Node<PointType, OrderType>*& get_R() { return R; }
+        Node<PointType, OrderType>*& get_A() { return A; }
+        Node<PointType, OrderType>*& get_B() { return B; }
 
         Node<PointType, OrderType>* get_left() { return left; }
         Node<PointType, OrderType>* get_right() { return right; }

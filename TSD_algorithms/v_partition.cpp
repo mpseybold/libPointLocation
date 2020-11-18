@@ -401,7 +401,6 @@ void TSD<PointType, OrderType>::v_partition(Node<PointType, OrderType>* node,
 V_Cut<PointType, OrderType>* v_cut, int side) {
     DestructionPattern pattern = node->get_dest_pattern();
 
-
     switch(pattern) {
         case E:
             v_part_handle_E_case(node, v_cut, side);

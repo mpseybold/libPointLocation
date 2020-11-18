@@ -23,9 +23,9 @@ class TSD {
         void v_part_handle_EV_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
         void v_part_handle_VVE_case(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);
 
-        Node<PointType, OrderType>* v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
-        Node<PointType, OrderType>* v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
-        Node<PointType, OrderType>* v_merge_equal_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
+        Node<PointType, OrderType>* v_merge_left_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right);
+        Node<PointType, OrderType>* v_merge_right_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right);
+        Node<PointType, OrderType>* v_merge_equal_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right);
 
         Node<PointType, OrderType>* merge_equal_priority_case(Node<PointType, OrderType>* below, Node<PointType, OrderType>* above);
 
@@ -62,7 +62,7 @@ class TSD {
 
         void affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert);
 
-        Node<PointType, OrderType>* v_merge(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
+        Node<PointType, OrderType>* v_merge(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right);
 
         void v_partition(Node<PointType, OrderType>* node, V_Cut<PointType, OrderType>* v_cut, int side);        
 

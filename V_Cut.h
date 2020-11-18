@@ -9,7 +9,7 @@ class V_Cut {
 
         Cut<PointType, OrderType>* up;
         Cut<PointType, OrderType>* down;
-        std::list<Segment<PointType, OrderType>*> segs;
+        std::vector<Segment<PointType, OrderType>*> segs;
 
     public:
 
@@ -33,9 +33,21 @@ class V_Cut {
             assert(false);
         }
 
+        bool is_empty() {
+            return segs.size() == 0;
+        }
+
      
         void set_up(Cut<PointType, OrderType>* _up) { up = _up; }
         void set_down(Cut<PointType, OrderType>* _down) { down = _down; }
+
+        bool all_overlap() {
+            bool result = true;
+
+            for (int i = 1; i < segs.size(); ++i) {
+                result = result && Segment<PointType, OrderType>::slope_comparison(*segs[i], *segs[i-1]) == 0;
+            }
+        }
 
         void update() {
 
@@ -46,11 +58,11 @@ class V_Cut {
 
             Segment<PointType, OrderType>* min_seg = nullptr;
 
-            auto cut == up != nullptr ? up : down;
+            auto cut = up != nullptr ? up : down;
 
             for (auto s: segs) {
                 if ((cut->has_seg_on_pos_side(s) && cut->has_seg_on_neg_side(s)) &&
-                    (min_seg == nullptr || s->seg_priority() < min_seg->get_priority()))
+                    (min_seg == nullptr || s->get_priority() < min_seg->get_priority()))
                     min_seg = s;
             }
 
@@ -66,24 +78,24 @@ class V_Cut {
                         auto s_1 = segs[i];
                         auto s_2 = segs[j];
 
-                        if (Segment<PointType, OrderType>::slope_comparison(s_1, s_2) == 0)
+                        if (Segment<PointType, OrderType>::slope_comparison(*s_1, *s_2) == 0)
                             continue;
 
                         auto edge_cut = Cut<PointType, OrderType>(
                             EDGE, s_1, nullptr
                         );
 
-                        if (edge_cut.has_on_pos_side(s_2) && edge_cut.has_on_neg_side(s_2))
+                        if (edge_cut.has_seg_on_pos_side(s_2) && edge_cut.has_seg_on_neg_side(s_2))
                             continue;
 
                         auto aux = Cut<PointType, OrderType>(
                             INTERSECTION, s_1, s_2
                         );
 
-                        if (up->defining_point_cut_ccomparison(aux) != 0)
+                        if (up->defining_point_cut_comparison(aux) != 0)
                             continue;
 
-                        if (opt_seg = nullptr || 
+                        if (opt_seg == nullptr || 
                         std::max(s_1->get_priority(), s_2->get_priority()) 
                         < std::max(opt_seg->get_priority(), opt_int_seg->get_priority())) {
                             opt_seg = s_1;
@@ -93,9 +105,9 @@ class V_Cut {
                 }
             }
 
-            auto temp_int = Cut<PointType, OrderType>(
+            auto temp_int = opt_seg != nullptr ? Cut<PointType, OrderType>(
                     INTERSECTION, opt_seg, opt_int_seg
-                );
+                ) : Cut<PointType, OrderType>();
 
             // search for the lowest priority source cut
     
@@ -147,14 +159,23 @@ class V_Cut {
                 down->set_type(INTERSECTION);
                 down->set_seg(opt_seg);
                 down->set_intersecting_seg(opt_int_seg);
-            } else if (source_priority < std::min(int_priority, target_priority)) {
+            } else {
                 if (min_seg == nullptr) {
-                    up->set_type(SOURCE);
-                    up->set_seg(opt_source);
-                    up->set_intersecting_seg(nullptr);
-                    down->set_type(SOURCE);
-                    down->set_seg(opt_source);
-                    down->set_intersecting_seg(nullptr);
+                    if (source_priority < std::min(int_priority, target_priority)) {
+                        up->set_type(SOURCE);
+                        up->set_seg(opt_source);
+                        up->set_intersecting_seg(nullptr);
+                        down->set_type(SOURCE);
+                        down->set_seg(opt_source);
+                        down->set_intersecting_seg(nullptr);
+                    } else if (target_priority < std::min(int_priority, source_priority)) {
+                        up->set_type(TARGET);
+                        up->set_seg(opt_target);
+                        up->set_intersecting_seg(nullptr);
+                        down->set_type(TARGET);
+                        down->set_seg(opt_target);
+                        down->set_intersecting_seg(nullptr);
+                    }
                 } else {
                     Segment<PointType, OrderType>* min_above = nullptr;
                     Segment<PointType, OrderType>* min_below = nullptr;
@@ -166,13 +187,13 @@ class V_Cut {
 
                     for (auto s: segs) {
                         if (cut->orientation(s->get_source()) == 0) {
-                            if (edge_cut->orienation(s, 0) == 1) {
+                            if (edge_cut.orientation(s, 0) == 1) {
                                 if (min_above == nullptr || s->get_priority() < min_above->get_priority()) {
                                     min_above = s;
                                     above_type = SOURCE;
                                 }
-                            } else if (edge_cut->orienation(s, 0) == -1) {
-                                if (min_below == nullptr || s->get_priority() < min_above->get_priority()) {
+                            } else if (edge_cut.orientation(s, 0) == -1) {
+                                if (min_below == nullptr || s->get_priority() < min_below->get_priority()) {
                                     min_below = s;
                                     below_type = SOURCE;
                                 }
@@ -180,13 +201,13 @@ class V_Cut {
                                 assert(false);
                             }
                         } else if (cut->orientation(s->get_target()) == 0) {
-                            if (edge_cut->orienation(s, 1) == 1) {
+                            if (edge_cut.orientation(s, 1) == 1) {
                                 if (min_above == nullptr || s->get_priority() < min_above->get_priority()) {
                                     min_above = s;
                                     above_type = TARGET;
                                 }
-                            } else if (edge_cut->orienation(s, 1) == -1) {
-                                if (min_below == nullptr || s->get_priority() < min_above->get_priority()) {
+                            } else if (edge_cut.orientation(s, 1) == -1) {
+                                if (min_below == nullptr || s->get_priority() < min_below->get_priority()) {
                                     min_below = s;
                                     below_type = TARGET;
                                 }
@@ -198,7 +219,28 @@ class V_Cut {
 
                     if (min_above != nullptr) {
                         up->set_type(above_type);
-                        up->
+                        up->set_seg(min_above);
+                        up->set_intersecting_seg(nullptr);
+                    }
+
+                    if (min_below != nullptr) {
+                        down->set_type(below_type);
+                        down->set_seg(min_below);
+                        down->set_intersecting_seg(nullptr);
+                    }
+
+                    if (opt_seg != nullptr) {
+                        if (min_above == nullptr) {
+                            up->set_type(INTERSECTION);
+                            up->set_seg(opt_seg);
+                            up->set_intersecting_seg(opt_int_seg);
+                        }
+
+                        if (min_below == nullptr) {
+                            down->set_type(INTERSECTION);
+                            down->set_seg(opt_seg);
+                            down->set_intersecting_seg(opt_int_seg);
+                        }
                     }
                     
                 }
@@ -210,7 +252,7 @@ class V_Cut {
         void insert_intersection(CutType type, 
             Segment<PointType, OrderType>* seg, 
             Segment<PointType, OrderType>* int_seg) {
-                std::cout << "v_cut size: " << segs.size() << std::endl;
+                // std::cout << "v_cut size: " << segs.size() << std::endl;
                 assert(seg != nullptr);
                 if (segs.empty() || std::find(segs.begin(), segs.end(), seg) == segs.end()) {
                     segs.push_back(seg);
@@ -221,87 +263,29 @@ class V_Cut {
                     }
                 }
 
-                // search for the lowest priority intersection cut
-
-                Segment<PointType, OrderType>* opt_seg = nullptr;
-                Segment<PointType, OrderType>* opt_int_seg = nullptr;
-
-                if (segs.size() > 1) {
-                    for (int i = 0; i < segs.size(); ++i) {
-                        for (int j = i+1; j < segs.size(); ++j) {
-                            auto s_1 = segs[i];
-                            auto s_2 = segs[j];
-
-                            if (opt_seg = nullptr || 
-                            std::max(s_1->get_priority(), s_2->get_priority()) 
-                            < std::max(opt_seg->get_priority(), opt_int_seg->get_priority())) {
-                                opt_seg = s_1;
-                                opt_int_seg = s_2;
-                            }
-                        }
-                    }
-                }
-
-                
-                // search for the lowest priority source cut
-
-
-                // search for the lowest priority target cut
-
-                // if (type == INTERSECTION) {
-                //     assert(int_seg != nullptr);
-                //     if (std::find(segs.begin(), segs.end(), int_seg) == segs.end()) {
-                //         segs.push_back(int_seg);
-                //     }
-                //     if (std::max(seg->get_priority(), int_seg->get_priority()) < up->get_priority()) {
-                //         up->set_type(type);
-                //         up->set_seg(seg);
-                //         up->set_intersecting_seg(int_seg);
-                //     }
-                //     if (std::max(seg->get_priority(), int_seg->get_priority()) < down->get_priority()) {
-                //         down->set_type(type);
-                //         down->set_seg(seg);
-                //         down->set_intersecting_seg(int_seg);
-                //     }
-                // } else if (type = SOURCE) {
-                //     if (seg->get_priority() < up->get_priority() && up->orientation(seg, 0) == 1) {
-                //         up->set_type(type);
-                //         up->set_seg(seg);
-                //         up->set_intersecting_seg(nullptr);
-                //     } else if (seg->get_priority() < down->get_priority() && down->orientation(seg, 0) == 1) {
-                //         down->set_type(type);
-                //         down->set_seg(seg);
-                //         down->set_intersecting_seg(nullptr);
-                //     }
-                // }
-                // if (seg->get_priority() < up->get_priority()) {
-                //     if (type == INTERSECTION) {
-                //         up->set_type(type);
-                //         up->set_seg(seg);
-                //         up->set_intersecting_seg(int_seg);
-                //     } else if ((type == SOURCE && up->orientation(seg, 0) == 1) 
-                //         || (type == TARGET && up->orientation(seg, 1) == 1)) {
-                //             up->set_type(type);
-                //             up->set_seg(seg);
-                //             up->set_intersecting_seg(nullptr);
-                //     }
-                // }
-                // if (seg->get_priority() < down->get_priority()) {
-                //     if (type == INTERSECTION) {
-                //         down->set_type(type);
-                //         down->set_seg(seg);
-                //         down->set_intersecting_seg(int_seg);
-                //     } else if ((type == SOURCE && up->orientation(seg, 0) == -1) 
-                //         || (type == TARGET && up->orientation(seg, 1) == -1)) {
-                //             down->set_type(type);
-                //             down->set_seg(seg);
-                //             down->set_intersecting_seg(nullptr);
-                //     } 
-                // }
+                update();
         }
 
         void delete_segment(Segment<PointType, OrderType>* seg) {
-            
+            for (int i = 0; i < segs.size(); ++i) {
+                if (seg == segs[i])
+                    segs.erase(segs.begin() + i);
+            }
+
+            if (all_overlap()) {
+                segs = std::vector<Segment<PointType, OrderType>*>();
+            }
+
+            update();
+        }
+
+        bool contains(Segment<PointType, OrderType>* seg) {
+            for (auto s: segs) {
+                if (s == seg)
+                    return true;
+            }
+
+            return false;
         }
 
         Cut<PointType, OrderType>* get_cut(int side) {

@@ -1,7 +1,7 @@
 #include "../TSD.h"
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
     
     
     assert(left != nullptr);
@@ -18,13 +18,15 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     new_node->copy_cuts(left);
 
     delete left;
+    left = NULL;
     delete right;
+    right = NULL;
 
     return new_node;
 }
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
     assert(left != nullptr);
     assert(right != nullptr);
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
@@ -38,13 +40,15 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
     new_node->set_desc(L, right->get_R(), right->get_A(), right->get_B());
 
     delete left;
+    left = NULL;
     delete right;
+    right = NULL;
 
     return new_node;
 }
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
     
     assert(left != nullptr);
     assert(right != nullptr);
@@ -56,7 +60,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     if (left->is_leaf()) {
         assert(right->is_leaf());
         delete left;
+        left = NULL;
         delete right;
+        right = NULL;
         leaf_count--;
         return new_node;
     }
@@ -81,13 +87,15 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     new_node->set_e(e_cut);
 
     delete left;
+    left = NULL;
     delete right;
+    right = NULL;
     
     return new_node;
 }
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
     // TODO: Implement this function
 
     assert(left != nullptr);

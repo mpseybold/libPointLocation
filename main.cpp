@@ -66,6 +66,13 @@ int main() {
         // << " " << segment.get_target().x() << " " << segment.get_target().y() << "\n";
         tsd.insert_segment(new_calidonia[i]);
     }
+    for (int i = new_calidonia.size() - 1; i > -1; --i) {
+        std::cout << i << "\n";
+        // auto segment = new_calidonia[i];
+        // std::cout << segment.get_source().x() << " " << segment.get_source().y() 
+        // << " " << segment.get_target().x() << " " << segment.get_target().y() << "\n";
+        tsd.delete_segment(new_calidonia[i]);
+    }
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "duration: " + std::to_string(duration) + "\n";
