@@ -99,7 +99,9 @@ class Node {
 
         bool is_leaf() { return destruction_cuts.no_cuts(); }
 
-        OrderType get_priority() { return destruction_cuts.priority(); }
+        OrderType get_priority() { 
+            return destruction_cuts.priority(); 
+        }
         
         bool is_visited() { return visited; }
 

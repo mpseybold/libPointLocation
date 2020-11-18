@@ -853,7 +853,7 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     //TODO: make v_merge calls
 
     for (int i = subdag_roots.size()-1; i >= 0; --i) {
-        if (seg.get_priority() == 66 & i == 51)
+        if (seg.get_priority() == 66 & i == 52)
             std::cout << "hello\n";
         auto node = subdag_roots[i];
         auto pattern = node->get_dest_pattern();
@@ -878,10 +878,18 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
                     if (v_1->is_empty())
                         delete v_1;
                 }
-
+            } else if (i == 0) {
+                v_2->delete_segment(&seg);
+                    if (v_2->is_empty())
+                        delete v_2;
+                v_1->delete_segment(&seg);
+                    if (v_1->is_empty())
+                        delete v_1;
             }
         } else if (pattern == V && node->get_v_1()->contains(&seg)) {
             auto v_1 = node->get_v_1();
+            if (node->get_v_2() != nullptr)
+                std::cout << "oops...\n";
             node->copy_node(v_merge(node->get_L(), node->get_R()));
 
             if (i > 0) {
@@ -891,6 +899,10 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
                     if (v_1->is_empty())
                         delete v_1;
                 }
+            } else if (i == 0) {
+                v_1->delete_segment(&seg);
+                    if (v_1->is_empty())
+                        delete v_1;
             }
         } else {
             if (node->get_v_1() != nullptr)

@@ -44,9 +44,16 @@ class V_Cut {
         bool all_overlap() {
             bool result = true;
 
+            result = result && !up->orientation(segs[0]->get_source()) == 0
+                && !up->orientation(segs[0]->get_target()) == 0;
+
             for (int i = 1; i < segs.size(); ++i) {
-                result = result && Segment<PointType, OrderType>::slope_comparison(*segs[i], *segs[i-1]) == 0;
+                result = result && Segment<PointType, OrderType>::slope_comparison(*segs[i], *segs[i-1]) == 0
+                && !up->orientation(segs[i]->get_source()) == 0
+                && !up->orientation(segs[i]->get_target()) == 0;
             }
+
+            return result;
         }
 
         void update() {
