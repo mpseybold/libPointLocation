@@ -38,7 +38,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
 
-    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 3) {
+    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 91) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
 
         if (node->get_L() != nullptr && node->get_L()->get_trapezoid().intersects_segment(seg)) {
@@ -275,6 +275,10 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             continue;
         }
 
+        if (!insert && top->get_priority() == 91 && seg->get_priority() == 91)
+            std::cout << "hello\n";
+
+
         search_refinement(seg, top);
 
         bool non_null_seen = false;
@@ -283,7 +287,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             Node<PointType, OrderType>* node = intersecting_descendants[i];
             if (node != nullptr && !node->is_visited()) {
                 bool condition = insert ? node->get_priority() > seg->get_priority() :
-                node->get_priority() == seg->get_priority();
+                (node->get_priority() == seg->get_priority());
                 if (condition) {
                     if (!insert && node->is_leaf())
                         std::cout << "hello\n";
@@ -607,6 +611,9 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 auto v_cut = find_v_cut(tgt_cut, root);
                 if (v_cut == nullptr) {
                     v_cut = new V_Cut<PointType, OrderType>(TARGET, &seg, nullptr);
+                } else {
+                    std::cout << "found cut\n";
+                    v_cut->insert_intersection(TARGET, &seg, nullptr);
                 }
                 
                 v_partition(node, v_cut, 1);
@@ -715,14 +722,16 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& seg) {
     //TODO: implement this properly/test the code
+    if (seg.get_priority() == 91)
+        std::cout << "hello\n";
     affected_subdag_roots(&seg, false);
 
     //DEBUG
-        if (seg.get_priority() == 99)
+        if (seg.get_priority() == 25)
             io::write_trapezoids(subdag_roots, "plotting/before_merges.dat");
     //DEBUG
 
-    //TODO: Undo merges above and below segment/make v-partition calls
+    //TODO: Undo merges subdag_roots above and below segment/make v-partition calls
     int i = subdag_roots.size() - 1;
 
     while (i > 0) {
@@ -853,9 +862,22 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     //TODO: make v_merge calls
 
     for (int i = subdag_roots.size()-1; i >= 0; --i) {
-        if (seg.get_priority() == 66 & i == 52)
+        if (seg.get_priority() == 93)
             std::cout << "hello\n";
         auto node = subdag_roots[i];
+
+        if (i > 0 && node->get_trapezoid().get_v_left()->contains(&seg) 
+        && (subdag_roots[i-1]->get_v_1() == nullptr || subdag_roots[i-1]->get_v_1() != node->get_trapezoid().get_v_left())
+        && (subdag_roots[i-1]->get_v_2() == nullptr || subdag_roots[i-1]->get_v_2() != node->get_trapezoid().get_v_left())) {
+            node->get_trapezoid().get_v_left()->delete_segment(&seg);
+        }
+
+        if (i == subdag_roots.size()-1 && node->get_trapezoid().get_v_right()->contains(&seg))
+            node->get_trapezoid().get_v_right()->delete_segment(&seg);
+
+        if (i == 0 && node->get_trapezoid().get_v_left()->contains(&seg))
+            node->get_trapezoid().get_v_left()->delete_segment(&seg);
+
         auto pattern = node->get_dest_pattern();
         if (pattern == VV && node->get_v_1()->contains(&seg) && node->get_v_2()->contains(&seg)) {
             auto v_1 = node->get_v_1();
@@ -905,6 +927,8 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
                         delete v_1;
             }
         } else {
+            if (pattern != NO_DESTRUCTION)
+                std::cout << "hello\n";
             if (node->get_v_1() != nullptr)
                 assert(!node->get_v_1()->contains(&seg));
             if (node->get_v_2() != nullptr)

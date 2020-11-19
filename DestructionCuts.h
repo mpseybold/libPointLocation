@@ -83,6 +83,8 @@ class DestructionCuts {
             if (no_cuts()) 
                 return 100000;
             
+            
+
             if (e != nullptr)
                 return e->get_priority();
             if (v_1 != nullptr)

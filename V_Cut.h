@@ -22,6 +22,9 @@ class V_Cut {
             segs.push_back(seg);
             if (int_seg != nullptr)
                 segs.push_back(int_seg);
+
+            if (up->orientation(PointCart(60, 50)) == 0)
+                std::cout << "hello\n";
         }
 
         int defining_point_cut_comparison(V_Cut<PointType, OrderType>& cut) {
@@ -88,11 +91,15 @@ class V_Cut {
                         if (Segment<PointType, OrderType>::slope_comparison(*s_1, *s_2) == 0)
                             continue;
 
-                        auto edge_cut = Cut<PointType, OrderType>(
+                        auto e_1 = Cut<PointType, OrderType>(
                             EDGE, s_1, nullptr
                         );
+                        auto e_2 = Cut<PointType, OrderType>(
+                            EDGE, s_2, nullptr
+                        );
 
-                        if (edge_cut.has_seg_on_pos_side(s_2) && edge_cut.has_seg_on_neg_side(s_2))
+                        if (!(e_1.has_seg_on_pos_side(s_2) && e_1.has_seg_on_neg_side(s_2)
+                        && e_2.has_seg_on_pos_side(s_1) && e_2.has_seg_on_neg_side(s_1)))
                             continue;
 
                         auto aux = Cut<PointType, OrderType>(
@@ -270,6 +277,9 @@ class V_Cut {
                     }
                 }
 
+                if (up->orientation(PointCart(60, 50)) == 0)
+                    std::cout << "hello\n";
+
                 update();
         }
 
@@ -284,6 +294,9 @@ class V_Cut {
             }
 
             update();
+
+            if (up->orientation(PointCart(60, 50)) == 0)
+                std::cout << "hello\n";
         }
 
         bool contains(Segment<PointType, OrderType>* seg) {
