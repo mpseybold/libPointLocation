@@ -488,7 +488,7 @@ TEST(TSDTests, leafInsertTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
     std::cout << "start...\n";
-    for (int i = 1; i <= 100; ++i) {
+    for (int i = 1; i <= 200; ++i) {
 
         std::cout << i << std::endl;
         PointCart s = PointCart(0, 0);

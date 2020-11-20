@@ -823,8 +823,6 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
             }
 
             delete descendant;
-            if (i - j > 3)
-                std::cout << "hello\n";
             i = j;
         } else 
             --i;
