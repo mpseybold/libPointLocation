@@ -11,11 +11,16 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
 
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
     auto new_node = new Node<PointType, OrderType>(new_trap);
-    
+
+    auto right_merge_node = right->get_right();
+
     auto R = v_merge(left->get_R(), right);
 
     new_node->set_desc(left->get_L(), R, left->get_A(), left->get_B());
     new_node->copy_cuts(left);
+
+    new_node->get_right()->set_right(right_merge_node);
+    right_merge_node->set_left(new_node->get_right());
 
     delete left;
     left = NULL;

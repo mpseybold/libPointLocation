@@ -52,8 +52,8 @@ class V_Cut {
 
             for (int i = 1; i < segs.size(); ++i) {
                 result = result && Segment<PointType, OrderType>::slope_comparison(*segs[i], *segs[i-1]) == 0
-                && !up->orientation(segs[i]->get_source()) == 0
-                && !up->orientation(segs[i]->get_target()) == 0;
+                && !(up->orientation(segs[i]->get_source()) == 0)
+                && !(up->orientation(segs[i]->get_target()) == 0);
             }
 
             return result;
