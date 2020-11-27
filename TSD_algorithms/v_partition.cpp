@@ -38,14 +38,12 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_e() == nullptr);
-    // assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
-    // assert(node->get_v_2() == nullptr);
-    // std::vector<BoundingTrap<PointType, OrderType>> problems = std::vector<BoundingTrap<PointType, OrderType>>();
-    // problems.push_back(node->get_trapezoid());
-    // io::write_trapezoids(problems, "problematic_traps.dat");
-    // if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1))
-    //     std::cout << "hello\n";
-    // assert(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1);
+    assert(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1);
+
+    assert(node->get_right() == nullptr);
+    assert(node->get_left() == nullptr);
+
+    
 
     auto r_trap = node->get_R()->get_trapezoid();
     auto pos_neg = r_trap.destroy(v_cut, side);
@@ -59,6 +57,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     node->set_R(R);
     node->set_A(A);
+
     if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1)) {
         node->set_v_2(node->get_v_1());
         node->set_v_1(v_cut);
@@ -70,69 +69,98 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::v_part_handle_E_case(Node<PointType, OrderType>* node, 
 V_Cut<PointType, OrderType>* v_cut, int side) {
 
-    // assert(node->get_A() != nullptr);
-    // assert(node->get_B() != nullptr);
-    // assert(node->get_L() == nullptr);
-    // assert(node->get_R() == nullptr);
-    // assert(node->get_e()->get_cut_type() == EDGE);
+    assert(node->get_A() != nullptr);
+    assert(node->get_B() != nullptr);
+    assert(node->get_L() == nullptr);
+    assert(node->get_R() == nullptr);
+    assert(node->get_e()->get_cut_type() == EDGE);
     // assert(node->get_v_1() != nullptr);
     // assert(node->get_v_2() != nullptr);
 
-    // BoundingTrap<PointType, OrderType> trap = node->get_trapezoid();
-    // int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut, *node->get_e());
-    // auto pos_neg = trap.destroy(v_cut);
-    // auto pos_trap = pos_neg.first;
-    // auto neg_trap = pos_neg.second;
-    // Node<PointType, OrderType>* L = new Node<PointType, OrderType>(neg_trap);
-    // Node<PointType, OrderType>* R = new Node<PointType, OrderType>(pos_trap);
+
+    int left_merge_side = 0;
+    int right_merge_side = 0;
+
+    if (node->get_left() != nullptr) {
+        assert(node->get_left()->get_right() == node);
+        left_merge_side = node->get_A() == node->get_left()->get_A() ?
+        1 : -1;
+
+        if (left_merge_side == -1) {
+            assert(node->get_B() == node->get_left()->get_B());
+        }
+    }
+
+    if (node->get_right() != nullptr) {
+        assert(node->get_right()->get_left() == node);
+        right_merge_side = node->get_A() == node->get_right()->get_A() ?
+        1 : -1;
+
+        if (right_merge_side == -1) {
+            assert(node->get_B() == node->get_right()->get_B());
+        }
+    }
+
+    BoundingTrap<PointType, OrderType> trap = node->get_trapezoid();
+    int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut, *node->get_e());
+    auto pos_neg = trap.destroy(v_cut);
+    auto pos_trap = pos_neg.first;
+    auto neg_trap = pos_neg.second;
+    Node<PointType, OrderType>* L = new Node<PointType, OrderType>(neg_trap);
+    Node<PointType, OrderType>* R = new Node<PointType, OrderType>(pos_trap);
     
-    // L->set_e(node->get_e());
-    // R->set_e(node->get_e());
+    L->set_e(node->get_e());
+    R->set_e(node->get_e());
 
-    // switch(def_point_orientation) {
-    //     case 1: {
-    //         v_partition(node->get_A(), v_cut);
+    switch(def_point_orientation) {
+        case 1: {
+            v_partition(node->get_A(), v_cut);
 
-    //         L->set_A(node->get_A()->get_L());
-    //         L->set_B(node->get_B());
+            L->set_A(node->get_A()->get_L());
+            L->set_B(node->get_B());
 
-    //         R->set_A(node->get_A()->get_R());
-    //         R->set_B(node->get_B());
+            R->set_A(node->get_A()->get_R());
+            R->set_B(node->get_B());
 
-    //         delete node->get_A();
-    //         break;
-    //     }
-    //     case -1: {
-    //         v_partition(node->get_B(), v_cut);
+            delete node->get_A();
+            break;
+        }
+        case -1: {
+            v_partition(node->get_B(), v_cut);
 
-    //         L->set_A(node->get_A());
-    //         L->set_B(node->get_B()->get_L());
+            L->set_A(node->get_A());
+            L->set_B(node->get_B()->get_L());
 
-    //         R->set_A(node->get_A());
-    //         R->set_B(node->get_B()->get_R());
+            R->set_A(node->get_A());
+            R->set_B(node->get_B()->get_R());
 
-    //         delete node->get_B();
-    //         break;
-    //     }
-    //     case 0: {
-    //         v_partition(node->get_A(), v_cut);
-    //         v_partition(node->get_B(), v_cut);
+            delete node->get_B();
+            break;
+        }
+        case 0: {
+            v_partition(node->get_A(), v_cut);
+            v_partition(node->get_B(), v_cut);
 
-    //         L->set_A(node->get_A()->get_L());
-    //         L->set_B(node->get_B()->get_L());
+            L->set_A(node->get_A()->get_L());
+            L->set_B(node->get_B()->get_L());
 
-    //         R->set_A(node->get_A()->get_R());
-    //         R->set_B(node->get_B()->get_R());
+            R->set_A(node->get_A()->get_R());
+            R->set_B(node->get_B()->get_R());
 
-    //         delete node->get_A();
-    //         delete node->get_B();
-    //         break;
-    //     }
-    // }
+            delete node->get_A();
+            delete node->get_B();
+            break;
+        }
+    }
 
-    // node->clear_e();
-    // node->set_v_1(v_cut);
-    // node->set_desc(L, R, nullptr, nullptr);
+    if (node->get_right() != nullptr) {
+        node->get_right()->set_left(node->get_R());
+        node->get_R()->set_right();
+    }
+
+    node->clear_e();
+    node->set_v_1(v_cut);
+    node->set_desc(L, R, nullptr, nullptr);
 }
 
 template <class PointType, class OrderType>

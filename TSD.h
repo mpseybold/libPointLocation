@@ -8,6 +8,10 @@
 #include <list>
 #include "io.h"
 
+
+
+enum MergeSide {LEFT, RIGHT};
+    
 template <class PointType, class OrderType>
 class TSD {
 
@@ -36,6 +40,8 @@ class TSD {
         void partition_VE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
         void partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);        
         void partition_VVE_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+
+        void shift_merge_list(Node<PointType, OrderType>* node, int desc, int side);
         
         void search_refinement(Segment<PointType, OrderType>* seg, Node<PointType, OrderType>* node);
 

@@ -52,8 +52,6 @@ void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<Point
 
 int main() {
     
-;
-    
     auto new_calidonia = io::read_segments<PointCart, int>("new-caledonia-200601.plot.lonlat");
     
     TSD<PointCart, int> tsd = TSD<PointCart, int>();
