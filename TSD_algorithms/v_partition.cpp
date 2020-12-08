@@ -465,6 +465,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_e()->get_cut_type() == EDGE);
+    assert(node->get_left() == nullptr);
+    assert(node->get_right() == nullptr);
     // assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
     // assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
 

@@ -211,9 +211,58 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
     delete old_A;
 }
 
+
+
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
+    
+    assert(node->get_A() !=  nullptr);
+    assert(node->get_B() != nullptr);
 
+    bool intersects_L = node->get_L() != nullptr &&
+    node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    bool intersects_R = node->get_R() != nullptr &&
+    node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    bool intersects_A = node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    bool intersects_B = node->get_B()->get_trapezoid().intersects_segment(e_cut->get_segment());
+
+    auto trap = node->get_trapezoid();
+    auto pos_neg = trap.destroy(e_cut);
+
+    auto A = new Node<PointType, OrderType>(pos_neg.first);
+    auto B = new Node<PointType, OrderType>(pos_neg.second);
+
+    if (/*segs don't cross*/true) {
+        if (intersects_A) {
+            assert(!intersects_B);
+
+            Node<PointType, OrderType>* L_A;
+            Node<PointType, OrderType>* L_B;
+            Node<PointType, OrderType>* R_A;
+            Node<PointType, OrderType>* R_B;
+            Node<PointType, OrderType>* A_A;
+            Node<PointType, OrderType>* A_B;
+
+            if (intersects_L) {
+                partition(node->get_L(), e_cut);
+                L_A = node->get_L()->get_A();
+                L_B = node->get_L()->get_B();
+            }
+
+            if (intersects_R) {
+                partition(node->get_R(), e_cut);
+                R_A = node->get_R()->get_A();
+                R_B = node->get_R()->get_B();
+            }
+
+            partition(A, e_cut);
+            A_A = A->get_A();
+            A_B = A->get_B();
+
+        } else if (intersects_B) {
+            assert(!intersects_A);
+        }
+    }
 }
 
 template <class PointType, class OrderType>
