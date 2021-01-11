@@ -419,6 +419,32 @@ TEST(TSDTests, overlappingTests) {
     // ASSERT_EQ(tsd.get_leaf_count(), 18);
 }
 
+TEST(TSDTests, dynamicInsertNonCrossingTest) {
+    auto segments = std::vector<Segment<PointCart, int>*>();
+
+    std::mt19937 generator (1235);
+    std::uniform_real_distribution<double> dis(0.0, 1.0);
+
+    for (int i = 1; i <= 100; ++i) {
+        int x = std::floor((double)10000 * dis(generator));
+        int y = std::floor((double)10000 * dis(generator));
+        int length = std::floor((double)(10000 - x) * dis(generator));
+        auto seg = new Segment<PointCart, int>(
+            PointCart(x, y), PointCart(x + length, y), i
+        );
+        segments.push_back(seg);
+    }
+
+    std::shuffle(segments.begin(), segments.end(), generator);
+
+    TSD<PointCart, int> tsd = TSD<PointCart, int>();
+
+    for (int i = 0; i < segments.size(); ++i) {
+        std::cout << i << ", prioirty: " << segments[i]->get_priority() << std::endl;
+        tsd.insert_segment(*segments[i]);
+    }   
+}
+
 TEST(TSDTests, leafInsertTest) {
     auto tsd = TSD<PointCart, int>();
 
@@ -536,13 +562,13 @@ TEST(TSDTests, leafInsertTest) {
     }
 
     for (int i = 0; i < segments.size(); ++i) {
-        std::cout << i << std::endl;
-        tsd.insert_segment(*segments[i]);
+        // std::cout << i << std::endl;
+        // tsd.insert_segment(*segments[i]);
     }
 
     for (int i = segments.size() - 1; i >= 0; --i) {
-        std::cout << i << std::endl;
-        tsd.delete_segment(*segments[i]);
+        // std::cout << i << std::endl;
+        // tsd.delete_segment(*segments[i]);
     }
 
     std::cout << "end...\n";

@@ -30,108 +30,162 @@ void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* 
 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
-    // assert(node != nullptr);
-    // assert(e_cut.get_cut_type() == EDGE);
-    // assert(node->get_A() != nullptr);
-    // assert(node->get_B() != nullptr);
-    // assert(node->get_e().get_cut_type() == EDGE);
+    assert(node != nullptr);
+    assert(e_cut->get_cut_type() == EDGE);
+    assert(node->get_A() != nullptr);
+    assert(node->get_B() != nullptr);
+    assert(node->get_e()->get_cut_type() == EDGE);
 
-    // auto trap = node->get_trapezoid();
-    // auto pos_neg = trap.destroy(e_cut);
-    // auto A = new Node<PointType, OrderType>(pos_neg.first);
-    // auto B = new Node<PointType, OrderType>(pos_neg.second);
+    auto trap = node->get_trapezoid();
+    auto pos_neg = trap.destroy(e_cut);
 
-    // bool intersects_A = node->get_A()
-    // ->get_trapezoid()
-    // .intersects_segment(e_cut.get_segment());
+    bool intersects_A = node->get_A()
+    ->get_trapezoid()
+    .intersects_segment(e_cut->get_segment());
 
-    // bool intersects_B = node->get_B()
-    // ->get_trapezoid()
-    // .intersects_segment(e_cut.get_segment());
+    bool intersects_B = node->get_B()
+    ->get_trapezoid()
+    .intersects_segment(e_cut->get_segment());
 
-    // assert(intersects_A || intersects_B);
+    assert(intersects_A || intersects_B);
 
-    // auto left_cut = trap.get_left().get_cut_type() == NO_CUT
-    // ? Cut<PointType, OrderType>(INTERSECTION, trap.get_top(), trap.get_bottom())
-    // : trap.get_left();
+    if (!(intersects_A && intersects_B)) {
+        std::vector<Node<PointType, OrderType>*> nodes {node};
 
-    // auto right_cut = trap.get_right().get_cut_type() == NO_CUT
-    // ? Cut<PointType, OrderType>(INTERSECTION, trap.get_top(), trap.get_bottom())
-    // : trap.get_right();
+        auto node_to_be_split = intersects_A ? node->get_A() : node->get_B();
 
-    // if (intersects_B && intersects_A) {
-    //     auto intersection_cut = Cut<PointType, OrderType>(
-    //         INTERSECTION, node->get_e(), e_cut
-    //     );
+        // populate nodes vector
+        if (node->get_right() != nullptr) {
 
-    //     if (trap.get_left().defining_point_cut_comparison(intersection_cut) == 1
-    //     &&  trap.get_right().defining_point_cut_comparison(intersection_cut) == -1) {
+            auto next = node->get_right();
             
-    //         if (!node->get_A()->is_partition_visited()) {
-    //             v_partition(node->get_A(), intersection_cut);
-    //             node->get_A()->toggle_partition_visited();
-    //             partition_visited_nodes.push_back(node->get_A());
-    //         }
+            while (next->get_right() != nullptr) {
+                bool add_to_list = intersects_A ? node_to_be_split == next->get_A()
+                : node_to_be_split == next->get_B();
+                
+                if (add_to_list)
+                    nodes.push_back(next);
+                
+                next = next->get_right();
+            }
+        }
 
-    //         if (!node->get_B()->is_partition_visited()) {
-    //             v_partition(node->get_B(), intersection_cut);
-    //             node->get_B()->toggle_intersection();
-    //             partition_visited_nodes.push_back(node->get_B());
-    //         }
+        partition(node_to_be_split, e_cut);
 
-    //         int slope_comparison = Segment<PointType, OrderType>::slope_comparison(e_cut, node->get_e());
+        auto old_e_cut = node->get_e();
 
-    //         assert(slope_comparison != 0);
+        for (int i = 0; i < nodes.size(); ++i) {
+            auto n = nodes[i];
+            Node<PointType, OrderType>* new_node;
+            Node<PointType, OrderType>*& new_A = intersects_A ? node_to_be_split->get_A() : new_node;
+            Node<PointType, OrderType>*& new_B = intersects_B ? node_to_be_split->get_B() : new_node;
 
-    //         switch(slope_comparison) {
-    //             case -1: {
-    //                 partition(node->get_B()->get_L(), e_cut);
-    //                 partition(node->get_A()->get_R(), e_cut);
+            if (intersects_A) {
+                new_B = new Node<PointType, OrderType>(pos_neg.second);
+                new_B->set_A(node_to_be_split->get_B());
+                new_B->set_B(node->get_B());
+                new_B->set_e(old_e_cut);
+            } else {
+                new_A = new Node<PointType, OrderType>(pos_neg.first);
+                new_A->set_A(node->get_A());
+                new_A->set_B(node_to_be_split->get_A());
+                new_A->set_e(old_e_cut);
+            }
 
-    //                 A->set_desc(nullptr, node->get_A()->get_R()->get_A(), 
-    //                 node->get_A()->get_L()->get_A(), node->get_B()->get_L()->get_A());
-    //                 A->set_v_2(intersection_cut);
-    //                 A->set_e(e_cut);
+            auto pattern = n->get_dest_pattern();
 
-    //                 B->set_desc(node->get_B()->get_L()->get_B(), nullptr, 
-    //                 node->get_A()->get_R()->get_B(), node->get_B()->get_R());
-    //                 B->set_v_1(intersection_cut);
-    //                 B->set_e(e_cut);
+            if (pattern != E) {
+                if (pattern == EV) {
+                    assert(n->get_R() != nullptr);
+                    assert(n->get_v_2() != nullptr);
+                } else if (pattern == VE) {
+                    assert(n->get_L() != nullptr);
+                    assert(n->get_v_1() != nullptr);
+                } else {
+                    assert(n->get_L() != nullptr);
+                    assert(n->get_R() != nullptr);
+                    assert(n->get_v_1() != nullptr);
+                    assert(n->get_v_2() != nullptr);
+                }
+        
+                if (pattern == EV)
+                    partition(n->get_R(), e_cut);
+                else if (pattern == VE)
+                    partition(n->get_L(), e_cut);
+                else {
+                    partition(n->get_L(), e_cut);
+                    partition(n->get_R(), e_cut);
+                }
 
-    //                 break;
-    //             }
-    //             case 1: {
-    //                 partition(node->get_B()->get_L(), e_cut);
-    //                 partition(node->get_A()->get_R(), e_cut);
-
-    //                 A->set_desc(nullptr, node->get_A()->get_R()->get_A(), 
-    //                 node->get_A()->get_L()->get_A(), node->get_B()->get_L()->get_A());
-    //                 A->set_v_2(intersection_cut);
-    //                 A->set_e(e_cut);
-
-    //                 B->set_desc(node->get_B()->get_L()->get_B(), nullptr, 
-    //                 node->get_A()->get_R()->get_B(), node->get_B()->get_R());
-    //                 B->set_v_1(intersection_cut);
-    //                 B->set_e(e_cut);
-
-    //                 break;
-    //             }
+                if (intersects_A) {
 
                 
-    //         }
+                    if (pattern == EV) {
+                        new_A = v_merge(new_A, n->get_R()->get_A());
+                        new_B->set_R(n->get_R()->get_B());
+                        new_B->set_v_2(n->get_v_2());
+                    } else if (pattern == VE) {
+                        new_A = v_merge(new_A, n->get_L()->get_A());
+                        new_B->set_L(n->get_L()->get_B());
+                        new_B->set_v_1(n->get_v_1());
+                    } else {
+                        auto aux = v_merge(new_A, n->get_L()->get_A());
+                        new_A = v_merge(aux, n->get_R()->get_A());
+                        new_B->set_R(n->get_R()->get_B());
+                        new_B->set_v_2(n->get_v_2());
+                        new_B->set_L(n->get_L()->get_B());
+                        new_B->set_v_1(n->get_v_1());
+                    }
 
-    //     } else if (trap.get_right().defining_point_cut_comparison(intersection_cut) == 1) {
+                    
+                } else {
             
-    //     } else {
+                    if (pattern == EV) {
+                        new_B = v_merge(new_B, n->get_R()->get_B());
+                        new_A->set_R(n->get_R()->get_A());
+                        new_A->set_v_2(n->get_v_2());
+                    } else if (pattern == VE) {
+                        new_B = v_merge(new_B, n->get_L()->get_B());
+                        new_A->set_L(n->get_L()->get_A());
+                        new_A->set_v_2(n->get_v_1());
+                    } else {
+                        auto aux = v_merge(new_B, n->get_L()->get_B());
+                        new_B = v_merge(aux, n->get_R()->get_B());
+                        new_A->set_R(n->get_R()->get_A());
+                        new_A->set_v_2(n->get_v_2());
+                        new_A->set_L(n->get_L()->get_A());
+                        new_A->set_v_2(n->get_v_1());
+                    }
+                }
 
-    //     }
-        
+                if (pattern == EV)
+                    delete n->get_R();
+                else
+                    delete n->get_L();
+                    
+            }
 
-    // } else if(intersects_B) {
-        
-    // } else if(intersects_A) {
+            n->set_A(new_A);
+            n->set_B(new_B);
+            n->set_L(nullptr);
+            n->set_R(nullptr);
+            n->set_e(e_cut);
 
-    // }
+            if (n != node) {
+                auto prev = nodes[i-1];
+                if (intersects_A) {
+                    prev->get_B()->set_right(n->get_B());
+                    n->get_B()->set_left(prev->get_B());
+                } else {
+                    prev->get_A()->set_right(n->get_A());
+                    n->get_A()->set_left(prev->get_A());
+                }
+            }
+            
+        }
+
+        delete node_to_be_split;
+    }
 }
 
 template <class PointType, class OrderType>
@@ -216,53 +270,32 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::partition_EV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
     
-    assert(node->get_A() !=  nullptr);
-    assert(node->get_B() != nullptr);
+    // assert(node->get_A() !=  nullptr);
+    // assert(node->get_B() != nullptr);
+    // assert(node->get_R() != nullptr);
+    // assert(node->get_left() == nullptr);
 
-    bool intersects_L = node->get_L() != nullptr &&
-    node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment());
-    bool intersects_R = node->get_R() != nullptr &&
-    node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment());
-    bool intersects_A = node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment());
-    bool intersects_B = node->get_B()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    // bool intersects_L = node->get_L() != nullptr &&
+    // node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    // bool intersects_R = node->get_R() != nullptr &&
+    // node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    // bool intersects_A = node->get_A()->get_trapezoid().intersects_segment(e_cut->get_segment());
+    // bool intersects_B = node->get_B()->get_trapezoid().intersects_segment(e_cut->get_segment());
 
-    auto trap = node->get_trapezoid();
-    auto pos_neg = trap.destroy(e_cut);
+    // auto trap = node->get_trapezoid();
+    // auto pos_neg = trap.destroy(e_cut);
 
-    auto A = new Node<PointType, OrderType>(pos_neg.first);
-    auto B = new Node<PointType, OrderType>(pos_neg.second);
+    // bool intersects_A = node->get_A();
 
-    if (/*segs don't cross*/true) {
-        if (intersects_A) {
-            assert(!intersects_B);
+    // bool intersects_A = node->get_A()
+    // ->get_trapezoid()
+    // .intersects_segment(e_cut->get_segment());
 
-            Node<PointType, OrderType>* L_A;
-            Node<PointType, OrderType>* L_B;
-            Node<PointType, OrderType>* R_A;
-            Node<PointType, OrderType>* R_B;
-            Node<PointType, OrderType>* A_A;
-            Node<PointType, OrderType>* A_B;
+    // bool intersects_B = node->get_B()
+    // ->get_trapezoid()
+    // .intersects_segment(e_cut->get_segment());
 
-            if (intersects_L) {
-                partition(node->get_L(), e_cut);
-                L_A = node->get_L()->get_A();
-                L_B = node->get_L()->get_B();
-            }
-
-            if (intersects_R) {
-                partition(node->get_R(), e_cut);
-                R_A = node->get_R()->get_A();
-                R_B = node->get_R()->get_B();
-            }
-
-            partition(A, e_cut);
-            A_A = A->get_A();
-            A_B = A->get_B();
-
-        } else if (intersects_B) {
-            assert(!intersects_A);
-        }
-    }
+    // assert(intersects_A || intersects_B);
 }
 
 template <class PointType, class OrderType>
@@ -282,6 +315,10 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
     assert(node != nullptr);
     DestructionPattern pattern = node->get_dest_pattern();
 
+    if (cut == node->get_e())
+        return;
+
+
     switch(pattern) {
         case NO_DESTRUCTION: {
             partition_leaf_case(node, cut);
@@ -292,15 +329,15 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
             break;
         }
         case VE: {
-            partition_VE_case(node, cut);
+            partition_E_case(node, cut);
             break;
         }
         case EV: {
-            partition_EV_case(node, cut);
+            partition_E_case(node, cut);
             break;
         }
         case VVE: {
-            partition_VVE_case(node, cut);
+            partition_E_case(node, cut);
             break;
         }
         case V: {

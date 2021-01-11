@@ -31,6 +31,8 @@ class Node {
         bool partition_visited = false;
         bool v_partition_visited = false;
 
+        OrderType partition_priority = -1;
+
     public:
 
         //for debugging purposes only
@@ -187,6 +189,10 @@ class Node {
             this->A = A;
             this->B = B;
         }
+
+        OrderType get_partition_priority() { return partition_priority; }
+        
+        void set_partition_priority(OrderType _partition_priority) { partition_priority = _partition_priority; }
 
         bool is_flat() {
             return trapezoid.get_top()->has_on(

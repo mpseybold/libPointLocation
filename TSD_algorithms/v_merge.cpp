@@ -42,6 +42,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
         new_node->set_left(left_merge_neighbour);
     }
 
+    assert(new_node != nullptr);
     return new_node;
 }
 
@@ -81,6 +82,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
         new_node->set_right(right_merge_neighbour);
     }
 
+    assert(new_node != nullptr);
     return new_node;
 }
 
@@ -97,10 +99,11 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     if (left->is_leaf()) {
         assert(right->is_leaf());
         delete left;
-        left = NULL;
+        // left = NULL;
         delete right;
-        right = NULL;
+        // right = NULL;
         leaf_count--;
+        assert(new_node != nullptr);
         return new_node;
     }
 
@@ -141,6 +144,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
         new_node->set_right(right_merge_neighbour);
     }
     
+    assert(new_node != nullptr);
     return new_node;
 }
 

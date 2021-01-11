@@ -22,7 +22,8 @@ BoundingTrap<PointType, OrderType>::vertical_destruction(V_Cut<PointType, OrderT
 template <class PointType, class OrderType>
 std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>>
 BoundingTrap<PointType, OrderType>::edge_destruction(Cut<PointType, OrderType>* cut) {
-    assert(cut != nullptr && cut->get_cut_type() == EDGE);
+    if(cut == nullptr || cut->get_cut_type() != EDGE)
+        assert(false);
     
     BoundingTrap<PointType, OrderType> new_trap_pos, new_trap_neg;
 

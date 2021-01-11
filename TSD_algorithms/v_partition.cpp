@@ -229,7 +229,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     }
 
     auto trap = node->get_trapezoid();
-    auto pos_neg = trap.destroy(v_cut->get_cut(side));
+    auto pos_neg = trap.destroy(v_cut, side);
     Node<PointType, OrderType>* L;// = new Node<PointType, OrderType>(pos_neg.second);
     auto R = new Node<PointType, OrderType>(pos_neg.first);
 
@@ -309,18 +309,18 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     * and update the nodes in the corresponding linked lists
     */
     if (node->get_right() != nullptr) {
-        node->get_right()->set_left(node->get_R());
+        node->get_right()->set_left(R);
         auto next = node->get_right();
         while (next != nullptr) {
             if (right_merge_side == 1) {
-                next->set_A(node->get_R()->get_A());
+                next->set_A(R->get_A());
             } else {
-                next->set_B(node->get_R()->get_B());
+                next->set_B(R->get_B());
             }
 
             next = next->get_right();
         }
-        node->get_R()->set_right(node->get_right());
+        R->set_right(node->get_right());
         node->set_right(nullptr);
     }
 
@@ -342,7 +342,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     assert(node->get_v_1() == nullptr);
 
     auto trap = node->get_trapezoid();
-    auto pos_neg = trap.destroy(v_cut->get_cut(side));
+    auto pos_neg = trap.destroy(v_cut, side);
 
     auto L = new Node<PointType, OrderType>(pos_neg.second);
     Node<PointType, OrderType>* R;

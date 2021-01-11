@@ -697,6 +697,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         Node<PointType, OrderType>* merged_node = indices.side == -1 
         ? subdag_roots[indices.start_index]->get_B() : subdag_roots[indices.start_index]->get_A();
 
+        assert(merged_node != nullptr);
+
         for (int i = indices.start_index + 1; i <= indices.end_index; ++i) {
             auto node = subdag_roots[i];
             if (indices.side == -1) {
