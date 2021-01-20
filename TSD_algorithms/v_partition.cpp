@@ -48,15 +48,18 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     auto r_trap = node->get_R()->get_trapezoid();
     auto pos_neg = r_trap.destroy(v_cut, side);
 
-    auto R = new Node<PointType, OrderType>(pos_neg.first);
-    auto A = new Node<PointType, OrderType>(pos_neg.second);
+    // auto R = new Node<PointType, OrderType>(pos_neg.first);
+    // auto A = new Node<PointType, OrderType>(pos_neg.second);
 
     v_partition(node->get_R(), v_cut, side);
 
-    delete node->get_R();
+    auto old_R = node->get_R();
 
-    node->set_R(R);
-    node->set_A(A);
+    node->set_R(old_R->get_R());
+    node->set_A(old_R->get_L());
+
+    delete old_R;
+
 
     if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1)) {
         node->set_v_2(node->get_v_1());
@@ -103,7 +106,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     BoundingTrap<PointType, OrderType> trap = node->get_trapezoid();
     int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
-    auto pos_neg = trap.destroy(v_cut->get_cut(side));
+    auto pos_neg = trap.destroy(v_cut, side);
     auto pos_trap = pos_neg.first;
     auto neg_trap = pos_neg.second;
     Node<PointType, OrderType>* L = new Node<PointType, OrderType>(neg_trap);
@@ -111,6 +114,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     
     L->set_e(node->get_e());
     R->set_e(node->get_e());
+
+    auto old_A = node->get_A();
+    auto old_B = node->get_B();
 
     switch(def_point_orientation) {
         case 1: {
@@ -125,7 +131,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             L->set_right(R);
             R->set_left(L);
 
-            delete node->get_A();
+            // delete node->get_A();
             break;
         }
         case -1: {
@@ -140,7 +146,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             L->set_right(R);
             R->set_left(L);
 
-            delete node->get_B();
+            // delete node->get_B();
             break;
         }
         case 0: {
@@ -153,11 +159,15 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             R->set_A(node->get_A()->get_R());
             R->set_B(node->get_B()->get_R());
 
-            delete node->get_A();
-            delete node->get_B();
+            // delete node->get_A();
+            // delete node->get_B();
             break;
         }
     }
+
+    node->clear_e();
+    node->set_v_1(v_cut);
+    node->set_desc(L, R, nullptr, nullptr);
 
 
     /*
@@ -167,7 +177,11 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     if (node->get_right() != nullptr) {
         node->get_right()->set_left(node->get_R());
         auto next = node->get_right();
-        while (next != nullptr) {
+
+        bool condition = next->get_B() == old_B ? def_point_orientation == -1
+        : next->get_A() == old_A;
+
+        while (next != nullptr && condition) {
             if (right_merge_side == 1) {
                 next->set_A(node->get_R()->get_A());
             } else {
@@ -175,6 +189,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             }
 
             next = next->get_right();
+            condition = next->get_B() == old_B ? def_point_orientation == -1
+            : next->get_A() == old_A;
         }
         node->get_R()->set_right(node->get_right());
         node->set_right(nullptr);
@@ -183,24 +199,33 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     if (node->get_left() != nullptr) {
         node->get_left()->set_right(node->get_L());
         auto next = node->get_left();
-        while (next != nullptr) {
+
+        bool condition = def_point_orientation == 1 ? next->get_B() == old_B
+        : next->get_A() == old_A;
+
+        while (next != nullptr && condition) {
             if (left_merge_side == 1) {
                 next->set_A(node->get_L()->get_A());
             } else {
                 next->set_B(node->get_L()->get_B());
             }
 
+
             next = next->get_left();
+            if (next != nullptr)
+                condition = def_point_orientation == 1 ? next->get_B() == old_B
+                : next->get_A() == old_A;
         }
         node->get_L()->set_left(node->get_left());
         node->set_left(nullptr);
+
+        if (def_point_orientation >= 0)
+            delete old_A;
+        if (def_point_orientation <= 0)
+            delete old_B;
+        
     }
 
-    
-
-    node->clear_e();
-    node->set_v_1(v_cut);
-    node->set_desc(L, R, nullptr, nullptr);
 }
 
 template <class PointType, class OrderType>
@@ -233,6 +258,11 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     Node<PointType, OrderType>* L;// = new Node<PointType, OrderType>(pos_neg.second);
     auto R = new Node<PointType, OrderType>(pos_neg.first);
 
+    auto old_A = node->get_A();
+    auto old_B = node->get_B();
+
+    int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
+
     if (v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1) {
         L = new Node<PointType, OrderType>(pos_neg.second);
         
@@ -242,7 +272,6 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
         L->set_L(node->get_L());
 
-        int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
         switch(def_point_orientation) {
             case 1: {
                 v_partition(node->get_A(), v_cut, side);
@@ -256,7 +285,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
                 L->set_right(R);
                 R->set_left(L);
 
-                delete node->get_A();
+                // delete node->get_A();
                 break;
             }
             case -1: {
@@ -271,7 +300,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
                 L->set_right(R);
                 R->set_left(L);
                 
-                delete node->get_B();
+                // delete node->get_B();
                 break;
             }
             case 0: {
@@ -284,8 +313,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
                 L->set_A(node->get_A()->get_L());
                 L->set_B(node->get_B()->get_L());
 
-                delete node->get_A();
-                delete node->get_B();
+                // delete node->get_A();
+                // delete node->get_B();
                 break;
             }
         }
@@ -311,7 +340,11 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     if (node->get_right() != nullptr) {
         node->get_right()->set_left(R);
         auto next = node->get_right();
-        while (next != nullptr) {
+
+        bool condition = def_point_orientation == 1 ? next->get_B() == old_B
+        : next->get_A() == old_A;
+
+        while (next != nullptr && condition) {
             if (right_merge_side == 1) {
                 next->set_A(R->get_A());
             } else {
@@ -319,6 +352,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             }
 
             next = next->get_right();
+            if (next !=  nullptr)
+                condition = def_point_orientation == 1 ? next->get_B() == old_B
+                : next->get_A() == old_A;
         }
         R->set_right(node->get_right());
         node->set_right(nullptr);
@@ -326,8 +362,15 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     node->set_L(L);
     node->set_R(R);
+    node->set_A(nullptr);
+    node->set_B(nullptr);
     node->set_v_1(v_cut);
     node->clear_e();
+
+    if (def_point_orientation >= 0)
+        delete old_A;
+    if (def_point_orientation <= 0)
+        delete old_B;
 }
 
 template <class PointType, class OrderType>
@@ -338,7 +381,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     assert(node->get_L() == nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_e()->get_cut_type() == EDGE);
-    assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
+    // assert(node->get_v_2() != nullptr && node->get_v_2()->get_cut_type() != EDGE);
     assert(node->get_v_1() == nullptr);
 
     auto trap = node->get_trapezoid();
@@ -346,6 +389,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     auto L = new Node<PointType, OrderType>(pos_neg.second);
     Node<PointType, OrderType>* R;
+
+    auto old_A = node->get_A();
+    auto old_B = node->get_B();
 
     assert(node->get_right() == nullptr);
 
@@ -361,7 +407,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         }
     }
 
-    if (v_cut->defining_point_cut_comparison(node->get_v_2()) == -1) {
+    int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
+
+    if (v_cut->defining_point_cut_comparison(*node->get_v_2()) == -1) {
         R = new Node<PointType, OrderType>(pos_neg.first);
 
         L->set_e(node->get_e());
@@ -369,10 +417,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         R->set_v_2(node->get_v_2());
         R->set_R(node->get_R());
 
-        int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
         switch(def_point_orientation) {
             case 1: {
-                v_partition(node->get_A(), v_cut->get_cut(side));
+                v_partition(node->get_A(), v_cut, side);
 
                 L->set_A(node->get_A()->get_L());
                 L->set_B(node->get_B());
@@ -380,14 +427,14 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
                 R->set_A(node->get_A()->get_R());
                 R->set_B(node->get_B());
 
-                L->set_R(R);
-                R->set_L(L);
+                L->set_right(R);
+                R->set_left(L);
 
-                delete node->get_A();
+                // delete node->get_A();
                 break;
             }
             case -1: {
-                v_partition(node->get_B(), v_cut->get_cut(side));
+                v_partition(node->get_B(), v_cut, side);
 
                 L->set_A(node->get_A());
                 L->set_B(node->get_B()->get_L());
@@ -395,15 +442,15 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
                 R->set_A(node->get_A());
                 R->set_B(node->get_B()->get_R());
 
-                L->set_R(R);
-                R->set_L(L);
+                L->set_right(R);
+                R->set_left(L);
 
-                delete node->get_B();
+                // delete node->get_B();
                 break;
             }
             case 0: {
-                v_partition(node->get_A(), v_cut->get_cut(side));
-                v_partition(node->get_B(), v_cut->get_cut(side));
+                v_partition(node->get_A(), v_cut, side);
+                v_partition(node->get_B(), v_cut, side);
 
                 L->set_A(node->get_A()->get_L());
                 L->set_B(node->get_B()->get_L());
@@ -411,13 +458,13 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
                 R->set_A(node->get_A()->get_R());
                 R->set_B(node->get_B()->get_R());
 
-                delete node->get_A();
-                delete node->get_B();
+                // delete node->get_A();
+                // delete node->get_B();
                 break;
             }
         }
     } else {
-        v_partition(node->get_R(), v_cut->get_cut(side));
+        v_partition(node->get_R(), v_cut, side);
 
         R = node->get_R()->get_R();
 
@@ -434,10 +481,22 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->clear_v_2();
     }
 
+    node->set_L(L);
+    node->set_R(R);
+    node->set_A(nullptr);
+    node->set_B(nullptr);
+    node->clear_e();
+    node->clear_v_2();
+    node->set_v_1(v_cut);
+
     if (node->get_left() != nullptr) {
         node->get_left()->set_right(node->get_L());
         auto next = node->get_left();
-        while (next != nullptr) {
+
+        bool condition = def_point_orientation == 1 ? next->get_B() == old_B
+        : next->get_A() == old_A;
+
+        while (next != nullptr && condition) {
             if (left_merge_side == 1) {
                 next->set_A(node->get_L()->get_A());
             } else {
@@ -445,16 +504,21 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             }
 
             next = next->get_left();
+            if (next != nullptr)
+                condition = def_point_orientation == 1 ? next->get_B() == old_B
+                : next->get_A() == old_A;
         }
+
         node->get_L()->set_left(node->get_left());
+        node->get_left()->set_right(node->get_L());
         node->set_left(nullptr);
+
+        if (def_point_orientation >= 0)
+            delete old_A;
+        if (def_point_orientation <= 0)
+            delete old_B;
     }
 
-    node->set_L(L);
-    node->set_R(R);
-    node->clear_e();
-    node->clear_v_2();
-    node->set_v_1(v_cut);
 }
 
 template <class PointType, class OrderType>
@@ -471,7 +535,7 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     // assert(node->get_v_1() != nullptr && node->get_v_1()->get_cut_type() != EDGE);
 
     auto trap = node->get_trapezoid();
-    auto pos_neg = trap.destroy(v_cut->get_cut(side));
+    auto pos_neg = trap.destroy(v_cut, side);
 
     Node<PointType, OrderType>* L; 
     Node<PointType, OrderType>* R;
@@ -552,12 +616,19 @@ void TSD<PointType, OrderType>::v_partition(Node<PointType, OrderType>* node,
 V_Cut<PointType, OrderType>* v_cut, int side) {
     DestructionPattern pattern = node->get_dest_pattern();
 
+    if (v_cut->get_priority() == 46 && node->get_priority() == 59) {
+        std::cout << "hello\n";        
+    }
+
     switch(pattern) {
         case E:
             v_part_handle_E_case(node, v_cut, side);
             break;
         case VE:
             v_part_handle_VE_case(node, v_cut, side);
+            break;
+        case EV:
+            v_part_handle_EV_case(node, v_cut, side);
             break;
         case V:
             v_part_handle_V_case(node, v_cut, side);

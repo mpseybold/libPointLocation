@@ -24,13 +24,14 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     new_node->set_desc(left->get_L(), R, left->get_A(), left->get_B());
     new_node->copy_cuts(left);
 
-    new_node->get_right()->set_right(right_merge_node);
-    right_merge_node->set_left(new_node->get_right());
+    new_node->get_R()->set_right(right_merge_node);
+    if (right_merge_node != nullptr)
+        right_merge_node->set_left(new_node->get_R());
 
     delete left;
     left = NULL;
-    delete right;
-    right = NULL;
+    // delete right;
+    // right = NULL;
 
     if (right_merge_neighbour != nullptr && update_right_merge_pointer) {
         right_merge_neighbour->set_left(new_node->get_R());
@@ -91,6 +92,8 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     
     assert(left != nullptr);
     assert(right != nullptr);
+    if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left())
+        std::cout << "hello\n";
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
@@ -116,7 +119,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     auto e_cut = left->get_e();
 
     if (left->get_B() == right->get_B()) {
-        auto A = v_merge(left->get_A(), right->get_B());
+        auto A = v_merge(left->get_A(), right->get_A());
         new_node->set_desc(left->get_L(), right->get_R(), A, left->get_B());
     } else if (left->get_A() == right->get_A()) {
         auto B = v_merge(left->get_B(), right->get_B());

@@ -425,12 +425,13 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
     std::mt19937 generator (1235);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    for (int i = 1; i <= 100; ++i) {
+    for (int i = 1; i <= 10; ++i) {
         int x = std::floor((double)10000 * dis(generator));
         int y = std::floor((double)10000 * dis(generator));
         int length = std::floor((double)(10000 - x) * dis(generator));
         auto seg = new Segment<PointCart, int>(
             PointCart(x, y), PointCart(x + length, y), i
+            // PointCart(2*i, i), PointCart(2*i+1, i), i
         );
         segments.push_back(seg);
     }
@@ -442,7 +443,13 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
     for (int i = 0; i < segments.size(); ++i) {
         std::cout << i << ", prioirty: " << segments[i]->get_priority() << std::endl;
         tsd.insert_segment(*segments[i]);
-    }   
+        auto traps = std::vector<BoundingTrap<PointCart, int>>();
+        write_leaf_traps(tsd.get_root(), traps);
+        std::cout << traps.size() << std::endl;
+        io::write_trapezoids(traps, "leaf_insert_dynamic.dat");   
+        std::cout << tsd.get_leaf_count() << std::endl;
+    }
+
 }
 
 TEST(TSDTests, leafInsertTest) {

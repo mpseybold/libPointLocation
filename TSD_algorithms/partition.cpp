@@ -74,11 +74,20 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         auto old_e_cut = node->get_e();
 
+        Node<PointType, OrderType>* new_A;
+        Node<PointType, OrderType>* new_B;
+        if (intersects_A)
+            new_A = node_to_be_split->get_A();
+        if (intersects_B)
+            new_B = node_to_be_split->get_B();
+
         for (int i = 0; i < nodes.size(); ++i) {
             auto n = nodes[i];
             Node<PointType, OrderType>* new_node;
-            Node<PointType, OrderType>*& new_A = intersects_A ? node_to_be_split->get_A() : new_node;
-            Node<PointType, OrderType>*& new_B = intersects_B ? node_to_be_split->get_B() : new_node;
+            if (!intersects_A)
+                new_A = new_node;
+            if (!intersects_B)
+                new_B = new_node;
 
             if (intersects_A) {
                 new_B = new Node<PointType, OrderType>(pos_neg.second);
@@ -117,19 +126,24 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                     partition(n->get_R(), e_cut);
                 }
 
-                if (intersects_A) {
+                if (intersects_A) {    
 
-                
                     if (pattern == EV) {
+                        if (e_cut->get_priority() == 8) {
+                        std::vector<BoundingTrap<PointType, OrderType>> traps = {
+                            n->get_A()->get_trapezoid(), n->get_B()->get_trapezoid(), 
+                            /*n->get_L()->get_trapezoid(),*/ n->get_R()->get_trapezoid()};
+                        io::write_trapezoids(traps, "v_merge.dat");
+                        }
                         new_A = v_merge(new_A, n->get_R()->get_A());
                         new_B->set_R(n->get_R()->get_B());
                         new_B->set_v_2(n->get_v_2());
                     } else if (pattern == VE) {
-                        new_A = v_merge(new_A, n->get_L()->get_A());
+                        new_A = v_merge(n->get_L()->get_A(), new_A);
                         new_B->set_L(n->get_L()->get_B());
                         new_B->set_v_1(n->get_v_1());
                     } else {
-                        auto aux = v_merge(new_A, n->get_L()->get_A());
+                        auto aux = v_merge(n->get_L()->get_A(), new_A);
                         new_A = v_merge(aux, n->get_R()->get_A());
                         new_B->set_R(n->get_R()->get_B());
                         new_B->set_v_2(n->get_v_2());
@@ -145,16 +159,16 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_A->set_R(n->get_R()->get_A());
                         new_A->set_v_2(n->get_v_2());
                     } else if (pattern == VE) {
-                        new_B = v_merge(new_B, n->get_L()->get_B());
+                        new_B = v_merge(n->get_L()->get_B(), new_B);
                         new_A->set_L(n->get_L()->get_A());
                         new_A->set_v_2(n->get_v_1());
                     } else {
-                        auto aux = v_merge(new_B, n->get_L()->get_B());
+                        auto aux = v_merge(n->get_L()->get_B(), new_B);
                         new_B = v_merge(aux, n->get_R()->get_B());
                         new_A->set_R(n->get_R()->get_A());
                         new_A->set_v_2(n->get_v_2());
                         new_A->set_L(n->get_L()->get_A());
-                        new_A->set_v_2(n->get_v_1());
+                        new_A->set_v_1(n->get_v_1());
                     }
                 }
 
@@ -170,6 +184,8 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
             n->set_L(nullptr);
             n->set_R(nullptr);
             n->set_e(e_cut);
+            n->clear_v_1();
+            n->clear_v_2();
 
             if (n != node) {
                 auto prev = nodes[i-1];
@@ -179,6 +195,31 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                 } else {
                     prev->get_A()->set_right(n->get_A());
                     n->get_A()->set_left(prev->get_A());
+                }
+            } else {
+                if (n->get_left() != nullptr) {
+                    auto prev = nodes[i-1];
+                    if (intersects_A) {
+                        n->get_B()->set_left(n->get_left());
+                        n->get_left()->set_right(n->get_B());
+                        n->set_left(nullptr);
+                    } else {
+                        n->get_A()->set_left(n->get_left());
+                        n->get_left()->set_right(n->get_A());
+                        n->set_left(nullptr);
+                    }
+                }
+            }
+
+            if (n == nodes[nodes.size() - 1] && n->get_right() != nullptr) {
+                if (intersects_A) {
+                    n->get_B()->set_right(n->get_right());
+                    n->get_right()->set_left(n->get_B());
+                    n->set_right(nullptr);
+                } else {
+                    n->get_A()->set_right(n->get_right());
+                    n->get_right()->set_left(n->get_A());
+                    n->set_right(nullptr);
                 }
             }
             
@@ -194,6 +235,9 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     assert(e_cut->get_cut_type() == EDGE);
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
+    if (node->get_A() != nullptr) {
+        std::cout << "hello\n";
+    }
     assert(node->get_A() == nullptr);
     assert(node->get_B() == nullptr);
     assert(node->get_e() == nullptr);
@@ -214,6 +258,8 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
         node->set_v_2(node->get_v_1());
         node->clear_v_1();
         node->set_e(e_cut);
+        if (node->get_R() == nullptr)
+            std::cout << "oops";
 
         delete old_L;
 
@@ -226,8 +272,10 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
         auto old_R = node->get_R();
 
         node->set_desc(node->get_L(), nullptr, old_R->get_A(), old_R->get_B());
-
         node->set_e(e_cut);
+
+        if (node->get_L() == nullptr)
+            std::cout << "oops";
 
         delete old_R;
     } else {

@@ -267,7 +267,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             continue;
         search_stack.pop();
 
-        if ((insert && top->is_leaf()) || (!insert && top->get_priority() == seg->get_priority())) {
+        if ((insert && (top->is_leaf() || top->get_priority() > seg->get_priority())) 
+        || (!insert && top->get_priority() == seg->get_priority())) {
             top->toggle_visited();
             num_subdag_roots++;
             subdag_roots.push_back(top);
@@ -354,11 +355,11 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     affected_subdag_roots(&seg, true);
 
     //debug
-    // auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
-    // for (auto node: subdag_roots) {
-    //     traps.push_back(node->get_trapezoid());
-    // }
-    // io::write_trapezoids(traps, "leaves.dat");
+    auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
+    for (auto node: subdag_roots) {
+        traps.push_back(node->get_trapezoid());
+    }
+    io::write_trapezoids(traps, "leaves.dat");
     // end debug
 
 
