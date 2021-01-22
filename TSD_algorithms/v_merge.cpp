@@ -92,6 +92,8 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     
     assert(left != nullptr);
     assert(right != nullptr);
+    if (left == right)
+        return left;
     if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left())
         std::cout << "hello\n";
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());

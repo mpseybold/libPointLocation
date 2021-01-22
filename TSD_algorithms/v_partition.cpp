@@ -42,7 +42,6 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     assert(node->get_right() == nullptr);
     assert(node->get_left() == nullptr);
-
     
 
     auto r_trap = node->get_R()->get_trapezoid();
@@ -59,7 +58,6 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     node->set_A(old_R->get_L());
 
     delete old_R;
-
 
     if (!(v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1)) {
         node->set_v_2(node->get_v_1());
@@ -178,8 +176,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->get_right()->set_left(node->get_R());
         auto next = node->get_right();
 
-        bool condition = next->get_B() == old_B ? def_point_orientation == -1
-        : next->get_A() == old_A;
+        bool condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+        : (next->get_A() == old_A);
 
         while (next != nullptr && condition) {
             if (right_merge_side == 1) {
@@ -189,8 +187,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
             }
 
             next = next->get_right();
-            condition = next->get_B() == old_B ? def_point_orientation == -1
-            : next->get_A() == old_A;
+            if (next != nullptr)
+                condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+                : (next->get_A() == old_A);
         }
         node->get_R()->set_right(node->get_right());
         node->set_right(nullptr);
@@ -200,8 +199,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->get_left()->set_right(node->get_L());
         auto next = node->get_left();
 
-        bool condition = def_point_orientation == 1 ? next->get_B() == old_B
-        : next->get_A() == old_A;
+         bool condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+        : (next->get_A() == old_A);
 
         while (next != nullptr && condition) {
             if (left_merge_side == 1) {
@@ -213,8 +212,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
             next = next->get_left();
             if (next != nullptr)
-                condition = def_point_orientation == 1 ? next->get_B() == old_B
-                : next->get_A() == old_A;
+                condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+                : (next->get_A() == old_A);
         }
         node->get_L()->set_left(node->get_left());
         node->set_left(nullptr);
@@ -262,6 +261,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     auto old_B = node->get_B();
 
     int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
+
+    auto old_v_1 = node->get_v_1();
 
     if (v_cut->defining_point_cut_comparison(*node->get_v_1()) == 1) {
         L = new Node<PointType, OrderType>(pos_neg.second);
@@ -341,8 +342,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->get_right()->set_left(R);
         auto next = node->get_right();
 
-        bool condition = def_point_orientation == 1 ? next->get_B() == old_B
-        : next->get_A() == old_A;
+        bool condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+        : (next->get_A() == old_A);
 
         while (next != nullptr && condition) {
             if (right_merge_side == 1) {
@@ -353,8 +354,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
             next = next->get_right();
             if (next !=  nullptr)
-                condition = def_point_orientation == 1 ? next->get_B() == old_B
-                : next->get_A() == old_A;
+                condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+                : (next->get_A() == old_A);
         }
         R->set_right(node->get_right());
         node->set_right(nullptr);
@@ -367,9 +368,11 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     node->set_v_1(v_cut);
     node->clear_e();
 
-    if (def_point_orientation >= 0)
+    if (def_point_orientation >= 0
+    && v_cut->defining_point_cut_comparison(*old_v_1) == 1)
         delete old_A;
-    if (def_point_orientation <= 0)
+    if (def_point_orientation <= 0
+    && v_cut->defining_point_cut_comparison(*old_v_1) == 1)
         delete old_B;
 }
 
@@ -408,6 +411,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     }
 
     int def_point_orientation = Cut<PointType, OrderType>::v_cut_edge_orientation(*v_cut->get_cut(side), *node->get_e());
+
+    auto old_v_2 = node->get_v_2();
 
     if (v_cut->defining_point_cut_comparison(*node->get_v_2()) == -1) {
         R = new Node<PointType, OrderType>(pos_neg.first);
@@ -493,8 +498,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->get_left()->set_right(node->get_L());
         auto next = node->get_left();
 
-        bool condition = def_point_orientation == 1 ? next->get_B() == old_B
-        : next->get_A() == old_A;
+        bool condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+        : (next->get_A() == old_A);
 
         while (next != nullptr && condition) {
             if (left_merge_side == 1) {
@@ -505,17 +510,19 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
             next = next->get_left();
             if (next != nullptr)
-                condition = def_point_orientation == 1 ? next->get_B() == old_B
-                : next->get_A() == old_A;
+                condition = (def_point_orientation == -1) ? (next->get_B() == old_B)
+                : (next->get_A() == old_A);
         }
 
         node->get_L()->set_left(node->get_left());
         node->get_left()->set_right(node->get_L());
         node->set_left(nullptr);
 
-        if (def_point_orientation >= 0)
+        if (def_point_orientation >= 0
+        && v_cut->defining_point_cut_comparison(*old_v_2) == -1)
             delete old_A;
-        if (def_point_orientation <= 0)
+        if (def_point_orientation <= 0
+        && v_cut->defining_point_cut_comparison(*old_v_2) == -1)
             delete old_B;
     }
 

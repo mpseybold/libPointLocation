@@ -423,9 +423,10 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
     std::mt19937 generator (1235);
+    // std::mt19937 generator (1236);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    for (int i = 1; i <= 10; ++i) {
+    for (int i = 1; i <= 20; ++i) {
         int x = std::floor((double)10000 * dis(generator));
         int y = std::floor((double)10000 * dis(generator));
         int length = std::floor((double)(10000 - x) * dis(generator));
