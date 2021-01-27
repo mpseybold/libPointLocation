@@ -55,12 +55,15 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         auto node_to_be_split = intersects_A ? node->get_A() : node->get_B();
 
+        if (e_cut->get_priority() == 1 && node->get_priority() == 15)
+            std::cout << "hello\n" << node->get_priority() << "\n";
+
         // populate nodes vector
         if (node->get_right() != nullptr) {
 
             auto next = node->get_right();
             
-            while (next->get_right() != nullptr) {
+            while (next != nullptr) {
                 bool add_to_list = intersects_A ? node_to_be_split == next->get_A()
                 : node_to_be_split == next->get_B();
                 
@@ -70,9 +73,7 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                 next = next->get_right();
             }
         }
-
-        if (nodes.size() > 1)
-            std::cout << "hello\n";
+    
 
         partition(node_to_be_split, e_cut);
 
@@ -171,7 +172,7 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                     } else if (pattern == VE) {
                         new_B = v_merge(n->get_L()->get_B(), new_B);
                         new_A->set_L(n->get_L()->get_A());
-                        new_A->set_v_2(n->get_v_1());
+                        new_A->set_v_1(n->get_v_1());
                     } else {
                         auto aux = v_merge(n->get_L()->get_B(), new_B);
                         new_B = v_merge(aux, n->get_R()->get_B());
@@ -274,6 +275,15 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
             }
         }
 
+
+        for (int i = 0; i < nodes.size(); ++i) {
+            if (intersects_A) {
+                nodes[i]->set_A(new_A);
+            }
+            if (intersects_B) {
+                nodes[i]->set_B(new_B);
+            }
+        }
 
         delete node_to_be_split;
     }
