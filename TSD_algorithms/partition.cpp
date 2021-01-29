@@ -36,8 +36,8 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
     assert(node->get_B() != nullptr);
     assert(node->get_e()->get_cut_type() == EDGE);
 
-    auto trap = node->get_trapezoid();
-    auto pos_neg = trap.destroy(e_cut);
+    // auto trap = node->get_trapezoid();
+    // auto pos_neg = trap.destroy(e_cut);
 
     bool intersects_A = node->get_A()
     ->get_trapezoid()
@@ -74,12 +74,9 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
             }
         }
     
-
         partition(node_to_be_split, e_cut);
 
         auto old_e_cut = node->get_e();
-        auto old_L = node->get_L();
-        auto old_R = node->get_R();
 
         Node<PointType, OrderType>* new_A;
         Node<PointType, OrderType>* new_B;
@@ -90,6 +87,12 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         for (int i = 0; i < nodes.size(); ++i) {
             auto n = nodes[i];
+
+            auto trap = n->get_trapezoid();
+            auto pos_neg = trap.destroy(e_cut);
+
+            auto old_L = n->get_L();
+            auto old_R = n->get_R();
 
             auto pattern = n->get_dest_pattern();
 
@@ -102,11 +105,11 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
             if (intersects_A) {
                 new_B = new Node<PointType, OrderType>(pos_neg.second);
                 new_B->set_A(node_to_be_split->get_B());
-                new_B->set_B(node->get_B());
+                new_B->set_B(n->get_B());
                 new_B->set_e(old_e_cut);
             } else {
                 new_A = new Node<PointType, OrderType>(pos_neg.first);
-                new_A->set_A(node->get_A());
+                new_A->set_A(n->get_A());
                 new_A->set_B(node_to_be_split->get_A());
                 new_A->set_e(old_e_cut);
             }
