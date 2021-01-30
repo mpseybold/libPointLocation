@@ -945,6 +945,89 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
 
 } 
 
+/*
+inline int64_t relId( int64_t root, int64_t node){
+    return node-root;
+}
+*/
+template <class PointType, class OrderType>
+const std::string TSD<PointType, OrderType>::asJsonGraph(){
+    std::stringstream ss;
+    ss << "{\"kind\":{\"graph\":true},";
+
+    // Collect nodes that are reachable from the root in a set
+    std::stack<Node<PointType, OrderType>*> queue;
+    queue.push( root );
+    std::unordered_set<Node<PointType, OrderType>*> nodeset;
+    Node<PointType, OrderType>* nodePtr;
+    while( !queue.empty() ){
+        nodePtr = queue.top();
+        queue.pop();
+        if( nodePtr == nullptr ) 
+            continue;
+        auto wasNew = nodeset.insert( nodePtr );
+        if( wasNew .second ){   // node is new
+            queue.push( nodePtr->get_L() );
+            queue.push( nodePtr->get_A() );
+            queue.push( nodePtr->get_B() );
+            queue.push( nodePtr->get_R() );
+        }
+    }
+    
+    // Put nodes in output
+    ss << "\n\"nodes\":[\n"; // {\"id\":\"1\"},{\"id\":\"2\"}," ;
+    Node<PointType, OrderType>* from;
+    Node<PointType, OrderType>* to;
+    for( auto v = nodeset.begin(); v != nodeset.end(); ++v ){ 
+        from = *v;
+        if(v != nodeset.begin())
+            ss<<",\n";
+        ss <<  "\t{\"id\":\"" <<  std::hex << from << "\""; 
+        // ss << ", \"label\":\""<< ( (from->get_partition_priority()))  <<"\"";
+        if( from == root )
+            ss << ", \"color\":\"lime\"";
+        ss <<  "}";
+    }
+    // ss << "]}";
+    ss << "],";
+    // Put outgoing edges in output
+    bool first = true;
+    ss << "\n\"edges\":[\n" ;
+    for( auto v = nodeset.begin(); v != nodeset.end(); ++v ){ 
+        from = *v;
+        assert( from != nullptr );
+        if( from->is_leaf() )
+            continue;
+        to = from->get_L();
+        if( to != nullptr ){
+            ss << ((first)?"":",\n");
+            ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to << "\", \"label\":\"L\"}\n"; 
+            first=false;
+        }
+        to = from->get_A();
+        if( to != nullptr ){
+            ss << ((first)?"":",\n");
+            ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to <<"\", \"label\":\"A\"}\n"; 
+            first=false;
+        }
+        to = from->get_B();
+        if( to != nullptr ){
+            ss << ((first)?"":",\n");
+            ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to << "\", \"label\":\"B\"}\n"; 
+            first=false;
+        }
+        to = from->get_R();
+        if( to != nullptr ){
+            ss << ((first)?"":",\n");
+            ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to << "\", \"label\":\"R\"}\n"; 
+            first=false;
+        }
+        
+    }
+    ss<< "]}";
+    return ss.str();
+}
+
 // template <class PointType, class OrderType>
 // V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
 //     assert(cut->get_cut_type() != EDGE);
