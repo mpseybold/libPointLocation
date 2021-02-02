@@ -359,7 +359,10 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     for (auto node: subdag_roots) {
         traps.push_back(node->get_trapezoid());
     }
-    io::write_trapezoids(traps, "leaves.dat");
+    io::write_trapezoids(traps, "subdag_roots.dat");
+
+    // std::string tmp = asJsonGraph(subdag_roots);
+
     // end debug
 
 
@@ -627,6 +630,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             }
             delete tgt_cut;
         }
+        // tmp = asJsonGraph(subdag_roots);
+        reachable_nodes_valid(root);
     }
 
 
@@ -638,6 +643,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     for (int i = 0; i < subdag_roots.size(); ++i) {
         auto node = subdag_roots[i];
         partition(node, e_cut);
+        // tmp = asJsonGraph(subdag_roots);
+        reachable_nodes_valid(root);
         if (!node->is_flat()) {
 
             if (i > 0) {
@@ -709,6 +716,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             } else {
                 assert(false);
             }
+            // tmp = asJsonGraph(subdag_roots);
         }
 
         for (int i = indices.start_index; i <= indices.end_index; ++i) {
@@ -719,6 +727,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 node->set_A(merged_node);
             }
         }
+        reachable_nodes_valid(root);
     }
 }
 
@@ -951,13 +960,15 @@ inline int64_t relId( int64_t root, int64_t node){
 }
 */
 template <class PointType, class OrderType>
-const std::string TSD<PointType, OrderType>::asJsonGraph(){
+const std::string TSD<PointType, OrderType>::asJsonGraph(
+    std::vector<Node<PointType, OrderType>*> roots, Node<PointType, OrderType>* node_of_interest){
     std::stringstream ss;
     ss << "{\"kind\":{\"graph\":true},";
 
     // Collect nodes that are reachable from the root in a set
     std::stack<Node<PointType, OrderType>*> queue;
-    queue.push( root );
+    for (auto r: roots)
+        queue.push( r );
     std::unordered_set<Node<PointType, OrderType>*> nodeset;
     Node<PointType, OrderType>* nodePtr;
     while( !queue.empty() ){
@@ -966,7 +977,7 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(){
         if( nodePtr == nullptr ) 
             continue;
         auto wasNew = nodeset.insert( nodePtr );
-        if( wasNew .second ){   // node is new
+        if( wasNew.second ){   // node is new
             queue.push( nodePtr->get_L() );
             queue.push( nodePtr->get_A() );
             queue.push( nodePtr->get_B() );
@@ -975,17 +986,19 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(){
     }
     
     // Put nodes in output
-    ss << "\n\"nodes\":[\n"; // {\"id\":\"1\"},{\"id\":\"2\"}," ;
+    ss << "\n\"nodes\":[\n"; 
+    ss <<  "\t{\"id\":\"" <<  std::hex << 0x0 << "\", \"color\":\"gray\"}\n";
     Node<PointType, OrderType>* from;
     Node<PointType, OrderType>* to;
     for( auto v = nodeset.begin(); v != nodeset.end(); ++v ){ 
         from = *v;
-        if(v != nodeset.begin())
-            ss<<",\n";
-        ss <<  "\t{\"id\":\"" <<  std::hex << from << "\""; 
-        // ss << ", \"label\":\""<< ( (from->get_partition_priority()))  <<"\"";
-        if( from == root )
+        ss <<  ",\t{\"id\":\"" <<  std::hex << from << "\""; 
+        ss << ", \"label\":\"" << std::dec << ( (int)(from->get_priority())) << "\\n" << std::hex << from <<"\"";
+        // if( from == root )
+        if (std::find(roots.begin(), roots.end(), from) != roots.end())
             ss << ", \"color\":\"lime\"";
+        else if (from == node_of_interest)
+            ss << ", \"color\":\"red\"";
         ss <<  "}";
     }
     // ss << "]}";
@@ -1024,8 +1037,44 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(){
         }
         
     }
+    for( auto v = nodeset.begin(); v != nodeset.end(); ++v ){ 
+        from = *v;
+        assert( from != nullptr );
+        if( from->is_leaf() )
+            continue;
+        to = from->get_left();
+        if( std::find(nodeset.begin(), nodeset.end(), to) == nodeset.end() )
+            to = nullptr;
+        ss << ((first)?"":",\n");
+        ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to << "\", \"label\":\"l\",\"color\":\"red\"}\n"; 
+        first=false;
+
+        to = from->get_right();
+        if( std::find(nodeset.begin(), nodeset.end(), to) == nodeset.end() )
+            to = nullptr;
+        ss << ((first)?"":",\n");
+        ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to <<"\", \"label\":\"r\",\"color\":\"red\"}\n"; 
+        first=false;
+    }
     ss<< "]}";
     return ss.str();
+}
+
+template <class PointType, class OrderType>
+void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>* node) {
+    node->is_valid();
+
+    if (node->get_A() != nullptr)
+        reachable_nodes_valid(node->get_A());
+
+    if (node->get_B() != nullptr)
+        reachable_nodes_valid(node->get_B());
+
+    if (node->get_L() != nullptr)
+        reachable_nodes_valid(node->get_L());
+
+    if (node->get_R() != nullptr)
+        reachable_nodes_valid(node->get_R());
 }
 
 // template <class PointType, class OrderType>

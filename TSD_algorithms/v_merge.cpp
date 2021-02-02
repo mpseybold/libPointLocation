@@ -67,6 +67,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
     auto L = v_merge(left, right->get_L());
 
     new_node->set_desc(L, right->get_R(), right->get_A(), right->get_B());
+    new_node->copy_cuts(right);
 
     delete left;
     left = NULL;

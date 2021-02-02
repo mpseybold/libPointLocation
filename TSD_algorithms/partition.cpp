@@ -55,9 +55,6 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         auto node_to_be_split = intersects_A ? node->get_A() : node->get_B();
 
-        if (e_cut->get_priority() == 1 && node->get_priority() == 15)
-            std::cout << "hello\n" << node->get_priority() << "\n";
-
         // populate nodes vector
         if (node->get_right() != nullptr) {
 
@@ -72,6 +69,11 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                 
                 next = next->get_right();
             }
+        }
+
+        if (nodes.size() > 1) {
+            std::cout << "list length: " << nodes.size() << std::endl;
+            std::cout << "hello\n";
         }
     
         partition(node_to_be_split, e_cut);
@@ -205,18 +207,19 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                     prev->get_A()->set_right(n->get_A());
                     n->get_A()->set_left(prev->get_A());
                 }
+                prev->set_right(nullptr);
+                n->set_left(nullptr);
             } else if (n == node) {
                 if (n->get_left() != nullptr) {
                     auto prev = nodes[i-1];
                     if (intersects_A) {
                         n->get_B()->set_left(n->get_left());
                         n->get_left()->set_right(n->get_B());
-                        n->set_left(nullptr);
                     } else {
                         n->get_A()->set_left(n->get_left());
                         n->get_left()->set_right(n->get_A());
-                        n->set_left(nullptr);
                     }
+                    n->set_left(nullptr);
                 }
             }
 
@@ -249,6 +252,8 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         prev->get_A()->set_right(n->get_A());
                         n->get_A()->set_left(prev->get_A());
                     }
+                    prev->set_right(nullptr);
+                    n->set_left(nullptr);
                 }
 
                 if (n->get_right() != nullptr

@@ -441,7 +441,9 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
 
     TSD<PointCart, int> tsd = TSD<PointCart, int>();
 
-    std::string tmp = tsd.asJsonGraph();    // force template instanciation
+    std::vector<Node<PointCart, int>*> roots{ tsd.get_root() };
+
+    // std::string tmp = tsd.asJsonGraph(roots);    // force template instanciation
 
     std::string myGraphJson = "{\"kind\":{\"graph\":true},"
         "\"nodes\":[{\"id\":\"1\"},{\"id\":\"2\"}],"
@@ -449,9 +451,12 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
 
     for (int i = 0; i < segments.size(); ++i) {
         std::cout << i << ", prioirty: " << segments[i]->get_priority() << std::endl;
-        tmp = tsd.asJsonGraph();
+        
+        io::write_segments(segments, i, "segments.dat");
+        
+        // tmp = tsd.asJsonGraph(roots);
         tsd.insert_segment(*segments[i]);
-        tmp = tsd.asJsonGraph();
+        // tmp = tsd.asJsonGraph(roots);
         auto traps = std::vector<BoundingTrap<PointCart, int>>();
         write_leaf_traps(tsd.get_root(), traps);
         std::cout << traps.size() << std::endl;

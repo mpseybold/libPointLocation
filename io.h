@@ -109,6 +109,24 @@ namespace io {
         write_trapezoids(traps, filename);
     }
 
+    void write_segments(std::vector<Segment<PointCart, int>*> segs, int index, std::string filename) {
+        
+        assert(index < segs.size());
+
+        std::ofstream file(filename);
+
+        for (int i = 0; i <= index; ++i) {
+            auto seg = segs[i];
+            file << CGAL::to_double(seg->get_source().x()) 
+            << " " << CGAL::to_double(seg->get_source().y()) 
+            << " " << CGAL::to_double(seg->get_target().x()) 
+            << " " << CGAL::to_double(seg->get_target().y())
+            << " " << seg->get_priority() << std::endl;
+        }
+
+        file.close();
+    }
+
     template <class PointType, class OrderType>
     std::vector<Segment<PointType, OrderType>> read_segments(std::string filename) {
         std::string path = "data/" + filename;

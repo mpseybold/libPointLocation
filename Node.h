@@ -190,7 +190,7 @@ class Node {
             this->B = B;
         }
 
-        OrderType get_partition_priority() { return partition_priority; }
+        // OrderType get_partition_priority() { return partition_priority; }
         
         void set_partition_priority(OrderType _partition_priority) { partition_priority = _partition_priority; }
 
@@ -202,5 +202,70 @@ class Node {
 
         bool through_common_corner(Node<PointType, OrderType>* other_node, Segment<PointType, OrderType>* seg) {
             return trapezoid.through_common_corner(other_node->get_trapezoid(), seg);
+        }
+
+        void is_valid() {
+            DestructionPattern pattern = get_dest_pattern();
+
+            switch(pattern) {
+                case E: {
+                    assert(A != nullptr);
+                    assert(B != nullptr);
+                    assert(L == nullptr);
+                    assert(R == nullptr);
+                    break;
+                }
+                case VE: {
+                    assert(L != nullptr);
+                    assert(A != nullptr);
+                    assert(B != nullptr);
+                    assert(R == nullptr);
+                    break;
+                }
+                case EV: {
+                    assert(L == nullptr);
+                    assert(A != nullptr);
+                    assert(B != nullptr);
+                    assert(R != nullptr);
+                    break;
+                }
+                case VVE: {
+                    assert(L != nullptr);
+                    assert(A != nullptr);
+                    assert(B != nullptr);
+                    assert(R != nullptr);
+                    break;
+                }
+                case NO_DESTRUCTION: {
+                    assert(L == nullptr);
+                    assert(A == nullptr);
+                    assert(B == nullptr);
+                    assert(R == nullptr);
+                    break;
+                }
+            }
+        
+            if (A != nullptr && B == nullptr)
+                assert(pattern == VV);
+            
+            assert(!(B != nullptr && A == nullptr));
+
+            if (L != nullptr && R == nullptr)
+                assert(A != nullptr);
+
+            if (R != nullptr && L == nullptr)
+                assert(A != nullptr);
+
+            if (A != nullptr && B == nullptr) {
+                assert(L != nullptr);
+                assert(R != nullptr);
+            }
+
+            if (L == nullptr && R != nullptr)
+                assert(A != nullptr && B != nullptr);
+
+            if (L != nullptr && R == nullptr)
+                assert(A != nullptr && B != nullptr);
+
         }
 };
