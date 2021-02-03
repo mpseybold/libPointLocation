@@ -361,7 +361,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     }
     io::write_trapezoids(traps, "subdag_roots.dat");
 
-    // std::string tmp = asJsonGraph(subdag_roots);
+    std::string tmp = asJsonGraph(subdag_roots);
 
     // end debug
 
@@ -630,7 +630,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             }
             delete tgt_cut;
         }
-        // tmp = asJsonGraph(subdag_roots);
+
+        tmp = asJsonGraph(subdag_roots);
         reachable_nodes_valid(root);
     }
 
@@ -643,7 +644,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     for (int i = 0; i < subdag_roots.size(); ++i) {
         auto node = subdag_roots[i];
         partition(node, e_cut);
-        // tmp = asJsonGraph(subdag_roots);
+        tmp = asJsonGraph(subdag_roots);
         reachable_nodes_valid(root);
         if (!node->is_flat()) {
 
@@ -716,7 +717,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             } else {
                 assert(false);
             }
-            // tmp = asJsonGraph(subdag_roots);
         }
 
         for (int i = indices.start_index; i <= indices.end_index; ++i) {
@@ -727,6 +727,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 node->set_A(merged_node);
             }
         }
+        tmp = asJsonGraph(subdag_roots);
         reachable_nodes_valid(root);
     }
 }
@@ -950,8 +951,6 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
         if (node->get_L() != nullptr)
             std::cout << "problem...\n";
     }
-
-
 } 
 
 /*
@@ -976,6 +975,8 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(
         queue.pop();
         if( nodePtr == nullptr ) 
             continue;
+        else
+            assert(retired_nodes.find(nodePtr) == retired_nodes.end());
         auto wasNew = nodeset.insert( nodePtr );
         if( wasNew.second ){   // node is new
             queue.push( nodePtr->get_L() );
@@ -992,6 +993,8 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(
     Node<PointType, OrderType>* to;
     for( auto v = nodeset.begin(); v != nodeset.end(); ++v ){ 
         from = *v;
+        // if (v != nodeset.begin())
+        //     ss << ",";
         ss <<  ",\t{\"id\":\"" <<  std::hex << from << "\""; 
         ss << ", \"label\":\"" << std::dec << ( (int)(from->get_priority())) << "\\n" << std::hex << from <<"\"";
         // if( from == root )
@@ -1043,18 +1046,22 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(
         if( from->is_leaf() )
             continue;
         to = from->get_left();
-        if( std::find(nodeset.begin(), nodeset.end(), to) == nodeset.end() )
-            to = nullptr;
-        ss << ((first)?"":",\n");
-        ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to << "\", \"label\":\"l\",\"color\":\"red\"}\n"; 
-        first=false;
+        if( to != nullptr ){
+            if( std::find(nodeset.begin(), nodeset.end(), to) == nodeset.end() )
+                to = from;
+            ss << ((first)?"":",\n");
+            ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to << "\", \"label\":\"l\",\"color\":\"red\"}\n"; 
+            first=false;
+        }
 
         to = from->get_right();
-        if( std::find(nodeset.begin(), nodeset.end(), to) == nodeset.end() )
-            to = nullptr;
-        ss << ((first)?"":",\n");
-        ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to <<"\", \"label\":\"r\",\"color\":\"red\"}\n"; 
-        first=false;
+        if( to != nullptr){
+            if( std::find(nodeset.begin(), nodeset.end(), to) == nodeset.end() )
+                to = from;
+            ss << ((first)?"":",\n");
+            ss << "{\"from\":\"" << std::hex << from << "\",\"to\":\""  << std::hex << to <<"\", \"label\":\"r\",\"color\":\"red\"}\n"; 
+            first=false;
+        }
     }
     ss<< "]}";
     return ss.str();
@@ -1064,17 +1071,45 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>* node) {
     node->is_valid();
 
-    if (node->get_A() != nullptr)
+    if (node->get_A() != nullptr) {
+        assert(retired_nodes.find(node->get_A()) == retired_nodes.end());
         reachable_nodes_valid(node->get_A());
-
-    if (node->get_B() != nullptr)
+    }
+    if (node->get_B() != nullptr) {
+        assert(retired_nodes.find(node->get_B()) == retired_nodes.end());
         reachable_nodes_valid(node->get_B());
-
-    if (node->get_L() != nullptr)
+    }
+    if (node->get_L() != nullptr) {
+        assert(retired_nodes.find(node->get_L()) == retired_nodes.end());
         reachable_nodes_valid(node->get_L());
-
-    if (node->get_R() != nullptr)
+    }
+    if (node->get_R() != nullptr) {
+        assert(retired_nodes.find(node->get_R()) == retired_nodes.end());
         reachable_nodes_valid(node->get_R());
+    }
+
+}
+
+template <class PointType, class OrderType>
+void TSD<PointType, OrderType>::delete_node(Node<PointType, OrderType>* node) {
+
+    if (TESTING >= 1000)
+        retired_nodes.insert(node);
+    else 
+        delete node;
+
+}
+
+template <class PointType, class OrderType>
+void TSD<PointType, OrderType>::cleanup() {
+    if (TESTING >= 1000) {
+       
+        for (auto node: retired_nodes) {
+            delete node;
+        }
+
+        retired_nodes.clear();
+    }
 }
 
 // template <class PointType, class OrderType>

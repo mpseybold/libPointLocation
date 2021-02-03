@@ -6,8 +6,8 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::merge_equal_priority_case
         auto new_trap = BoundingTrap<PointType, OrderType>::merge(above->get_trapezoid(), below->get_trapezoid());
         auto new_node = new Node<PointType, OrderType>(new_trap);
 
-        delete below;
-        delete above;
+        delete_node(below);
+        delete_node(above);
 
         return new_node;
     }

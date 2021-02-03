@@ -274,12 +274,12 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
             }
 
             if (pattern == EV)
-                delete old_R;
+                delete_node(old_R);
             if (pattern == VE)
-                delete old_L;
+                delete_node(old_L);
             if (pattern == VVE) {
-                delete old_L;
-                delete old_R;
+                delete_node(old_L);
+                delete_node(old_R);
             }
         }
 
@@ -293,7 +293,7 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
             }
         }
 
-        delete node_to_be_split;
+        delete_node(node_to_be_split);
     }
 }
 
@@ -338,7 +338,7 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
             old_L->set_left(nullptr);
         }
 
-        delete old_L;
+        delete_node(old_L);
 
     } else if (node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment()) 
     && !node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment())) {
@@ -360,7 +360,7 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
             old_R->set_right(nullptr);
         }
 
-        delete old_R;
+        delete_node(old_R);
     } else {
         if (node->is_flat())
             return;
@@ -393,7 +393,7 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
     node->set_B(old_A->get_B());
 
     node->set_e(e_cut);
-    delete old_A;
+    delete_node(old_A);
 }
 
 

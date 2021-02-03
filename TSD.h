@@ -8,6 +8,8 @@
 #include <list>
 #include "io.h"
 
+#define TESTING 1000
+
 
 
 enum MergeSide {LEFT, RIGHT};
@@ -53,6 +55,8 @@ class TSD {
 
         std::list<Cut<PointType, OrderType>> v_cuts;
 
+        std::set<Node<PointType, OrderType>*> retired_nodes = std::set<Node<PointType, OrderType>*>();
+
         int leaf_count;
 
     public:
@@ -82,6 +86,10 @@ class TSD {
         const std::string asJsonGraph(std::vector<Node<PointType, OrderType>*> roots, Node<PointType, OrderType>* node_of_interest=nullptr);
 
         void reachable_nodes_valid(Node<PointType, OrderType>* node);
+
+        void delete_node(Node<PointType, OrderType>* node);
+
+        void cleanup();
 };
 
 #include "TSD.cpp"
