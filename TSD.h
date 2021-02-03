@@ -63,6 +63,8 @@ class TSD {
 
         TSD();
 
+        std::string visMe;
+
         Node<PointType, OrderType>* get_root() { return root; }
         std::vector<Node<PointType, OrderType>*> get_subdag_roots() { return subdag_roots; }
 
@@ -84,6 +86,10 @@ class TSD {
 
         V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node);
         const std::string asJsonGraph(std::vector<Node<PointType, OrderType>*> roots, Node<PointType, OrderType>* node_of_interest=nullptr);
+        const std::string asJsonGraph(){
+            std::vector<Node<PointType, OrderType>*> roots = {root};
+            return asJsonGraph(roots, nullptr);
+        }
 
         void reachable_nodes_valid(Node<PointType, OrderType>* node);
 
