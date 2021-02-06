@@ -631,7 +631,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             delete tgt_cut;
         }
 
-        tmp = asJsonGraph(subdag_roots);
+        visMe = asJsonGraph(subdag_roots);
         reachable_nodes_valid(root);
     }
 
@@ -644,7 +644,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     for (int i = 0; i < subdag_roots.size(); ++i) {
         auto node = subdag_roots[i];
         partition(node, e_cut);
-        tmp = asJsonGraph(subdag_roots);
+        visMe = asJsonGraph(subdag_roots);
         reachable_nodes_valid(root);
         if (!node->is_flat()) {
 
@@ -708,12 +708,20 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
         assert(merged_node != nullptr);
 
+        Node<PointType, OrderType>* last_merge_node = nullptr;
+
         for (int i = indices.start_index + 1; i <= indices.end_index; ++i) {
             auto node = subdag_roots[i];
             if (indices.side == -1) {
-                merged_node = v_merge(merged_node, node->get_B());
+                if (node->get_B() != last_merge_node) {
+                    last_merge_node = node->get_B();
+                    merged_node = v_merge(merged_node, node->get_B());
+                }
             } else if (indices.side == 1) {
-                merged_node = v_merge(merged_node, node->get_A());
+                if (node->get_A() != last_merge_node) {
+                    last_merge_node = node->get_A();
+                    merged_node = v_merge(merged_node, node->get_A());
+                }
             } else {
                 assert(false);
             }
@@ -727,7 +735,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 node->set_A(merged_node);
             }
         }
-        tmp = asJsonGraph(subdag_roots);
+        visMe = asJsonGraph(subdag_roots);
         reachable_nodes_valid(root);
     }
 }
@@ -975,8 +983,8 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(
         queue.pop();
         if( nodePtr == nullptr ) 
             continue;
-        else
-            assert(retired_nodes.find(nodePtr) == retired_nodes.end());
+        // else
+        //     assert(retired_nodes.find(nodePtr) == retired_nodes.end());
         auto wasNew = nodeset.insert( nodePtr );
         if( wasNew.second ){   // node is new
             queue.push( nodePtr->get_L() );
@@ -1086,6 +1094,14 @@ void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>
     if (node->get_R() != nullptr) {
         assert(retired_nodes.find(node->get_R()) == retired_nodes.end());
         reachable_nodes_valid(node->get_R());
+    }
+
+    if (node->get_left() != nullptr) {
+        assert(retired_nodes.find(node->get_left()) == retired_nodes.end());
+    }
+
+    if (node->get_right() != nullptr) {
+        assert(retired_nodes.find(node->get_right()) == retired_nodes.end());
     }
 
 }

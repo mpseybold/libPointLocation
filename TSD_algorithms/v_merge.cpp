@@ -99,7 +99,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
         std::cout << "hello\n";
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
-    std::cout << "v_merge_equal_priority\n";
+    // std::cout << "v_merge_equal_priority\n";
 
     auto common_boundary_cut = left->get_trapezoid().get_right();
 
@@ -160,7 +160,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     auto next_left = left->get_left();
 
     while (next_left != nullptr) {
-        std::cout << "...l\n";
+        // std::cout << "...l\n";
         if (left_A_will_vanish && next_left->get_A() == old_left_A)
             next_left->set_A(A);
         if (left_B_will_vanish && next_left->get_B() == old_left_B)
@@ -172,7 +172,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     auto next_right = right->get_right();
 
     while (next_right != nullptr) {
-        std::cout << "...r\n";
+        // std::cout << "...r\n";
         if (right_A_will_vanish && next_right->get_A() == old_right_A)
             next_right->set_A(A);
         if (right_B_will_vanish && next_right->get_B() == old_right_B)
