@@ -218,10 +218,18 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->get_L()->set_left(node->get_left());
         node->set_left(nullptr);
 
-        if (def_point_orientation >= 0)
+        if (def_point_orientation >= 0) {
             delete_node(old_A);
-        if (def_point_orientation <= 0)
+        
+            if (is_reachable(root, old_A))
+                assert(false);
+        }
+        if (def_point_orientation <= 0) {
             delete_node(old_B);
+        
+            if (is_reachable(root, old_B))
+                assert(false);
+        }
         
     }
 
@@ -369,11 +377,19 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     node->clear_e();
 
     if (def_point_orientation >= 0
-    && v_cut->defining_point_cut_comparison(*old_v_1) == 1)
+    && v_cut->defining_point_cut_comparison(*old_v_1) == 1) {
         delete_node(old_A);
+    
+        if (is_reachable(root, old_A))
+            assert(false);
+    }
     if (def_point_orientation <= 0
-    && v_cut->defining_point_cut_comparison(*old_v_1) == 1)
+    && v_cut->defining_point_cut_comparison(*old_v_1) == 1) {
         delete_node(old_B);
+    
+        if (is_reachable(root, old_B))
+            assert(false);
+    }
 }
 
 template <class PointType, class OrderType>
@@ -519,11 +535,20 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         node->set_left(nullptr);
 
         if (def_point_orientation >= 0
-        && v_cut->defining_point_cut_comparison(*old_v_2) == -1)
+        && v_cut->defining_point_cut_comparison(*old_v_2) == -1) {
             delete_node(old_A);
+
+            if (is_reachable(root, old_A))
+                assert(false);
+
+        }
         if (def_point_orientation <= 0
-        && v_cut->defining_point_cut_comparison(*old_v_2) == -1)
+        && v_cut->defining_point_cut_comparison(*old_v_2) == -1) {
             delete_node(old_B);
+
+            if (is_reachable(root, old_B))
+                assert(false);
+        }
     }
 
 }
@@ -546,6 +571,9 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
 
     Node<PointType, OrderType>* L; 
     Node<PointType, OrderType>* R;
+
+    auto old_L = node->get_L();
+    auto old_R = node->get_R();
 
     if (v_cut->defining_point_cut_comparison(*node->get_v_1()) == -1) {
         R = new Node<PointType, OrderType>(pos_neg.first);
@@ -616,6 +644,12 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     node->set_desc(L, R, nullptr, nullptr);
     node->clear_cuts();
     node->set_v_1(v_cut);
+
+    if (old_L->get_v_1() == v_cut && is_reachable(root, old_L))
+        assert(false);
+
+    if (old_R->get_v_1() == v_cut && is_reachable(root, old_R))
+        assert(false);
 }
 
 template <class PointType, class OrderType>

@@ -96,6 +96,8 @@ class TSD {
         void delete_node(Node<PointType, OrderType>* node);
 
         void cleanup();
+
+        bool is_reachable(Node<PointType, OrderType>* from, Node<PointType, OrderType>* to);
 };
 
 #include "TSD.cpp"

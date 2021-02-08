@@ -426,7 +426,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
     // std::mt19937 generator (1236);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    for (int i = 1; i <= 40; ++i) {
+    for (int i = 1; i <= 30; ++i) {
         int x = std::floor((double)10000 * dis(generator));
         int y = std::floor((double)10000 * dis(generator));
         int length = std::floor((double)(10000 - x) * dis(generator));

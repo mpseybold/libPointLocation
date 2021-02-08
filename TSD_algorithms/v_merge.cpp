@@ -6,8 +6,22 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     
     assert(left != nullptr);
     assert(right != nullptr);
-    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+
     assert(left->get_R() != nullptr);
+    // THIS IS A VERY CLUMSY WAY TO DEAL WITH
+    // A CORNER CASE WHERE LEFT AND RIGHT OVERLAP
+    // TODO: find cleaner solution
+    if (left->get_R() == right) {
+        
+        left->get_trapezoid().set_right(
+            right->get_trapezoid().get_v_right(), 
+            right->get_trapezoid().get_right_side());
+
+        return left;
+    }
+
+
+    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
 
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
@@ -52,8 +66,20 @@ template <class PointType, class OrderType>
 Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
     assert(left != nullptr);
     assert(right != nullptr);
-    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+
     assert(right->get_L() != nullptr);
+    if (right->get_L() == left) {
+        
+        right->get_trapezoid().set_left(
+            left->get_trapezoid().get_v_left(), 
+            left->get_trapezoid().get_left_side());
+
+        return right;
+    }
+
+
+    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+
     
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
     auto new_node = new Node<PointType, OrderType>(new_trap);
@@ -199,6 +225,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
         right_merge_neighbour->set_left(new_node);
         new_node->set_right(right_merge_neighbour);
     }
+
+    // assert(!is_reachable(root, left));
+    // assert(!is_reachable(root, right));
     
     assert(new_node != nullptr);
     return new_node;

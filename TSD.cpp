@@ -632,7 +632,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         }
 
         visMe = asJsonGraph(subdag_roots);
-        reachable_nodes_valid(root);
+        // reachable_nodes_valid(root);
     }
 
 
@@ -645,7 +645,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         auto node = subdag_roots[i];
         partition(node, e_cut);
         visMe = asJsonGraph(subdag_roots);
-        reachable_nodes_valid(root);
+        // reachable_nodes_valid(root);
         if (!node->is_flat()) {
 
             if (i > 0) {
@@ -711,6 +711,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         Node<PointType, OrderType>* last_merge_node = nullptr;
 
         for (int i = indices.start_index + 1; i <= indices.end_index; ++i) {
+            visMe = asJsonGraph(subdag_roots);
             auto node = subdag_roots[i];
             if (indices.side == -1) {
                 if (node->get_B() != last_merge_node) {
@@ -1107,10 +1108,38 @@ void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>
 }
 
 template <class PointType, class OrderType>
+bool TSD<PointType, OrderType>::is_reachable(Node<PointType, OrderType>* from, Node<PointType, OrderType>* to) {
+
+    if (from == to)
+        return true;
+
+    if (to == from->get_left())
+        return true;
+    if (to == from->get_left())
+        return true;
+
+    if (from->get_A() != nullptr && is_reachable(from->get_A(), to))
+        return true;
+    if (from->get_B() != nullptr && is_reachable(from->get_B(), to))
+        return true;
+    if (from->get_L() != nullptr && is_reachable(from->get_L(), to))
+        return true;
+    if (from->get_R() != nullptr && is_reachable(from->get_R(), to))
+        return true;
+
+    return false;
+}
+
+
+template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_node(Node<PointType, OrderType>* node) {
 
-    if (TESTING >= 1000)
+    if (TESTING >= 1000) {
+        std::cout << node << std::endl;
+        if (node == const_cast<Node<PointType, OrderType>*>(reinterpret_cast<const Node<PointType, OrderType>*>("0x5555558803c0")))
+            std::cout << "hello cast\n";
         retired_nodes.insert(node);
+    }
     else 
         delete node;
 

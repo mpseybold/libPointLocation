@@ -165,20 +165,20 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_A = v_merge(new_A, n->get_R()->get_A());
                         new_B->set_R(n->get_R()->get_B());
                         new_B->set_v_2(n->get_v_2());
-                        if (n->get_B()->get_right() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_B()->get_right()->set_left(new_B->get_B());
-                            new_B->get_B()->set_right(n->get_B()->get_right());
-                        }
+                        // if (n->get_B()->get_right() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_B()->get_right()->set_left(new_B->get_B());
+                        //     new_B->get_B()->set_right(n->get_B()->get_right());
+                        // }
                     } else if (pattern == VE) {
                         new_A = v_merge(n->get_L()->get_A(), new_A);
                         new_B->set_L(n->get_L()->get_B());
                         new_B->set_v_1(n->get_v_1());
-                        if (n->get_B()->get_left() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_B()->get_left()->set_right(new_B->get_B());
-                            new_B->get_B()->set_left(n->get_B()->get_left());
-                        }
+                        // if (n->get_B()->get_left() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_B()->get_left()->set_right(new_B->get_B());
+                        //     new_B->get_B()->set_left(n->get_B()->get_left());
+                        // }
                     } else {
                         auto aux = v_merge(n->get_L()->get_A(), new_A);
                         new_A = v_merge(aux, n->get_R()->get_A());
@@ -186,16 +186,16 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_B->set_v_2(n->get_v_2());
                         new_B->set_L(n->get_L()->get_B());
                         new_B->set_v_1(n->get_v_1());
-                        if (n->get_B()->get_right() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_B()->get_right()->set_left(new_B->get_B());
-                            new_B->get_B()->set_right(n->get_B()->get_right());
-                        }
-                        if (n->get_B()->get_left() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_B()->get_left()->set_right(new_B->get_B());
-                            new_B->get_B()->set_left(n->get_B()->get_left());
-                        }
+                        // if (n->get_B()->get_right() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_B()->get_right()->set_left(new_B->get_B());
+                        //     new_B->get_B()->set_right(n->get_B()->get_right());
+                        // }
+                        // if (n->get_B()->get_left() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_B()->get_left()->set_right(new_B->get_B());
+                        //     new_B->get_B()->set_left(n->get_B()->get_left());
+                        // }
                     }
 
                     
@@ -205,20 +205,20 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_B = v_merge(new_B, n->get_R()->get_B());
                         new_A->set_R(n->get_R()->get_A());
                         new_A->set_v_2(n->get_v_2());
-                        if (n->get_A()->get_right() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_A()->get_right()->set_left(new_A->get_A());
-                            new_A->get_A()->set_right(n->get_A()->get_right());
-                        }
+                        // if (n->get_A()->get_right() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_A()->get_right()->set_left(new_A->get_A());
+                        //     new_A->get_A()->set_right(n->get_A()->get_right());
+                        // }
                     } else if (pattern == VE) {
                         new_B = v_merge(n->get_L()->get_B(), new_B);
                         new_A->set_L(n->get_L()->get_A());
                         new_A->set_v_1(n->get_v_1());
-                        if (n->get_A()->get_left() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_A()->get_left()->set_right(new_A->get_A());
-                            new_A->get_A()->set_left(n->get_A()->get_left());
-                        }
+                        // if (n->get_A()->get_left() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_A()->get_left()->set_right(new_A->get_A());
+                        //     new_A->get_A()->set_left(n->get_A()->get_left());
+                        // }
                     } else { 
                         auto aux = v_merge(n->get_L()->get_B(), new_B);
                         new_B = v_merge(aux, n->get_R()->get_B());
@@ -226,16 +226,16 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_A->set_v_2(n->get_v_2());
                         new_A->set_L(n->get_L()->get_A());
                         new_A->set_v_1(n->get_v_1());
-                        if (n->get_A()->get_right() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_A()->get_right()->set_left(new_A->get_A());
-                            new_A->get_A()->set_right(n->get_A()->get_right());
-                        }
-                        if (n->get_A()->get_left() != nullptr) {
-                            std::cout << "vveR\n";
-                            n->get_A()->get_left()->set_right(new_A->get_A());
-                            new_A->get_A()->set_left(n->get_A()->get_left());
-                        }
+                        // if (n->get_A()->get_right() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_A()->get_right()->set_left(new_A->get_A());
+                        //     new_A->get_A()->set_right(n->get_A()->get_right());
+                        // }
+                        // if (n->get_A()->get_left() != nullptr) {
+                        //     std::cout << "vveR\n";
+                        //     n->get_A()->get_left()->set_right(new_A->get_A());
+                        //     new_A->get_A()->set_left(n->get_A()->get_left());
+                        // }
                     }
                 }                    
             }
@@ -332,6 +332,13 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                 delete_node(old_L);
                 delete_node(old_R);
             }
+
+            if (old_L != nullptr && is_reachable(root, old_L))
+                assert(false);
+
+            if (old_R != nullptr && is_reachable(root, old_R))
+                assert(false);
+
         }
 
 
@@ -345,6 +352,9 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
         }
 
         delete_node(node_to_be_split);
+
+        if (is_reachable(root, node_to_be_split))
+            assert(false);
     }
 }
 
