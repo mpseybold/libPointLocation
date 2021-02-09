@@ -422,17 +422,31 @@ TEST(TSDTests, overlappingTests) {
 TEST(TSDTests, dynamicInsertNonCrossingTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
-    std::mt19937 generator (1235);
+    std::mt19937 generator (1234);
+    // std::mt19937 generator (1235);
     // std::mt19937 generator (1236);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    for (int i = 1; i <= 30; ++i) {
+    int n = 30;
+
+    for (int i = 1; i <= n; ++i) {
         int x = std::floor((double)10000 * dis(generator));
         int y = std::floor((double)10000 * dis(generator));
         int length = std::floor((double)(10000 - x) * dis(generator));
         auto seg = new Segment<PointCart, int>(
-            PointCart(x, y), PointCart(x + length, y), i
-            // PointCart(2*i, i), PointCart(2*i+1, i), i
+            // PointCart(x, y), PointCart(x + length, y), i
+            PointCart(2*i, i), PointCart(2*i + n, i), std::floor(dis(generator)*1000000)
+        );
+        segments.push_back(seg);
+    }
+
+    for (int i = 1; i <= n; ++i) {
+        int x = std::floor((double)10000 * dis(generator));
+        int y = std::floor((double)10000 * dis(generator));
+        int length = std::floor((double)(10000 - x) * dis(generator));
+        auto seg = new Segment<PointCart, int>(
+            // PointCart(x, y), PointCart(x + length, y), i
+            PointCart(2.0*(n-i) - .5, n + i), PointCart(2.0*(n+1-i) + n - .5, n + i), std::floor(dis(generator)*1000000)
         );
         segments.push_back(seg);
     }

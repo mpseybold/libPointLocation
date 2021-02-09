@@ -67,7 +67,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
     assert(left != nullptr);
     assert(right != nullptr);
 
-    assert(right->get_L() != nullptr);
+    if (right->get_L() == nullptr)
+        assert(false);
+
     if (right->get_L() == left) {
         
         right->get_trapezoid().set_left(

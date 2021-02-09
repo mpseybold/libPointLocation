@@ -57,6 +57,8 @@ class TSD {
 
         std::set<Node<PointType, OrderType>*> retired_nodes = std::set<Node<PointType, OrderType>*>();
 
+        void walk_to_fix_desc(Node<PointType, OrderType>* node, Node<PointType, OrderType>* new_desc, Node<PointType, OrderType>* old_desc);
+
         int leaf_count;
 
     public:

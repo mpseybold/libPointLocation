@@ -1135,9 +1135,12 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_node(Node<PointType, OrderType>* node) {
 
     if (TESTING >= 1000) {
-        std::cout << node << std::endl;
-        if (node == const_cast<Node<PointType, OrderType>*>(reinterpret_cast<const Node<PointType, OrderType>*>("0x5555558803c0")))
-            std::cout << "hello cast\n";
+        if (node->get_right() != nullptr && node->get_right()->get_left() == node) {
+            node->get_right()->set_left(nullptr);
+        }
+        if (node->get_left() != nullptr && node->get_left()->get_right() == node) {
+            node->get_left()->set_right(nullptr);
+        }
         retired_nodes.insert(node);
     }
     else 

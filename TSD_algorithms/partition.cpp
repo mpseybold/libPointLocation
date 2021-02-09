@@ -28,6 +28,59 @@ void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* 
     leaf_count++;
 }
 
+
+// Walk left/right from 'node'
+// and reassign either the A or B descendant to 'new_desc'
+// to all merge neighbours which are parents of 'old_desc'
+template <class PointType , class OrderType>
+void TSD<PointType, OrderType>::walk_to_fix_desc(Node<PointType, OrderType>* node, Node<PointType, OrderType>* new_desc, Node<PointType, OrderType>* old_desc) {
+    
+    auto next = node->get_right();
+
+    bool A_match; 
+    bool B_match;
+
+    if (next != nullptr) {
+        A_match = next->get_A() == old_desc;
+        B_match = next->get_B() == old_desc;
+    }
+
+    while (next != nullptr && (A_match || B_match)) {
+        if (A_match)
+            next->set_A(new_desc);
+        if (B_match)
+            next->set_B(new_desc);
+
+        next = next->get_right();
+        if (next != nullptr) {
+            A_match = next->get_A() == old_desc;
+            B_match = next->get_B() == old_desc;
+        }
+    }
+
+    next = node->get_left();
+
+    if (next != nullptr) {
+        A_match = next->get_A() == old_desc;
+        B_match = next->get_B() == old_desc;
+    }
+
+    while (next != nullptr && (A_match || B_match)) {
+        if (A_match)
+            next->set_A(new_desc);
+        if (B_match)
+            next->set_B(new_desc);
+
+        next = next->get_left();
+        if (next != nullptr) {
+            A_match = next->get_A() == old_desc;
+            B_match = next->get_B() == old_desc;
+        }
+    }
+}
+
+
+
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
     assert(node != nullptr);
@@ -154,7 +207,7 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
 
                 if (intersects_A) {    
-                    std::cout << "intersectsA\n";
+                    auto old_desc = new_A;
                     if (pattern == EV) {
                         if (e_cut->get_priority() == 8) {
                         std::vector<BoundingTrap<PointType, OrderType>> traps = {
@@ -165,6 +218,9 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_A = v_merge(new_A, n->get_R()->get_A());
                         new_B->set_R(n->get_R()->get_B());
                         new_B->set_v_2(n->get_v_2());
+
+                        walk_to_fix_desc(n->get_R(), new_A, old_desc);
+                        walk_to_fix_desc(n->get_A(), new_A, old_desc);
                         // if (n->get_B()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_B()->get_right()->set_left(new_B->get_B());
@@ -174,18 +230,28 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_A = v_merge(n->get_L()->get_A(), new_A);
                         new_B->set_L(n->get_L()->get_B());
                         new_B->set_v_1(n->get_v_1());
+
+                        walk_to_fix_desc(n->get_L(), new_A, old_desc);
+                        walk_to_fix_desc(n->get_A(), new_A, old_desc);
                         // if (n->get_B()->get_left() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_B()->get_left()->set_right(new_B->get_B());
                         //     new_B->get_B()->set_left(n->get_B()->get_left());
                         // }
                     } else {
+                        
+                        auto old_desc_L = n->get_L()->get_A();
+                        auto old_desc_R = n->get_R()->get_A(); 
+
                         auto aux = v_merge(n->get_L()->get_A(), new_A);
                         new_A = v_merge(aux, n->get_R()->get_A());
                         new_B->set_R(n->get_R()->get_B());
                         new_B->set_v_2(n->get_v_2());
                         new_B->set_L(n->get_L()->get_B());
                         new_B->set_v_1(n->get_v_1());
+
+                        walk_to_fix_desc(n->get_L(), new_A, old_desc_L);
+                        walk_to_fix_desc(n->get_R(), new_A, old_desc_R);
                         // if (n->get_B()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_B()->get_right()->set_left(new_B->get_B());
@@ -200,11 +266,14 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                     
                 } else {
-                    std::cout << "intersectsB\n";
+                    auto old_desc = new_B;
                     if (pattern == EV) {
                         new_B = v_merge(new_B, n->get_R()->get_B());
                         new_A->set_R(n->get_R()->get_A());
                         new_A->set_v_2(n->get_v_2());
+
+                        walk_to_fix_desc(n->get_R(), new_B, old_desc);
+                        walk_to_fix_desc(n->get_B(), new_B, old_desc);
                         // if (n->get_A()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_A()->get_right()->set_left(new_A->get_A());
@@ -214,18 +283,28 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         new_B = v_merge(n->get_L()->get_B(), new_B);
                         new_A->set_L(n->get_L()->get_A());
                         new_A->set_v_1(n->get_v_1());
+
+                        walk_to_fix_desc(n->get_L(), new_B, old_desc);
+                        walk_to_fix_desc(n->get_B(), new_B, old_desc);
                         // if (n->get_A()->get_left() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_A()->get_left()->set_right(new_A->get_A());
                         //     new_A->get_A()->set_left(n->get_A()->get_left());
                         // }
                     } else { 
+
+                        auto old_desc_L = n->get_L()->get_B();
+                        auto old_desc_R = n->get_R()->get_B();
+
                         auto aux = v_merge(n->get_L()->get_B(), new_B);
                         new_B = v_merge(aux, n->get_R()->get_B());
                         new_A->set_R(n->get_R()->get_A());
                         new_A->set_v_2(n->get_v_2());
                         new_A->set_L(n->get_L()->get_A());
                         new_A->set_v_1(n->get_v_1());
+
+                        walk_to_fix_desc(n->get_L(), new_B, old_desc_L);
+                        walk_to_fix_desc(n->get_R(), new_B, old_desc_R);
                         // if (n->get_A()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_A()->get_right()->set_left(new_A->get_A());
@@ -257,8 +336,8 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                     prev->get_A()->set_right(n->get_A());
                     n->get_A()->set_left(prev->get_A());
                 }
-                prev->set_right(nullptr);
-                n->set_left(nullptr);
+                // prev->set_right(nullptr);
+                // n->set_left(nullptr);
             } else if (n == node) {
                 if (n->get_left() != nullptr) {
                     auto prev = nodes[i-1];
@@ -302,8 +381,8 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         prev->get_A()->set_right(n->get_A());
                         n->get_A()->set_left(prev->get_A());
                     }
-                    prev->set_right(nullptr);
-                    n->set_left(nullptr);
+                    // prev->set_right(nullptr);
+                    // n->set_left(nullptr);
                 }
 
                 if (n->get_right() != nullptr) {
@@ -353,6 +432,7 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         delete_node(node_to_be_split);
 
+        visMe = asJsonGraph({root});
         if (is_reachable(root, node_to_be_split))
             assert(false);
     }

@@ -81,7 +81,7 @@ class DestructionCuts {
 
         OrderType priority() {
             if (no_cuts()) 
-                return 100000;
+                return 10000000;
             
             
 
