@@ -400,7 +400,6 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         n->set_right(nullptr);
                     }
                 }
-
             }
 
             if (pattern == EV)
@@ -594,32 +593,32 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
     switch(pattern) {
         case NO_DESTRUCTION: {
             partition_leaf_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
         case E: {
             partition_E_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
         case VE: {
             partition_E_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
         case EV: {
             partition_E_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
         case VVE: {
             partition_E_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
         case V: {
             partition_V_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
         case VV: {

@@ -243,15 +243,21 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
     assert(right != nullptr);
 
     if (left->get_priority() < right->get_priority()) {
-        return v_merge_left_lower_priority_case(left, right);
+        auto node = v_merge_left_lower_priority_case(left, right);
+        visMe = asJsonGraph(subdag_roots);
+        return node;
     }
 
     if (left->get_priority() > right->get_priority()) {
-        return v_merge_right_lower_priority_case(left, right);
+        auto node = v_merge_right_lower_priority_case(left, right);
+        visMe = asJsonGraph(subdag_roots);
+        return node;
     }
 
     if (left->get_priority() == right->get_priority()) {
-        return v_merge_equal_priority_case(left, right);
+        auto node = v_merge_equal_priority_case(left, right);
+        visMe = asJsonGraph(subdag_roots);
+        return node;
     }
 
     assert(false);
