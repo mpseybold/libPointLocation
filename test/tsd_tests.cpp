@@ -468,7 +468,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
         
         io::write_segments(segments, i, "segments.dat");
         
-        if (i == 23)
+        if (i >= 23)
             std::cout << "hello\n";
 
         tmp = tsd.asJsonGraph(roots);

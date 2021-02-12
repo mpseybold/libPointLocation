@@ -100,6 +100,10 @@ class TSD {
         void cleanup();
 
         bool is_reachable(Node<PointType, OrderType>* from, Node<PointType, OrderType>* to);
+
+        bool assert_has_parent(Node<PointType, OrderType>* node, 
+        Node<PointType, OrderType>* parent, 
+        Node<PointType, OrderType>* root_of_search);
 };
 
 #include "TSD.cpp"

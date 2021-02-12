@@ -1160,6 +1160,50 @@ void TSD<PointType, OrderType>::cleanup() {
     }
 }
 
+template <class PointType, class OrderType>
+bool TSD<PointType, OrderType>::assert_has_parent(
+    Node<PointType, OrderType>* node,
+    Node<PointType, OrderType>* parent,
+    Node<PointType, OrderType>* root_of_search
+) {
+    if (root_of_search == parent) {
+        if (root_of_search->get_A() == node)
+            return true;
+        if (root_of_search->get_B() == node)
+            return true;
+        if (root_of_search->get_L() == node)
+            return true;
+        if (root_of_search->get_R() == node)
+            return true;
+    } else {
+        if (root_of_search->get_A() == node) {
+            return false;
+        } else if (assert_has_parent(node, root, root_of_search->get_A()))  {
+            return true;
+        }
+
+        if (root_of_search->get_B() == node) {
+            return false;
+        } else if (assert_has_parent(node, root, root_of_search->get_B()))  {
+            return true;
+        }
+
+        if (root_of_search->get_L() == node) {
+            return false;
+        } else if (assert_has_parent(node, root, root_of_search->get_L()))  {
+            return true;
+        }
+
+        if (root_of_search->get_R() == node) {
+            return false;
+        } else if (assert_has_parent(node, root, root_of_search->get_R()))  {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // template <class PointType, class OrderType>
 // V_Cut<PointType, OrderType>* find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
 //     assert(cut->get_cut_type() != EDGE);
