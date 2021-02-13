@@ -419,6 +419,62 @@ TEST(TSDTests, overlappingTests) {
     // ASSERT_EQ(tsd.get_leaf_count(), 18);
 }
 
+TEST(TSDTests, trickyCase) {
+
+    auto s1 = new Segment<PointCart, int>(
+        PointCart(47, 35), PointCart(103, 35), 1
+    );
+
+    auto s2 = new Segment<PointCart, int>(
+        PointCart(50, 50), PointCart(70, 50), 2
+    );
+
+    auto s3 = new Segment<PointCart, int>(
+        PointCart(51, 30), PointCart(60, 30), 3
+    );
+
+    auto s4 = new Segment<PointCart, int>(
+        PointCart(80, 20), PointCart(100, 20), 4
+    );
+
+    auto s5 = new Segment<PointCart, int>(
+        PointCart(49, 40), PointCart(101, 40), 5
+    );
+
+    auto s6 = new Segment<PointCart, int>(
+        PointCart(48, 10), PointCart(102, 10), 6
+    );
+
+    std::vector<Segment<PointCart, int>*> segments{
+        s2, s3, s4, s5, s6, s1
+    };
+
+    auto tsd = TSD<PointCart, int>();
+    
+
+    for (auto s: segments)
+        if (s != s1)
+            tsd.insert_segment(*s);
+
+    io::write_segments(segments, 3, "segments.dat");
+    auto traps = std::vector<BoundingTrap<PointCart, int>>();
+    write_leaf_traps(tsd.get_root(), traps);
+    io::write_trapezoids(traps, "leaf_insert_dynamic.dat");   
+
+    
+    std::vector<Node<PointCart, int>*> roots{ tsd.get_root() };
+
+    std::string tmp = tsd.asJsonGraph(roots);
+
+    tsd.insert_segment(*s1);
+
+    tmp = tsd.asJsonGraph(roots);
+    io::write_segments(segments, 4, "segments.dat");
+    traps = std::vector<BoundingTrap<PointCart, int>>();
+    write_leaf_traps(tsd.get_root(), traps);
+    io::write_trapezoids(traps, "leaf_insert_dynamic.dat");
+}
+
 TEST(TSDTests, dynamicInsertNonCrossingTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
@@ -473,7 +529,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
 
         tmp = tsd.asJsonGraph(roots);
         tsd.reachable_nodes_valid(tsd.get_root());
-        tsd.insert_segment(*segments[i]);
+        // tsd.insert_segment(*segments[i]);
         tmp = tsd.asJsonGraph(roots);
         auto traps = std::vector<BoundingTrap<PointCart, int>>();
         write_leaf_traps(tsd.get_root(), traps);
