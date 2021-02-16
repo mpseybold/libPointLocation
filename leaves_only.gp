@@ -1,0 +1,1 @@
+plot "build/test/leaf_insert_dynamic.dat" using 1:2:($3-$1):($4-$2) with vectors nohead

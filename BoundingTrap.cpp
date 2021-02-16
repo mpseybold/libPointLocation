@@ -124,7 +124,7 @@ BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_
     if (trap_1.get_top() != trap_2.get_top())
         assert(trap_1.get_top() == trap_2.get_top());
     assert(trap_1.get_bottom() == trap_2.get_bottom());
-    assert(trap_1.get_right() == trap_2.get_left());
+    // assert(trap_1.get_right() == trap_2.get_left());
     return BoundingTrap<PointType, OrderType>(
         trap_1.get_bottom(), trap_2.get_v_right(), 
         trap_1.get_top(), trap_1.get_v_left(), trap_1.get_left_side(), trap_2.get_right_side()
@@ -154,8 +154,10 @@ template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::merge(
     BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
 ) {
-    if (trap_1.get_right() != nullptr 
-    && trap_1.get_right() == trap_2.get_left()) 
+    // if (trap_1.get_right() != nullptr 
+    // && trap_1.get_right() == trap_2.get_left()) 
+    if (trap_1.get_top() == trap_2.get_top() &&
+    trap_1.get_bottom() == trap_2.get_bottom())    
         return vertical_merge(trap_1, trap_2);
 
     if (trap_1.get_bottom() == trap_2.get_top()) 

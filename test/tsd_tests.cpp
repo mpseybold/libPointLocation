@@ -529,7 +529,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
 
         tmp = tsd.asJsonGraph(roots);
         tsd.reachable_nodes_valid(tsd.get_root());
-        // tsd.insert_segment(*segments[i]);
+        tsd.insert_segment(*segments[i]);
         tmp = tsd.asJsonGraph(roots);
         auto traps = std::vector<BoundingTrap<PointCart, int>>();
         write_leaf_traps(tsd.get_root(), traps);
