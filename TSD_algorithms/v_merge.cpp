@@ -21,7 +21,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     }
 
 
-    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+    // assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
 
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
@@ -43,7 +43,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     // if (right_merge_node != nullptr)
     //     right_merge_node->set_left(new_node->get_R());
 
-    assert(retired_nodes.find(left) == retired_nodes.end());
+    // assert(retired_nodes.find(left) == retired_nodes.end());
     delete_node(left);
     // left = NULL;
     // delete right;
@@ -82,7 +82,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
     }
 
 
-    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+    // assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
     
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
@@ -129,8 +129,8 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left())
         std::cout << "hello\n";
 
-    if (!left->is_leaf())
-        assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+    // if (!left->is_leaf())
+    //     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
     // std::cout << "v_merge_equal_priority\n";
 
@@ -227,12 +227,12 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     new_node->set_e(e_cut);
 
     // if (left != new_node)
-    assert(retired_nodes.find(left) == retired_nodes.end());
+    // assert(retired_nodes.find(left) == retired_nodes.end());
     delete_node(left);
     // left = NULL;
     // if (right != new_node)
     visMe = asJsonGraph({root});
-    assert(retired_nodes.find(right) == retired_nodes.end());
+    // assert(retired_nodes.find(right) == retired_nodes.end());
     if (right_A_will_vanish && is_reachable(root, old_right_A)) 
         // assert(false);
         std::cout << "hello\n";

@@ -642,8 +642,11 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     auto merge_indices = std::vector<MergeIndices>();
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
+
+        if (seg.get_priority() == 7 && i == 3)
+            std::cout << "hello\n";
         auto node = subdag_roots[i];
-        partition(node, e_cut);
+        partition(node, e_cut, nullptr);
         visMe = asJsonGraph(subdag_roots);
         // reachable_nodes_valid(root);
         if (!node->is_flat()) {
@@ -699,7 +702,11 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 }
             }
         }
+        visMe = asJsonGraph(subdag_roots);
     }
+
+    if (seg.get_priority() == 7)
+        std::cout << "hello\n";
 
     // final pass to merge nodes
     for (auto& indices: merge_indices) {
@@ -737,7 +744,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
             }
         }
         visMe = asJsonGraph(subdag_roots);
-        reachable_nodes_valid(root);
+        // reachable_nodes_valid(root);
     }
 }
 

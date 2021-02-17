@@ -35,7 +35,7 @@ class TSD {
 
         Node<PointType, OrderType>* merge_equal_priority_case(Node<PointType, OrderType>* below, Node<PointType, OrderType>* above);
 
-        void partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
+        void partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut, Node<PointType, OrderType>* parent);
         void partition_leaf_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
         void partition_V_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
         void partition_VV_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut);
@@ -82,7 +82,7 @@ class TSD {
 
         Node<PointType, OrderType>* merge(Node<PointType, OrderType>* below, Node<PointType, OrderType>* above);
 
-        void partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut);
+        void partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* parent);
 
         int get_leaf_count() { return leaf_count; }
 

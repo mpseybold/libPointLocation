@@ -82,7 +82,7 @@ void TSD<PointType, OrderType>::walk_to_fix_desc(Node<PointType, OrderType>* nod
 
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut) {
+void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut, Node<PointType, OrderType>* parent) {
     assert(node != nullptr);
     assert(e_cut->get_cut_type() == EDGE);
     assert(node->get_A() != nullptr);
@@ -133,13 +133,13 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         if (pattern == VE || pattern == VVE) {
             l_visited = (node->get_L()->get_priority() == e_cut->get_priority());
-            partition(node->get_L(), e_cut);
+            partition(node->get_L(), e_cut, node);
         }
 
         if (l_visited)
             std::cout << "l_visited\n";
     
-        partition(node_to_be_split, e_cut);
+        partition(node_to_be_split, e_cut, node);
 
         auto old_e_cut = node->get_e();
 
@@ -195,7 +195,7 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
     
 
                 if (pattern == EV || pattern == VVE) 
-                    partition(n->get_R(), e_cut);
+                    partition(n->get_R(), e_cut, n);
                 // else if (pattern == VE) {
                 //     l_visited = (n->get_L()->get_priority() == e_cut->get_priority());
                 //     partition(n->get_L(), e_cut);
@@ -221,6 +221,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                         walk_to_fix_desc(n->get_R(), new_A, old_desc);
                         walk_to_fix_desc(n->get_A(), new_A, old_desc);
+                        if (parent != nullptr) {
+                            walk_to_fix_desc(parent, new_A, old_desc);
+                            walk_to_fix_desc(parent, new_A, old_desc);
+                        }
                         // if (n->get_B()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_B()->get_right()->set_left(new_B->get_B());
@@ -233,6 +237,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                         walk_to_fix_desc(n->get_L(), new_A, old_desc);
                         walk_to_fix_desc(n->get_A(), new_A, old_desc);
+                        if (parent != nullptr) {
+                            walk_to_fix_desc(parent, new_A, old_desc);
+                            walk_to_fix_desc(parent, new_A, old_desc);
+                        }
                         // if (n->get_B()->get_left() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_B()->get_left()->set_right(new_B->get_B());
@@ -252,6 +260,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                         walk_to_fix_desc(n->get_L(), new_A, old_desc_L);
                         walk_to_fix_desc(n->get_R(), new_A, old_desc_R);
+                        if (parent != nullptr) {
+                            walk_to_fix_desc(parent, new_A, old_desc_L);
+                            walk_to_fix_desc(parent, new_A, old_desc_R);
+                        }
                         // if (n->get_B()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_B()->get_right()->set_left(new_B->get_B());
@@ -274,6 +286,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                         walk_to_fix_desc(n->get_R(), new_B, old_desc);
                         walk_to_fix_desc(n->get_B(), new_B, old_desc);
+                        if (parent != nullptr) {
+                            walk_to_fix_desc(parent, new_B, old_desc);
+                            walk_to_fix_desc(parent, new_B, old_desc);
+                        }
                         // if (n->get_A()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_A()->get_right()->set_left(new_A->get_A());
@@ -286,6 +302,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                         walk_to_fix_desc(n->get_L(), new_B, old_desc);
                         walk_to_fix_desc(n->get_B(), new_B, old_desc);
+                        if (parent != nullptr) {
+                            walk_to_fix_desc(parent, new_B, old_desc);
+                            walk_to_fix_desc(parent, new_B, old_desc);
+                        }
                         // if (n->get_A()->get_left() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_A()->get_left()->set_right(new_A->get_A());
@@ -305,6 +325,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                         walk_to_fix_desc(n->get_L(), new_B, old_desc_L);
                         walk_to_fix_desc(n->get_R(), new_B, old_desc_R);
+                        if (parent != nullptr) {
+                            walk_to_fix_desc(parent, new_B, old_desc_L);
+                            walk_to_fix_desc(parent, new_B, old_desc_R);
+                        }
                         // if (n->get_A()->get_right() != nullptr) {
                         //     std::cout << "vveR\n";
                         //     n->get_A()->get_right()->set_left(new_A->get_A());
@@ -411,11 +435,11 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                 delete_node(old_R);
             }
 
-            if (old_L != nullptr && is_reachable(root, old_L))
-                assert(false);
+            // if (old_L != nullptr && is_reachable(root, old_L))
+            //     assert(false);
 
-            if (old_R != nullptr && is_reachable(root, old_R))
-                assert(false);
+            // if (old_R != nullptr && is_reachable(root, old_R))
+            //     assert(false);
 
         }
 
@@ -457,7 +481,7 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     && !node->get_R()->get_trapezoid().intersects_segment(e_cut->get_segment())) {
     // if (node->get_v_1().orientation(e_cut.get_segment()->get_target()) < 1) {
 
-        partition(node->get_L(), e_cut);
+        partition(node->get_L(), e_cut, node);
 
         auto old_L = node->get_L();
 
@@ -484,7 +508,7 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     && !node->get_L()->get_trapezoid().intersects_segment(e_cut->get_segment())) {
     // } else {
 
-        partition(node->get_R(), e_cut);
+        partition(node->get_R(), e_cut, node);
 
         auto old_R = node->get_R();
 
@@ -528,7 +552,7 @@ void TSD<PointType, OrderType>::partition_VV_case(Node<PointType, OrderType>* no
 
     auto old_A = node->get_A();
 
-    partition(old_A, e_cut);
+    partition(old_A, e_cut, node);
     node->set_A(old_A->get_A());
     node->set_B(old_A->get_B());
 
@@ -580,7 +604,7 @@ void TSD<PointType, OrderType>::partition_VVE_case(Node<PointType, OrderType>* n
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut) {
+void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* parent) {
     //TODO: Implement this function.
 
     assert(node != nullptr);
@@ -597,22 +621,22 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
             break;
         }
         case E: {
-            partition_E_case(node, cut);
+            partition_E_case(node, cut, parent);
             visMe = asJsonGraph(subdag_roots);
             break;
         }
         case VE: {
-            partition_E_case(node, cut);
+            partition_E_case(node, cut, parent);
             visMe = asJsonGraph(subdag_roots);
             break;
         }
         case EV: {
-            partition_E_case(node, cut);
+            partition_E_case(node, cut, parent);
             visMe = asJsonGraph(subdag_roots);
             break;
         }
         case VVE: {
-            partition_E_case(node, cut);
+            partition_E_case(node, cut, parent);
             visMe = asJsonGraph(subdag_roots);
             break;
         }
