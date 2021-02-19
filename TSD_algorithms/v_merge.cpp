@@ -197,7 +197,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     auto next_left = left->get_left();
 
     while (next_left != nullptr) {
-        std::cout << "...l\n";
+        // std::cout << "...l\n";
         if (left_A_will_vanish && next_left->get_A() == old_left_A) {
             next_left->set_A(A);
         }
@@ -211,7 +211,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     auto next_right = right->get_right();
 
     while (next_right != nullptr) {
-        std::cout << "...r\n";
+        // std::cout << "...r\n";
         if (right_A_will_vanish && next_right->get_A() == old_right_A) {
             next_right->set_A(A);
         }
@@ -233,9 +233,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     // if (right != new_node)
     visMe = asJsonGraph({root});
     // assert(retired_nodes.find(right) == retired_nodes.end());
-    if (right_A_will_vanish && is_reachable(root, old_right_A)) 
-        // assert(false);
-        std::cout << "hello\n";
+    // if (right_A_will_vanish && is_reachable(root, old_right_A)) 
+    //     // assert(false);
+    //     std::cout << "hello\n";
     delete_node(right);
     // right = NULL;
 
@@ -262,6 +262,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
 
     assert(left != nullptr);
     assert(right != nullptr);
+
+    if (segments.size() == 25 && right->get_priority() == 99)
+        std::cout << "hello\n";
 
     if (left->get_priority() < right->get_priority()) {
         auto node = v_merge_left_lower_priority_case(left, right);

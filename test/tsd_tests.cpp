@@ -477,12 +477,12 @@ TEST(TSDTests, trickyCase) {
 TEST(TSDTests, dynamicInsertNonCrossingTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
-    // std::mt19937 generator (1234);
-    std::mt19937 generator (1235);
+    std::mt19937 generator (1246);
+    // std::mt19937 generator (1235);
     // std::mt19937 generator (1236);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    int n = 100;
+    int n = 30;
 
     std::set<int> x_coords = std::set<int>();
     std::set<int> y_coords = std::set<int>();
@@ -537,7 +537,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
         
         io::write_segments(segments, i, "segments.dat");
         
-        if (i >= 19)
+        if (i >= 25)
             std::cout << "hello\n";
 
         tmp = tsd.asJsonGraph(roots);

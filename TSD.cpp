@@ -377,12 +377,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
         auto node = subdag_roots[i];
         int v_part_count = 0;
-
-
-        // if (i == 0 && seg.get_priority() == 62) {
-        //     io::write_trapezoids({subdag_roots[i]->get_trapezoid(), subdag_roots[i+1]->get_trapezoid()}, "merge_debug.dat");
-        // }
-
     
         if (i == 0) {
             auto src_cut = new Cut<PointType, OrderType>(
@@ -643,8 +637,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
-        if (seg.get_priority() == 7 && i == 3)
-            std::cout << "hello\n";
+        // if (seg.get_priority() == 7 && i == 3)
+        //     std::cout << "hello\n";
         auto node = subdag_roots[i];
         partition(node, e_cut, nullptr);
         visMe = asJsonGraph(subdag_roots);
