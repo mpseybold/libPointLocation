@@ -83,21 +83,27 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     int right_merge_side = 0;
 
     if (node->get_left() != nullptr) {
+        assert(retired_nodes.find(node->get_left()) == retired_nodes.end());
         assert(node->get_left()->get_right() == node);
         left_merge_side = node->get_A() == node->get_left()->get_A() ?
         1 : -1;
 
         if (left_merge_side == -1) {
+            assert(retired_nodes.find(node->get_B()) == retired_nodes.end());
+            assert(retired_nodes.find(node->get_left()->get_B()) == retired_nodes.end());
             assert(node->get_B() == node->get_left()->get_B());
         }
     }
 
     if (node->get_right() != nullptr) {
+        assert(retired_nodes.find(node->get_right()) == retired_nodes.end());
         assert(node->get_right()->get_left() == node);
         right_merge_side = node->get_A() == node->get_right()->get_A() ?
         1 : -1;
 
         if (right_merge_side == -1) {
+            assert(retired_nodes.find(node->get_B()) == retired_nodes.end());
+            assert(retired_nodes.find(node->get_right()->get_B()) == retired_nodes.end());
             assert(node->get_B() == node->get_right()->get_B());
         }
     }

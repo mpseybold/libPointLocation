@@ -266,23 +266,68 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
     if (segments.size() == 25 && right->get_priority() == 99)
         std::cout << "hello\n";
 
-    if (left->get_priority() < right->get_priority()) {
+    OrderType left_priority = left->get_priority();
+    OrderType right_priority = right->get_priority();
+
+    auto left_parents = left->get_parents();
+    auto right_parents = right->get_parents();    
+
+    Node<PointType, OrderType>* result;
+
+    // if (left->get_priority() < right->get_priority()) {
+    if (left_priority < right_priority) {
         auto node = v_merge_left_lower_priority_case(left, right);
         // visMe = asJsonGraph(subdag_roots);
-        return node;
+        result = node;
     }
 
-    if (left->get_priority() > right->get_priority()) {
+    // if (left->get_priority() > right->get_priority()) {
+    if (left_priority > right_priority) {    
         auto node = v_merge_right_lower_priority_case(left, right);
         // visMe = asJsonGraph(subdag_roots);
-        return node;
+        result = node;
     }
 
-    if (left->get_priority() == right->get_priority()) {
+    // if (left->get_priority() == right->get_priority()) {
+    if (left_priority == right_priority) {    
         auto node = v_merge_equal_priority_case(left, right);
         // visMe = asJsonGraph(subdag_roots);
-        return node;
+        result = node;
     }
+
+
+    for (auto p: left_parents) {
+        if (p != result && p->get_A() == left) {
+            p->set_A(result);
+        }
+        if (p != result && p->get_B() == left) {
+            p->set_B(result);
+        }
+        if (p != result && p->get_L() == left) {
+            p->set_L(result);
+        }
+        if (p != result && p->get_R() == left) {
+            p->set_R(result);
+        }
+    }
+
+
+    for (auto p: right_parents) {
+        if (p != result && p->get_A() == right) {
+            p->set_A(result);
+        }
+        if (p != result && p->get_B() == right) {
+            p->set_B(result);
+        }
+        if (p != result && p->get_L() == right) {
+            p->set_L(result);
+        }
+        if (p != result && p->get_R() == right) {
+            p->set_R(result);
+        }
+    }
+
+    return result;
 
     assert(false);
 }

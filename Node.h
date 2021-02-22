@@ -31,6 +31,8 @@ class Node {
         bool partition_visited = false;
         bool v_partition_visited = false;
 
+        std::set<Node<PointType, OrderType>*> parents;
+
         OrderType partition_priority = -1;
 
     public:
@@ -41,6 +43,7 @@ class Node {
         Node(BoundingTrap<PointType, OrderType> trap) {
             trapezoid = trap;
             destruction_cuts = DestructionCuts<PointType, OrderType>();
+            parents = std::set<Node<PointType, OrderType>*>();
         }
 
         DestructionCuts<PointType, OrderType>& get_destruction_cuts() { return destruction_cuts; }
@@ -148,10 +151,34 @@ class Node {
 
         void set_negative_child(Node<PointType, OrderType>* node) { negative_child = node; }
         void set_positive_child(Node<PointType, OrderType>* node) { positive_child = node; }
-        void set_L(Node<PointType, OrderType>* node) { L = node; }
-        void set_R(Node<PointType, OrderType>* node) { R = node; }
-        void set_A(Node<PointType, OrderType>* node) { A = node; }
-        void set_B(Node<PointType, OrderType>* node) {  B = node; }
+        void set_L(Node<PointType, OrderType>* node) { 
+            if (L != nullptr)
+                L->remove_parent(this);
+            L = node;
+            if (L != nullptr)
+                L->add_parent(this); 
+        }
+        void set_R(Node<PointType, OrderType>* node) { 
+            if (R != nullptr)
+                R->remove_parent(this);
+            R = node;
+            if (R != nullptr)
+                R->add_parent(this); 
+        }
+        void set_A(Node<PointType, OrderType>* node) { 
+            if (A != nullptr)
+                A->remove_parent(this);
+            A = node;
+            if (A != nullptr)
+                A->add_parent(this); 
+        }
+        void set_B(Node<PointType, OrderType>* node) {  
+            if (B != nullptr)
+                B->remove_parent(this);
+            B = node;
+            if (B != nullptr)
+                B->add_parent(this);
+        }
 
         void set_left(Node<PointType, OrderType>* _left) { left = _left; }
         void set_right(Node<PointType, OrderType>* _right) { right = _right; }
@@ -189,6 +216,20 @@ class Node {
             this->A = A;
             this->B = B;
         }
+
+        void add_parent(Node<PointType, OrderType>* parent) {
+            assert(this != parent);
+            parents.insert(parent);
+        }
+
+        void remove_parent(Node<PointType, OrderType>* parent) {
+            parents.erase(parent);
+        }
+
+        std::set<Node<PointType, OrderType>*> get_parents() {
+            return parents;
+        }
+
 
         // OrderType get_partition_priority() { return partition_priority; }
         

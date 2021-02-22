@@ -1135,6 +1135,15 @@ bool TSD<PointType, OrderType>::is_reachable(Node<PointType, OrderType>* from, N
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_node(Node<PointType, OrderType>* node) {
 
+    if (node->get_A() != nullptr)
+        node->get_A()->remove_parent(node);
+    if (node->get_B() != nullptr)
+        node->get_B()->remove_parent(node);
+    if (node->get_L() != nullptr)
+        node->get_L()->remove_parent(node);
+    if (node->get_R() != nullptr)
+        node->get_R()->remove_parent(node);
+
     if (TESTING >= 1000) {
         if (node->get_right() != nullptr && node->get_right()->get_left() == node) {
             node->get_right()->set_left(nullptr);
