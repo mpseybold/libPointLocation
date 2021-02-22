@@ -637,8 +637,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
-        // if (seg.get_priority() == 7 && i == 3)
-        //     std::cout << "hello\n";
+        if (seg.get_priority() == 7 && i == 3)
+            std::cout << "hello\n";
         auto node = subdag_roots[i];
         partition(node, e_cut, nullptr);
         visMe = asJsonGraph(subdag_roots);

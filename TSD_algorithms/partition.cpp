@@ -672,6 +672,5 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
             visMe = asJsonGraph({root});
             break;
         }
-        
     }
 }
