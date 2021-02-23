@@ -1,7 +1,7 @@
 #include "../TSD.h"
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     
     
     assert(left != nullptr);
@@ -12,7 +12,16 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     // A CORNER CASE WHERE LEFT AND RIGHT OVERLAP
     // TODO: find cleaner solution
     if (left->get_R() == right) {
-        
+        assert(false);
+        left->get_trapezoid().set_right(
+            right->get_trapezoid().get_v_right(), 
+            right->get_trapezoid().get_right_side());
+
+        return left;
+    }
+
+    if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
+        assert(false);
         left->get_trapezoid().set_right(
             right->get_trapezoid().get_v_right(), 
             right->get_trapezoid().get_right_side());
@@ -21,7 +30,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     }
 
 
-    // assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
 
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
@@ -65,7 +74,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
 }
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     assert(left != nullptr);
     assert(right != nullptr);
 
@@ -73,7 +82,16 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
         assert(false);
 
     if (right->get_L() == left) {
-        
+        assert(false);
+        right->get_trapezoid().set_left(
+            left->get_trapezoid().get_v_left(), 
+            left->get_trapezoid().get_left_side());
+
+        return right;
+    }
+
+    if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
+        assert(false);
         right->get_trapezoid().set_left(
             left->get_trapezoid().get_v_left(), 
             left->get_trapezoid().get_left_side());
@@ -82,7 +100,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
     }
 
 
-    // assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
+    assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
     
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
@@ -120,7 +138,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
 }
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_case(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     
     assert(left != nullptr);
     assert(right != nullptr);
@@ -257,7 +275,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
 }
 
 template <class PointType, class OrderType>
-Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, OrderType>*& left, Node<PointType, OrderType>*& right) {
+Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     // TODO: Implement this function
 
     assert(left != nullptr);
@@ -327,6 +345,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
         }
     }
 
+    visMe = asJsonGraph(subdag_roots);
     return result;
 
     assert(false);

@@ -152,27 +152,35 @@ class Node {
         void set_negative_child(Node<PointType, OrderType>* node) { negative_child = node; }
         void set_positive_child(Node<PointType, OrderType>* node) { positive_child = node; }
         void set_L(Node<PointType, OrderType>* node) { 
+            if (parents.find(node) != parents.end())
+                return;
             if (L != nullptr)
                 L->remove_parent(this);
             L = node;
             if (L != nullptr)
                 L->add_parent(this); 
         }
-        void set_R(Node<PointType, OrderType>* node) { 
+        void set_R(Node<PointType, OrderType>* node) {
+            if (parents.find(node) != parents.end())
+                return; 
             if (R != nullptr)
                 R->remove_parent(this);
             R = node;
             if (R != nullptr)
                 R->add_parent(this); 
         }
-        void set_A(Node<PointType, OrderType>* node) { 
+        void set_A(Node<PointType, OrderType>* node) {
+            if (parents.find(node) != parents.end())
+                return; 
             if (A != nullptr)
                 A->remove_parent(this);
             A = node;
             if (A != nullptr)
                 A->add_parent(this); 
         }
-        void set_B(Node<PointType, OrderType>* node) {  
+        void set_B(Node<PointType, OrderType>* node) {
+            if (parents.find(node) != parents.end())
+                return;  
             if (B != nullptr)
                 B->remove_parent(this);
             B = node;

@@ -633,12 +633,13 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // second pass over affected roots
     // to make edge partition calls
 
+    if (seg.get_priority() == 19)
+        std::cout << "hello\n";
+
     auto merge_indices = std::vector<MergeIndices>();
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
-        if (seg.get_priority() == 7 && i == 3)
-            std::cout << "hello\n";
         auto node = subdag_roots[i];
         partition(node, e_cut, nullptr);
         visMe = asJsonGraph(subdag_roots);
@@ -696,7 +697,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                 }
             }
         }
-        visMe = asJsonGraph(subdag_roots);
+        // visMe = asJsonGraph(subdag_roots);
     }
 
     if (seg.get_priority() == 7)
@@ -1100,10 +1101,14 @@ void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>
 
     if (node->get_left() != nullptr) {
         assert(retired_nodes.find(node->get_left()) == retired_nodes.end());
+        assert(node->get_left()->get_right() == node);
+        assert(node->get_A() == node->get_left()->get_A() || node->get_B() == node->get_left()->get_B());
     }
 
     if (node->get_right() != nullptr) {
         assert(retired_nodes.find(node->get_right()) == retired_nodes.end());
+        assert(node->get_right()->get_left() == node);
+        assert(node->get_A() == node->get_right()->get_A() || node->get_B() == node->get_right()->get_B());
     }
 
 }

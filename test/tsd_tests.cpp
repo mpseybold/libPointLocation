@@ -446,7 +446,7 @@ TEST(TSDTests, trickyCase) {
     );
 
     std::vector<Segment<PointCart, int>*> segments{
-        s2, s3, s4, s5, s6, s1
+        s2, s3, s4, s5, /*s6,*/ s1
     };
 
     auto tsd = TSD<PointCart, int>();
@@ -477,12 +477,12 @@ TEST(TSDTests, trickyCase) {
 TEST(TSDTests, dynamicInsertNonCrossingTest) {
     auto segments = std::vector<Segment<PointCart, int>*>();
 
-    std::mt19937 generator (1243);
+    std::mt19937 generator (1262);
     // std::mt19937 generator (1235);
     // std::mt19937 generator (1236);
     std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-    int n = 200;
+    int n = 400;
 
     std::set<int> x_coords = std::set<int>();
     std::set<int> y_coords = std::set<int>();
@@ -501,24 +501,24 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
         
         y_coords.insert(y);
         
-        int length = std::floor((double)(10000 - x) * dis(generator));
+        int length = 1 + std::floor((double)(10000 - x) * dis(generator));
         auto seg = new Segment<PointCart, int>(
-            // PointCart(x, y), PointCart(x + length, y), i
-            PointCart(2*i, i), PointCart(2*i + n, i), std::floor(dis(generator)*1000000)
+            PointCart(x, y), PointCart(x + length, y), i
+            // PointCart(2*i, i), PointCart(2*i + n, i), i//std::floor(dis(generator)*1000000)
         );
         segments.push_back(seg);
     }
 
-    for (int i = 1; i <= n; ++i) {
-        int x = std::floor((double)10000 * dis(generator));
-        int y = std::floor((double)10000 * dis(generator));
-        int length = std::floor((double)(10000 - x) * dis(generator));
-        auto seg = new Segment<PointCart, int>(
-            // PointCart(x, y), PointCart(x + length, y), i
-            PointCart(2.0*(n-i) - .5, n + i), PointCart(2.0*(n+1-i) + n - .5, n + i), std::floor(dis(generator)*1000000)
-        );
-        segments.push_back(seg);
-    }
+    // for (int i = 1; i <= n; ++i) {
+    //     int x = std::floor((double)10000 * dis(generator));
+    //     int y = std::floor((double)10000 * dis(generator));
+    //     int length = std::floor((double)(10000 - x) * dis(generator));
+    //     auto seg = new Segment<PointCart, int>(
+    //         // PointCart(x, y), PointCart(x + length, y), i
+    //         PointCart(2.0*(n-i) - .5, n + i), PointCart(2.0*(n+1-i) + n - .5, n + i), i+n//std::floor(dis(generator)*1000000)
+    //     );
+    //     segments.push_back(seg);
+    // }
 
     std::shuffle(segments.begin(), segments.end(), generator);
 
@@ -537,7 +537,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
         
         io::write_segments(segments, i, "segments.dat");
         
-        if (i >= 24)
+        if (i >= 10)
             std::cout << "hello\n";
 
         tmp = tsd.asJsonGraph(roots);
@@ -546,9 +546,9 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
         tmp = tsd.asJsonGraph(roots);
         auto traps = std::vector<BoundingTrap<PointCart, int>>();
         write_leaf_traps(tsd.get_root(), traps);
-        std::cout << traps.size() << std::endl;
+        // std::cout << traps.size() << std::endl;
         io::write_trapezoids(traps, "leaf_insert_dynamic.dat");   
-        std::cout << tsd.get_leaf_count() << std::endl;
+        // std::cout << tsd.get_leaf_count() << std::endl;
     }
     std::cout << "done\n";
 }

@@ -205,6 +205,10 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
                 if (pattern == EV || pattern == VVE) 
                     partition(n->get_R(), e_cut, n);
+                if (intersects_A)
+                    new_A = node_to_be_split->get_A();
+                if (intersects_B)
+                    new_B = node_to_be_split->get_B();
                 // else if (pattern == VE) {
                 //     l_visited = (n->get_L()->get_priority() == e_cut->get_priority());
                 //     partition(n->get_L(), e_cut);
@@ -474,9 +478,9 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         delete_node(node_to_be_split);
 
-        visMe = asJsonGraph({root});
-        if (is_reachable(root, node_to_be_split))
-            assert(false);
+        // visMe = asJsonGraph({root});
+        // if (is_reachable(root, node_to_be_split))
+        //     assert(false);
     }
 }
 
@@ -669,7 +673,7 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
         }
         case VV: {
             partition_VV_case(node, cut);
-            visMe = asJsonGraph({root});
+            visMe = asJsonGraph(subdag_roots);
             break;
         }
     }
