@@ -244,7 +244,8 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         //     n->get_B()->get_right()->set_left(new_B->get_B());
                         //     new_B->get_B()->set_right(n->get_B()->get_right());
                         // }
-                    } else if (pattern == VE) {
+                    } else if (pattern == VE) {   
+
                         auto old_desc_L = n->get_L()->get_A();
                         new_A = v_merge(n->get_L()->get_A(), new_A);
                         new_B->set_L(n->get_L()->get_B());
@@ -294,7 +295,6 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         // }
                     }
 
-                    
                 } else {
                     auto old_desc = new_B;
                     if (pattern == EV) {
@@ -364,6 +364,26 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
                         // }
                     }
                 }                    
+            }
+
+            // Fixing left boundaires if l_visited
+
+            if ((pattern == VE || pattern == VVE) && l_visited) {
+                auto old_L_A_left = n->get_L()->get_A()->get_trapezoid().get_v_left();
+                auto old_L_B_left = n->get_L()->get_B()->get_trapezoid().get_v_left();
+
+                auto old_L_A_left_side = n->get_L()->get_A()->get_trapezoid().get_left_side();
+                auto old_L_B_left_side = n->get_L()->get_B()->get_trapezoid().get_left_side();
+            
+                if (n->get_trapezoid().get_v_left() != old_L_A_left) {
+                    new_A->get_trapezoid().set_left(old_L_A_left,
+                    old_L_A_left_side);
+                }
+
+                if (n->get_trapezoid().get_v_left() != old_L_B_left) {
+                    new_B->get_trapezoid().set_left(old_L_B_left,
+                    old_L_B_left_side);
+                }
             }
 
             n->set_A(new_A);

@@ -6,6 +6,7 @@
 #include "BoundingTrap.h"
 #include <stack>
 #include <list>
+#include <unordered_map>
 #include "io.h"
 
 #define TESTING 1000
@@ -32,7 +33,7 @@ class TSD {
         Node<PointType, OrderType>* v_merge_left_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
         Node<PointType, OrderType>* v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
         Node<PointType, OrderType>* v_merge_equal_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
-
+        Node<PointType, OrderType>* v_merge_partial(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
         Node<PointType, OrderType>* merge_equal_priority_case(Node<PointType, OrderType>* below, Node<PointType, OrderType>* above);
 
         void partition_E_case(Node<PointType, OrderType>* node, Cut<PointType, OrderType>* e_cut, Node<PointType, OrderType>* parent);

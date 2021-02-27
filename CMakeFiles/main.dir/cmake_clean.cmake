@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/main.dir/BoundingTrap.cpp.o"
   "CMakeFiles/main.dir/Cut.cpp.o"
   "CMakeFiles/main.dir/Point_2D.cpp.o"
+  "CMakeFiles/main.dir/Point_S2ratss.cpp.o"
   "CMakeFiles/main.dir/main.cpp.o"
   "main"
   "main.pdb"

@@ -663,10 +663,6 @@ void TSD<PointType, OrderType>::v_partition(Node<PointType, OrderType>* node,
 V_Cut<PointType, OrderType>* v_cut, int side) {
     DestructionPattern pattern = node->get_dest_pattern();
 
-    if (v_cut->get_priority() == 46 && node->get_priority() == 59) {
-        std::cout << "hello\n";        
-    }
-
     switch(pattern) {
         case E:
             v_part_handle_E_case(node, v_cut, side);
