@@ -1,0 +1,1 @@
+plot "build/test/leaf_insert_dynamic.dat" using 1:2:($3-$1):($4-$2) with vectors nohead, "build/test/refinement_debug.dat" using 1:2:($3-$1):($4-$2) with vectors nohead dashtype 2 lw 2, "build/test/segments.dat" using 1:2:($3-$1):($4-$2) with vectors nohead dashtype 3 lw 1, "build/test/segments.dat" u ($3+$1)/2:($2+$4)/2:5 with labels 

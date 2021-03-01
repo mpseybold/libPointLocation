@@ -133,6 +133,9 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         auto pattern = node->get_dest_pattern();
 
+        if (e_cut->get_priority() == 3 && node->get_priority() == 9)
+            std::cout << "hello\n";
+
         if (pattern == VE || pattern == VVE) {
             l_visited = (node->get_L()->get_priority() == e_cut->get_priority());
             partition(node->get_L(), e_cut, node);

@@ -158,7 +158,13 @@ class Node {
                 L->remove_parent(this);
             L = node;
             if (L != nullptr)
-                L->add_parent(this); 
+                L->add_parent(this);
+
+            if (L != nullptr)
+                trapezoid.set_left(
+                    L->get_trapezoid().get_v_left(),
+                    L->get_trapezoid().get_left_side()
+                ); 
         }
         void set_R(Node<PointType, OrderType>* node) {
             if (parents.find(node) != parents.end())
@@ -167,7 +173,13 @@ class Node {
                 R->remove_parent(this);
             R = node;
             if (R != nullptr)
-                R->add_parent(this); 
+                R->add_parent(this);
+            
+            if (R != nullptr)
+                trapezoid.set_right(
+                    R->get_trapezoid().get_v_right(),
+                    R->get_trapezoid().get_right_side()
+                ); 
         }
         void set_A(Node<PointType, OrderType>* node) {
             if (parents.find(node) != parents.end())
@@ -272,7 +284,8 @@ class Node {
                     break;
                 }
                 case EV: {
-                    assert(L == nullptr);
+                    if (L != nullptr)
+                        assert(L == nullptr);
                     assert(A != nullptr);
                     assert(B != nullptr);
                     assert(R != nullptr);

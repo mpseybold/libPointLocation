@@ -1,7 +1,7 @@
 #include "TSD.h"
 // #include "io.h"
 
-#define VERBOSITY_LEVEL 1
+#define VERBOSITY_LEVEL 2
 
 
 template <class PointType, class OrderType>
@@ -38,7 +38,11 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
 
-    if (VERBOSITY_LEVEL >= 2 && seg->get_priority() == 91) {
+    if (seg->get_priority() == 16 && node->get_priority() == 10) {
+        std::cout << "hello\n";
+    }
+
+    if (VERBOSITY_LEVEL >= 2) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
 
         if (node->get_L() != nullptr && node->get_L()->get_trapezoid().intersects_segment(seg)) {
@@ -640,7 +644,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
-        if (e_cut->get_priority() == 279 && i == 2)
+        if (e_cut->get_priority() == 3 && i == 1)
             std::cout << "hello\n";
 
         auto node = subdag_roots[i];
@@ -703,8 +707,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         // visMe = asJsonGraph(subdag_roots);
     }
 
-    if (seg.get_priority() == 7)
-        std::cout << "hello\n";
+    // if (seg.get_priority() == 2)
+    //     std::cout << "hello\n";
 
     // final pass to merge nodes
     for (auto& indices: merge_indices) {
@@ -1095,10 +1099,14 @@ void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>
     }
     if (node->get_L() != nullptr) {
         assert(retired_nodes.find(node->get_L()) == retired_nodes.end());
+        if(!(node->get_trapezoid().get_left() == node->get_L()->get_trapezoid().get_left()))
+            assert(false);
         reachable_nodes_valid(node->get_L());
     }
     if (node->get_R() != nullptr) {
         assert(retired_nodes.find(node->get_R()) == retired_nodes.end());
+        if(!(node->get_trapezoid().get_right() == node->get_R()->get_trapezoid().get_right()))
+            assert(false);
         reachable_nodes_valid(node->get_R());
     }
 
@@ -1122,7 +1130,6 @@ void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>
 
 template <class PointType, class OrderType>
 bool TSD<PointType, OrderType>::is_reachable(Node<PointType, OrderType>* from, Node<PointType, OrderType>* to) {
-
     if (from == to)
         return true;
 

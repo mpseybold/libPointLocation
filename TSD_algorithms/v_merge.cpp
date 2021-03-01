@@ -8,63 +8,6 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_left_lower_priori
     assert(right != nullptr);
 
     assert(left->get_R() != nullptr);
-
-    if (left->get_R() == right->get_L()) {
-        left->set_R(right);
-        return left;
-    }
-
-    // THIS IS A VERY CLUMSY WAY TO DEAL WITH
-    // A CORNER CASE WHERE LEFT AND RIGHT OVERLAP
-    // TODO: find cleaner solution
-    if (left->get_R() == right) {
-        // assert(false);
-        left->get_trapezoid().set_right(
-            right->get_trapezoid().get_v_right(), 
-            right->get_trapezoid().get_right_side());
-
-        return left;
-    }
-
-    if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
-        // assert(false);
-
-        Node<PointType, OrderType>* right_desc = left->get_R();
-        while (right_desc != right && right_desc != nullptr) {
-            std::cout << "right_desc...\n";
-            // if (right_desc == nullptr)
-            //     assert(false);
-            right_desc = right_desc->get_R();
-        }
-        Node<PointType, OrderType>* left_desc = right->get_L();
-        while (left_desc != left && left_desc != nullptr) {
-            std::cout << "left_desc...\n";
-            // if (left_desc == nullptr)
-                // assert(false);
-            left_desc = left_desc->get_L();
-        }
-
-        left->get_trapezoid().set_right(
-        right->get_trapezoid().get_v_right(), 
-        right->get_trapezoid().get_right_side());
-
-        if (left_desc == left) {
-            auto left_old_R = left->get_R();
-            left->set_R(right);
-            right->set_left(left_old_R);
-        } else if (right_desc == right) {
-            std::cout << "good\n";
-        } else {
-            v_merge(left->get_R(), right);
-            return left;
-            assert(false);
-        }
-            // assert(false);
-
-        return left;
-    }
-
-
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
 
@@ -112,61 +55,6 @@ template <class PointType, class OrderType>
 Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_priority_case(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     assert(left != nullptr);
     assert(right != nullptr);
-
-    // if (right->get_L() == nullptr)
-        // assert(false);
-
-    if (right->get_L() == left->get_R()) {
-        right->set_L(left);
-        return right;
-    }
-
-    if (right->get_L() == left) {
-        // assert(false);
-        right->get_trapezoid().set_left(
-            left->get_trapezoid().get_v_left(), 
-            left->get_trapezoid().get_left_side());
-
-        return right;
-    }
-
-    if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
-        // assert(false);
-
-        Node<PointType, OrderType>* right_desc = left->get_R();
-        while (right_desc != right && right_desc != nullptr) {
-            std::cout << "right_desc...\n";
-            // if (right_desc == nullptr)
-            //     assert(false);
-            right_desc = right_desc->get_R();
-        }
-        Node<PointType, OrderType>* left_desc = right->get_L();
-        while (left_desc != left && left_desc != nullptr) {
-            std::cout << "left_desc...\n";
-            // if (left_desc == nullptr)
-                // assert(false);
-            left_desc = left_desc->get_L();
-        }
-
-        right->get_trapezoid().set_left(
-            left->get_trapezoid().get_v_left(), 
-            left->get_trapezoid().get_left_side());
-
-        if (right_desc == right) {
-            auto right_old_L = right->get_L();
-            right->set_L(left);
-            left->set_right(right_old_L);
-        }   else if (left_desc == left) {
-            std::cout << "good\n";
-        } else {
-            v_merge(left, right->get_L());
-            return right;
-            assert(false);
-        }
-        return right;
-    }
-
-
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
     
@@ -241,17 +129,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
     auto old_right_B = right->get_B();
 
     bool left_A_will_vanish = left->get_B() == right->get_B() && left->get_A() != right->get_A();
-    /*old_left_A->get_trapezoid().get_right()
-    ->defining_point_cut_comparison(*common_boundary_cut) == 0;*/
     bool left_B_will_vanish = left->get_A() == right->get_A() && left->get_B() != right->get_B();
-    /*old_left_B->get_trapezoid().get_right()
-    ->defining_point_cut_comparison(*common_boundary_cut) == 0;*/
     bool right_A_will_vanish = left->get_B() == right->get_B() && left->get_A() != right->get_A();
-    /*old_right_A->get_trapezoid().get_left()
-    ->defining_point_cut_comparison(*common_boundary_cut) == 0;*/
     bool right_B_will_vanish = left->get_A() == right->get_A() && left->get_B() != right->get_B();
-    /*old_right_B->get_trapezoid().get_left()
-    ->defining_point_cut_comparison(*common_boundary_cut) == 0;*/
 
 
     auto right_merge_neighbour = right->get_right();
@@ -344,9 +224,145 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_equal_priority_ca
 template <class PointType, class OrderType>
 Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_partial(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right) {
     if (left->get_priority() < right->get_priority()) {
+        if (left->get_R() == right->get_L()) {
+            left->get_trapezoid().set_right(
+                right->get_trapezoid().get_v_right(),
+                right->get_trapezoid().get_right_side()
+            );
+            left->set_R(right);
+            return left;
+        }
 
+        // THIS IS A VERY CLUMSY WAY TO DEAL WITH
+        // A CORNER CASE WHERE LEFT AND RIGHT OVERLAP
+        // TODO: find cleaner solution
+        if (left->get_R() == right) {
+            // assert(false);
+            left->get_trapezoid().set_right(
+                right->get_trapezoid().get_v_right(), 
+                right->get_trapezoid().get_right_side());
+
+            return left;
+        }
+
+        if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
+            // assert(false);
+
+            Node<PointType, OrderType>* right_desc = left->get_R();
+            while (right_desc != right && right_desc != nullptr) {
+                std::cout << "right_desc...\n";
+                // if (right_desc == nullptr)
+                //     assert(false);
+                right_desc = right_desc->get_R();
+            }
+            Node<PointType, OrderType>* left_desc = right->get_L();
+            while (left_desc != left && left_desc != nullptr) {
+                std::cout << "left_desc...\n";
+                // if (left_desc == nullptr)
+                    // assert(false);
+                left_desc = left_desc->get_L();
+            }
+
+            left->get_trapezoid().set_right(
+            right->get_trapezoid().get_v_right(), 
+            right->get_trapezoid().get_right_side());
+
+            if (right_desc == right) {
+                right_desc = left->get_R();
+
+                while (right_desc != right && right_desc != nullptr) {
+                    right_desc->get_trapezoid().set_right(
+                    right->get_trapezoid().get_v_right(), 
+                    right->get_trapezoid().get_right_side());
+
+                    right_desc = right_desc->get_R();
+                }
+            }
+
+            if (left_desc == left) {
+                auto left_old_R = left->get_R();
+                left->set_R(right);
+                right->set_left(left_old_R);
+            } else if (right_desc == right) {
+                std::cout << "good\n";
+            } else {
+                v_merge(left->get_R(), right);
+                return left;
+                assert(false);
+            }
+                // assert(false);
+
+            return left;
+        }
     } else if (left->get_priority() > right->get_priority()) {
+        if (right->get_L() == left->get_R()) {
+            right->get_trapezoid().set_left(
+                left->get_trapezoid().get_v_left(),
+                left->get_trapezoid().get_left_side()
+            );
+            right->set_L(left);
+            return right;
+        }
 
+        if (right->get_L() == left) {
+            // assert(false);
+            right->get_trapezoid().set_left(
+                left->get_trapezoid().get_v_left(), 
+                left->get_trapezoid().get_left_side());
+
+            return right;
+        }
+
+        if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
+            // assert(false);
+
+            Node<PointType, OrderType>* right_desc = left->get_R();
+            while (right_desc != right && right_desc != nullptr) {
+                std::cout << "right_desc...\n";
+                // if (right_desc == nullptr)
+                //     assert(false);
+                right_desc = right_desc->get_R();
+            }
+            Node<PointType, OrderType>* left_desc = right->get_L();
+            while (left_desc != left && left_desc != nullptr) {
+                std::cout << "left_desc...\n";
+                // if (left_desc == nullptr)
+                    // assert(false);
+                left_desc = left_desc->get_L();
+            }
+
+            right->get_trapezoid().set_left(
+                left->get_trapezoid().get_v_left(), 
+                left->get_trapezoid().get_left_side());
+
+            if (left_desc == left) {
+                left_desc = right->get_L();
+
+                while (left_desc != left && left_desc != nullptr) {
+                    left_desc->get_trapezoid().set_left(
+                    left->get_trapezoid().get_v_left(), 
+                    left->get_trapezoid().get_left_side());
+
+                    left_desc = left_desc->get_L();
+                }
+            }
+
+            if (right_desc == right) {
+                auto right_old_L = right->get_L();
+                right->set_L(left);
+                left->set_right(right_old_L);
+            }   else if (left_desc == left) {
+                std::cout << "good\n";
+            } else {
+                v_merge(left, right->get_L());
+                return right;
+                assert(false);
+            }
+            return right;
+        }
+    } else {
+        return v_merge_equal_priority_case(left, right);
+        assert(false);
     }
 
     return nullptr;
@@ -388,10 +404,9 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
 
     Node<PointType, OrderType>* result;
 
-    // if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left())
-    //     std::cout << "oh no, here's trouble\n";
-    //     result = v_merge_partial(left, right);
-    // } else {
+    if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
+        result = v_merge_partial(left, right);
+    } else {
         if (left_priority < right_priority) {
             auto node = v_merge_left_lower_priority_case(left, right);
             // visMe = asJsonGraph(subdag_roots);
@@ -409,23 +424,26 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
             // visMe = asJsonGraph(subdag_roots);
             result = node;
         }
-    // }
+    }
 
 
     for (auto& p_desc: left_parent_desc) {
         auto parent = p_desc.first;
         auto descendants = p_desc.second;
 
-        if (parent != result && descendants[0] == left) {
+        if (parent->get_priority() >= result->get_priority())
+            continue;
+
+        if (descendants[0] == left) {
             parent->set_L(result);
         }
-        if (parent != result && descendants[1] == left) {
+        if (descendants[1] == left) {
             parent->set_R(result);
         }
-        if (parent != result && descendants[2] == left) {
+        if (descendants[2] == left) {
             parent->set_A(result);
         }
-        if (parent != result && descendants[3] == left) {
+        if (descendants[3] == left) {
             parent->set_B(result);
         }
     }
@@ -434,16 +452,19 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
         auto parent = p_desc.first;
         auto descendants = p_desc.second;
 
-        if (parent != result && descendants[0] == right) {
+        if (parent->get_priority() >= result->get_priority())
+            continue;
+
+        if (descendants[0] == right) {
             parent->set_L(result);
         }
-        if (parent != result && descendants[1] == right) {
+        if (descendants[1] == right) {
             parent->set_R(result);
         }
-        if (parent != result && descendants[2] == right) {
+        if (descendants[2] == right) {
             parent->set_A(result);
         }
-        if (parent != result && descendants[3] == right) {
+        if (descendants[3] == right) {
             parent->set_B(result);
         }
     }

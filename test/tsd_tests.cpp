@@ -475,7 +475,7 @@ TEST(TSDTests, trickyCase) {
 }
 
 TEST(TSDTests, dynamicInsertNonCrossingTest) {
-    for (int seed = 1; seed < 1000; ++seed) {
+    for (int seed = 789; seed < 790; ++seed) {
         std::cout << "seed: " << seed << std::endl;
         std::mt19937 generator (seed);
         // std::mt19937 generator (1235);
@@ -483,7 +483,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
         std::uniform_real_distribution<double> dis(0.0, 1.0);
 
         auto segments = std::vector<Segment<PointCart, int>*>();
-        int n = 100;
+        int n = 20;
 
         std::set<int> x_coords = std::set<int>();
         std::set<int> y_coords = std::set<int>();
@@ -538,7 +538,7 @@ TEST(TSDTests, dynamicInsertNonCrossingTest) {
             
             io::write_segments(segments, i, "segments.dat");
             
-            if (i >= 4)
+            if (i >= 12)
                 std::cout << "hello\n";
 
             tmp = tsd.asJsonGraph(roots);
