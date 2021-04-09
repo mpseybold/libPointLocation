@@ -227,14 +227,14 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         if (def_point_orientation >= 0) {
             delete_node(old_A);
         
-            if (is_reachable(root, old_A))
-                assert(false);
+            // if (is_reachable(root, old_A))
+            //     assert(false);
         }
         if (def_point_orientation <= 0) {
             delete_node(old_B);
         
-            if (is_reachable(root, old_B))
-                assert(false);
+            // if (is_reachable(root, old_B))
+            //     assert(false);
         }
         
     }
@@ -386,15 +386,15 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     && v_cut->defining_point_cut_comparison(*old_v_1) == 1) {
         delete_node(old_A);
     
-        if (is_reachable(root, old_A))
-            assert(false);
+        // if (is_reachable(root, old_A))
+        //     assert(false);
     }
     if (def_point_orientation <= 0
     && v_cut->defining_point_cut_comparison(*old_v_1) == 1) {
         delete_node(old_B);
     
-        if (is_reachable(root, old_B))
-            assert(false);
+        // if (is_reachable(root, old_B))
+        //     assert(false);
     }
 }
 
@@ -403,6 +403,8 @@ void TSD<PointType, OrderType>::v_part_handle_EV_case(Node<PointType, OrderType>
 V_Cut<PointType, OrderType>* v_cut, int side) {
     assert(node->get_A() != nullptr);
     assert(node->get_B() != nullptr);
+    if (node->get_L() != nullptr)
+        std::cout << "oops\n";
     assert(node->get_L() == nullptr);
     assert(node->get_R() != nullptr);
     assert(node->get_e()->get_cut_type() == EDGE);
@@ -544,16 +546,16 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
         && v_cut->defining_point_cut_comparison(*old_v_2) == -1) {
             delete_node(old_A);
 
-            if (is_reachable(root, old_A))
-                assert(false);
+            // if (is_reachable(root, old_A))
+            //     assert(false);
 
         }
         if (def_point_orientation <= 0
         && v_cut->defining_point_cut_comparison(*old_v_2) == -1) {
             delete_node(old_B);
 
-            if (is_reachable(root, old_B))
-                assert(false);
+            // if (is_reachable(root, old_B))
+            //     assert(false);
         }
     }
 
@@ -651,11 +653,11 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     node->clear_cuts();
     node->set_v_1(v_cut);
 
-    if (old_L->get_v_1() == v_cut && is_reachable(root, old_L))
-        assert(false);
+    // if (old_L->get_v_1() == v_cut && is_reachable(root, old_L))
+    //     assert(false);
 
-    if (old_R->get_v_1() == v_cut && is_reachable(root, old_R))
-        assert(false);
+    // if (old_R->get_v_1() == v_cut && is_reachable(root, old_R))
+    //     assert(false);
 }
 
 template <class PointType, class OrderType>

@@ -1,7 +1,7 @@
 #include "TSD.h"
 // #include "io.h"
 
-#define VERBOSITY_LEVEL 2
+#define VERBOSITY_LEVEL 1
 
 
 template <class PointType, class OrderType>
@@ -37,10 +37,6 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>* seg, Node<PointType, OrderType>* node) {
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
-
-    if (seg->get_priority() == 16 && node->get_priority() == 10) {
-        std::cout << "hello\n";
-    }
 
     if (VERBOSITY_LEVEL >= 2) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
@@ -246,6 +242,7 @@ TSD<PointType, OrderType>::TSD() {
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert) {
 
+    node_visits = 0;
     int num_visited = 0;
     int num_subdag_roots = 0;
 
@@ -280,9 +277,6 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             continue;
         }
 
-        if (!insert && top->get_priority() == 91 && seg->get_priority() == 91)
-            std::cout << "hello\n";
-
 
         search_refinement(seg, top);
 
@@ -294,8 +288,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
                 bool condition = insert ? node->get_priority() > seg->get_priority() :
                 (node->get_priority() == seg->get_priority());
                 if (condition) {
-                    if (!insert && node->is_leaf())
-                        std::cout << "hello\n";
+                    // if (!insert && node->is_leaf())
+                    //     std::cout << "hello\n";
                     subdag_roots.push_back(node);
                     node->toggle_visited();
                     visited_nodes.push_back(node);
@@ -327,6 +321,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
     }
 
     // std::cout << subdag_roots.size() << "\n";
+    node_visits = num_visited;
 
     if (VERBOSITY_LEVEL >= 100) {
         std::cout << "number of nodes visited:\t" << num_visited << "\n";
@@ -355,7 +350,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
     // TODO: check if move is needed
     segments.push_back(seg);
-    // std::cout << "search...\n";
     affected_subdag_roots(&seg, true);
 
     //debug
@@ -526,11 +520,12 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
                 int side = leftmost == top_int ? -1 : 1;
                 delete leftmost;
+                std::cout << "INTERSECTION...\n";
                 v_partition(node, leftmost_v_cut, side);
             }
 
             if (rightmost != nullptr) {
-
+                
                 auto rightmost_v_cut = find_v_cut(rightmost, root);
 
                 if (rightmost_v_cut == nullptr) {
@@ -545,6 +540,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
 
                 int side = rightmost == top_int ? -1 : 1;
                 delete rightmost;
+                std::cout << "INTERSECTION...\n";
                 v_partition(node, rightmost_v_cut, side);
             }
         }
@@ -586,6 +582,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                     }
 
                     delete top_int;
+                    std::cout << "INTERSECTION...\n";
                     v_partition(node, top_v_cut, -1);
                 } else if (bottom_int != nullptr) {
 
@@ -600,10 +597,9 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
                             INTERSECTION, bottom_int->get_segment(), bottom_int->get_intersecting_seg()
                         );
                     }
-
+                    std::cout << "INTERSECTION...\n";
                     v_partition(node, bottom_v_cut, 1);
                 }
-
             }
 
             auto tgt_cut = new Cut<PointType, OrderType>(
@@ -630,22 +626,19 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         }
 
         visMe = asJsonGraph(subdag_roots);
-        // reachable_nodes_valid(root);
+        reachable_nodes_valid(root);
     }
 
 
     // second pass over affected roots
     // to make edge partition calls
 
-    if (seg.get_priority() == 19)
-        std::cout << "hello\n";
-
     auto merge_indices = std::vector<MergeIndices>();
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
-        if (e_cut->get_priority() == 3 && i == 1)
-            std::cout << "hello\n";
+        // if (e_cut->get_priority() == 7 && i == 3)
+            // std::cout << "hello\n";
 
         auto node = subdag_roots[i];
         partition(node, e_cut, nullptr);
@@ -707,9 +700,8 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         // visMe = asJsonGraph(subdag_roots);
     }
 
-    // if (seg.get_priority() == 2)
-    //     std::cout << "hello\n";
-
+    if (e_cut->get_priority() == 5)
+        std::cout << "hello\n";
     // final pass to merge nodes
     for (auto& indices: merge_indices) {
         Node<PointType, OrderType>* merged_node = indices.side == -1 
@@ -748,13 +740,13 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         visMe = asJsonGraph(subdag_roots);
         // reachable_nodes_valid(root);
     }
+
+    cleanup();
 }
 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& seg) {
     //TODO: implement this properly/test the code
-    if (seg.get_priority() == 91)
-        std::cout << "hello\n";
     affected_subdag_roots(&seg, false);
 
     //DEBUG
@@ -832,7 +824,7 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
 
                 auto aux = prev_desc;
                 prev_desc = prev_desc->get_L();
-                delete aux;
+                delete_node(aux);
 
                 assert(j > 0);
                 j--;
@@ -853,7 +845,7 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
                 } 
             }
 
-            delete descendant;
+            delete_node(descendant);
             i = j;
         } else 
             --i;
@@ -891,8 +883,6 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
     //TODO: make v_merge calls
 
     for (int i = subdag_roots.size()-1; i >= 0; --i) {
-        if (seg.get_priority() == 93)
-            std::cout << "hello\n";
         auto node = subdag_roots[i];
 
         if (i > 0 && node->get_trapezoid().get_v_left()->contains(&seg) 
@@ -956,8 +946,8 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
                         delete v_1;
             }
         } else {
-            if (pattern != NO_DESTRUCTION)
-                std::cout << "hello\n";
+            // if (pattern != NO_DESTRUCTION)
+            //     std::cout << "hello\n";
             if (node->get_v_1() != nullptr)
                 assert(!node->get_v_1()->contains(&seg));
             if (node->get_v_2() != nullptr)
@@ -969,6 +959,8 @@ void TSD<PointType, OrderType>::delete_segment(Segment<PointType, OrderType>& se
         if (node->get_L() != nullptr)
             std::cout << "problem...\n";
     }
+
+    cleanup();
 } 
 
 /*
@@ -979,9 +971,10 @@ inline int64_t relId( int64_t root, int64_t node){
 template <class PointType, class OrderType>
 const std::string TSD<PointType, OrderType>::asJsonGraph(
     std::vector<Node<PointType, OrderType>*> roots, Node<PointType, OrderType>* node_of_interest){
+    return "";
     std::stringstream ss;
     ss << "{\"kind\":{\"graph\":true},";
-
+    
     // Collect nodes that are reachable from the root in a set
     std::stack<Node<PointType, OrderType>*> queue;
     for (auto r: roots)
@@ -1087,6 +1080,7 @@ const std::string TSD<PointType, OrderType>::asJsonGraph(
 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>* node) {
+    return;
     node->is_valid();
 
     if (node->get_A() != nullptr) {
@@ -1130,6 +1124,7 @@ void TSD<PointType, OrderType>::reachable_nodes_valid(Node<PointType, OrderType>
 
 template <class PointType, class OrderType>
 bool TSD<PointType, OrderType>::is_reachable(Node<PointType, OrderType>* from, Node<PointType, OrderType>* to) {
+    return true;
     if (from == to)
         return true;
 
@@ -1172,21 +1167,27 @@ void TSD<PointType, OrderType>::delete_node(Node<PointType, OrderType>* node) {
         }
         retired_nodes.insert(node);
     }
-    else 
+    else  {
+        if (node->get_right() != nullptr && node->get_right()->get_left() == node) {
+            node->get_right()->set_left(nullptr);
+        }
+        if (node->get_left() != nullptr && node->get_left()->get_right() == node) {
+            node->get_left()->set_right(nullptr);
+        }
         delete node;
-
+    }
 }
 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::cleanup() {
-    if (TESTING >= 1000) {
+    // if (TESTING >= 1000) {
        
-        for (auto node: retired_nodes) {
-            delete node;
-        }
+        // for (auto node: retired_nodes) {
+        //     delete node;
+        // }
 
-        retired_nodes.clear();
-    }
+        // retired_nodes.clear();
+    // }
 }
 
 template <class PointType, class OrderType>
@@ -1195,6 +1196,7 @@ bool TSD<PointType, OrderType>::assert_has_parent(
     Node<PointType, OrderType>* parent,
     Node<PointType, OrderType>* root_of_search
 ) {
+    return true;
     if (root_of_search == parent) {
         if (root_of_search->get_A() == node)
             return true;

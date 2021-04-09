@@ -13,3 +13,5 @@ plotting/leaf_insert.dat
 plotting/*
 
 *.dat
+*.csv
+*.txt

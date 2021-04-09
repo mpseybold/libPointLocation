@@ -45,6 +45,7 @@ namespace {
 
 namespace io {
     void write_trapezoid(BoundingTrap<PointCart, int> trap, std::fstream& file) {
+        return;
         std::vector<Cut<PointCart, int>> cuts = std::vector<Cut<PointCart, int>>();
         cuts.push_back(*trap.get_bottom());
         if (trap.get_right() != nullptr)
@@ -89,6 +90,7 @@ namespace io {
     }
 
     void write_trapezoids(std::vector<BoundingTrap<PointCart, int>> traps, std::string filename) {
+        return;
         std::fstream file;
         file.open(filename, std::fstream::out | std::fstream::trunc);
 
@@ -110,7 +112,7 @@ namespace io {
     }
 
     void write_segments(std::vector<Segment<PointCart, int>*> segs, int index, std::string filename) {
-        
+        return;
         assert(index < segs.size());
 
         std::ofstream file(filename);

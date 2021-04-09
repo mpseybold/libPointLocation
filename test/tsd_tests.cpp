@@ -2,6 +2,8 @@
 #include "../TSD.h"
 #include "../io.h"
 #include <random>
+#include <unordered_set>
+#include <omp.h>
 
 
 // TEST(TSDTests, searchTest) {
@@ -359,6 +361,7 @@
 // }
 
 void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<PointCart, int>>& traps) {
+    return;
     if (node->is_leaf()) {
         if (node->is_flat()) {
             std::cout << "flat node!\n";
@@ -475,245 +478,257 @@ TEST(TSDTests, trickyCase) {
 }
 
 TEST(TSDTests, dynamicInsertNonCrossingTest) {
-    for (int seed = 789; seed < 790; ++seed) {
-        std::cout << "seed: " << seed << std::endl;
-        std::mt19937 generator (seed);
-        // std::mt19937 generator (1235);
-        // std::mt19937 generator (1236);
-        std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-        auto segments = std::vector<Segment<PointCart, int>*>();
-        int n = 20;
+    for (int n = 10; n <= 10; n+=10) {
+        // #pragma omp parallel for
+        for (int seed = 133205; seed < 200000; ++seed) {
+            // 96816
+            std::cout << "seed: " << seed << std::endl;
+            std::mt19937 generator (seed);
+            // std::mt19937 generator (1235);
+            // std::mt19937 generator (1236);
+            std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-        std::set<int> x_coords = std::set<int>();
-        std::set<int> y_coords = std::set<int>();
+            auto segments = std::vector<Segment<PointCart, int>*>();
+            // int n = 100;
 
-        for (int i = 1; i <= n; ++i) {
-            int x = std::floor((double)10000 * dis(generator));
-            int y = std::floor((double)10000 * dis(generator));
-            
-            while (x_coords.find(x) != x_coords.end())
-                x = std::floor((double)10000 * dis(generator));
-            
-            x_coords.insert(x);
+            std::unordered_set<int> x_coords = std::unordered_set<int>();
+            std::unordered_set<int> y_coords = std::unordered_set<int>();
 
-            while (y_coords.find(y) != y_coords.end())
-                y = std::floor((double)10000 * dis(generator));
-            
-            y_coords.insert(y);
-            
-            int length = 1 + std::floor((double)(10000 - x) * dis(generator));
-            auto seg = new Segment<PointCart, int>(
-                PointCart(x, y), PointCart(x + length, y), i
-                // PointCart(2*i, i), PointCart(2*i + n, i), i//std::floor(dis(generator)*1000000)
-            );
-            segments.push_back(seg);
+            for (int i = 1; i <= n; ++i) {
+                int x = std::floor((double)30 * dis(generator));
+                int y = std::floor((double)39 * dis(generator));
+                
+                while (x_coords.find(x) != x_coords.end())
+                    x = std::floor((double)30 * dis(generator));
+                
+                x_coords.insert(x);
+
+                while (y_coords.find(y) != y_coords.end())
+                    y = std::floor((double)39 * dis(generator));
+                
+                y_coords.insert(y);
+                
+                int length = 1 + std::floor((double)(39 - x) * dis(generator));
+
+                while(x_coords.find(x+length) != x_coords.end())
+                    length = 1 + std::floor((double)(39 - x) * dis(generator));
+
+                x_coords.insert(x+length);
+
+                auto seg = new Segment<PointCart, int>(
+                    PointCart(x, y), PointCart(x + length, y), i
+                    // PointCart(2*i, i), PointCart(2*i + n, i), i//std::floor(dis(generator)*1000000)
+                );
+                segments.push_back(seg);
+            }
+
+            // for (int i = 1; i <= n; ++i) {
+            //     int x = std::floor((double)10000 * dis(generator));
+            //     int y = std::floor((double)10000 * dis(generator));
+            //     int length = std::floor((double)(10000 - x) * dis(generator));
+            //     auto seg = new Segment<PointCart, int>(
+            //         // PointCart(x, y), PointCart(x + length, y), i
+            //         PointCart(2.0*(n-i) - .5, n + i), PointCart(2.0*(n+1-i) + n - .5, n + i), i+n//std::floor(dis(generator)*1000000)
+            //     );
+            //     segments.push_back(seg);
+            // }
+
+            std::shuffle(segments.begin(), segments.end(), generator);
+
+            TSD<PointCart, int> tsd = TSD<PointCart, int>();
+
+            std::vector<Node<PointCart, int>*> roots{ tsd.get_root() };
+
+            std::string tmp = tsd.asJsonGraph(roots);    // force template instanciation
+
+            std::string myGraphJson = "{\"kind\":{\"graph\":true},"
+                "\"nodes\":[{\"id\":\"1\"},{\"id\":\"2\"}],"
+                "\"edges\":[{\"from\":\"1\",\"to\":\"2\"}]}";
+
+            for (int i = 0; i < segments.size(); ++i) {
+                std::cout << i << ", prioirty: " << segments[i]->get_priority() << std::endl;
+                
+                io::write_segments(segments, i, "segments.dat");
+
+                if (i == 8)
+                    std::cout << "hello\n";
+
+                tmp = tsd.asJsonGraph(roots);
+                tsd.reachable_nodes_valid(tsd.get_root());
+                tsd.insert_segment(*segments[i]);
+                tmp = tsd.asJsonGraph(roots);
+
+                auto traps = std::vector<BoundingTrap<PointCart, int>>();
+                write_leaf_traps(tsd.get_root(), traps);
+                std::cout << traps.size() << std::endl;
+                io::write_trapezoids(traps, "leaf_insert_dynamic.dat");   
+                std::cout << tsd.get_leaf_count() << std::endl;
+            }
+            std::cout << "done\n";
         }
-
-        // for (int i = 1; i <= n; ++i) {
-        //     int x = std::floor((double)10000 * dis(generator));
-        //     int y = std::floor((double)10000 * dis(generator));
-        //     int length = std::floor((double)(10000 - x) * dis(generator));
-        //     auto seg = new Segment<PointCart, int>(
-        //         // PointCart(x, y), PointCart(x + length, y), i
-        //         PointCart(2.0*(n-i) - .5, n + i), PointCart(2.0*(n+1-i) + n - .5, n + i), i+n//std::floor(dis(generator)*1000000)
-        //     );
-        //     segments.push_back(seg);
-        // }
-
-        std::shuffle(segments.begin(), segments.end(), generator);
-
-        TSD<PointCart, int> tsd = TSD<PointCart, int>();
-
-        std::vector<Node<PointCart, int>*> roots{ tsd.get_root() };
-
-        std::string tmp = tsd.asJsonGraph(roots);    // force template instanciation
-
-        std::string myGraphJson = "{\"kind\":{\"graph\":true},"
-            "\"nodes\":[{\"id\":\"1\"},{\"id\":\"2\"}],"
-            "\"edges\":[{\"from\":\"1\",\"to\":\"2\"}]}";
-
-        for (int i = 0; i < segments.size(); ++i) {
-            std::cout << i << ", prioirty: " << segments[i]->get_priority() << std::endl;
-            
-            io::write_segments(segments, i, "segments.dat");
-            
-            if (i >= 12)
-                std::cout << "hello\n";
-
-            tmp = tsd.asJsonGraph(roots);
-            tsd.reachable_nodes_valid(tsd.get_root());
-            tsd.insert_segment(*segments[i]);
-            tmp = tsd.asJsonGraph(roots);
-            auto traps = std::vector<BoundingTrap<PointCart, int>>();
-            write_leaf_traps(tsd.get_root(), traps);
-            // std::cout << traps.size() << std::endl;
-            io::write_trapezoids(traps, "leaf_insert_dynamic.dat");   
-            // std::cout << tsd.get_leaf_count() << std::endl;
-        }
-        std::cout << "done\n";
     }
 }
 
-TEST(TSDTests, leafInsertTest) {
-    auto tsd = TSD<PointCart, int>();
+// TEST(TSDTests, leafInsertTest) {
+//     auto tsd = TSD<PointCart, int>();
 
-    Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
-        PointCart(10, 50), PointCart(60, 50), 1
-    );
-    Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
-        PointCart(0, 50), PointCart(100, 50), 4
-    );
-    Segment<PointCart, int> seg_5 = Segment<PointCart, int>(
-        PointCart(1, 50), PointCart(99, 50), 5
-    );
-    Segment<PointCart, int> seg_6 = Segment<PointCart, int>(
-        PointCart(2, 50), PointCart(98, 50), 6
-    );
-    Segment<PointCart, int> seg_7 = Segment<PointCart, int>(
-        PointCart(3, 50), PointCart(97, 50), 7
-    );
-    Segment<PointCart, int> seg_8 = Segment<PointCart, int>(
-        PointCart(4, 50), PointCart(96, 50), 8
-    );
-    Segment<PointCart, int> seg_1 = Segment<PointCart, int>(
-        PointCart(30, 50), PointCart(50, 50), 2
-    );
+//     Segment<PointCart, int> seg_2 = Segment<PointCart, int>(
+//         PointCart(10, 50), PointCart(60, 50), 1
+//     );
+//     Segment<PointCart, int> seg_4 = Segment<PointCart, int>(
+//         PointCart(0, 50), PointCart(100, 50), 4
+//     );
+//     Segment<PointCart, int> seg_5 = Segment<PointCart, int>(
+//         PointCart(1, 50), PointCart(99, 50), 5
+//     );
+//     Segment<PointCart, int> seg_6 = Segment<PointCart, int>(
+//         PointCart(2, 50), PointCart(98, 50), 6
+//     );
+//     Segment<PointCart, int> seg_7 = Segment<PointCart, int>(
+//         PointCart(3, 50), PointCart(97, 50), 7
+//     );
+//     Segment<PointCart, int> seg_8 = Segment<PointCart, int>(
+//         PointCart(4, 50), PointCart(96, 50), 8
+//     );
+//     Segment<PointCart, int> seg_1 = Segment<PointCart, int>(
+//         PointCart(30, 50), PointCart(50, 50), 2
+//     );
 
-    Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
-        PointCart(40, 80), PointCart(40, 10), 3
-    );
-    // Segment<PointCart, int> seg_5 = Segment<PointCart, int>(
-    //     PointCart(41, 80), PointCart(41, 10), 5
-    // );
-    // Segment<PointCart, int> seg_6 = Segment<PointCart, int>(
-    //     PointCart(3, 98), PointCart(97, 3), 6
-    // );
-    // Segment<PointCart, int> seg_7 = Segment<PointCart, int>(
-    //     PointCart(31, 51), PointCart(71, 61), 7
-    // );
+//     Segment<PointCart, int> seg_3 = Segment<PointCart, int>(
+//         PointCart(40, 80), PointCart(40, 10), 3
+//     );
+//     // Segment<PointCart, int> seg_5 = Segment<PointCart, int>(
+//     //     PointCart(41, 80), PointCart(41, 10), 5
+//     // );
+//     // Segment<PointCart, int> seg_6 = Segment<PointCart, int>(
+//     //     PointCart(3, 98), PointCart(97, 3), 6
+//     // );
+//     // Segment<PointCart, int> seg_7 = Segment<PointCart, int>(
+//     //     PointCart(31, 51), PointCart(71, 61), 7
+//     // );
 
-    // Segment<PointCart, int> seg_8 = Segment<PointCart, int>(
-    //     PointCart(41, 31), PointCart(81, 31), 8
-    // );
+//     // Segment<PointCart, int> seg_8 = Segment<PointCart, int>(
+//     //     PointCart(41, 31), PointCart(81, 31), 8
+//     // );
 
-    // Segment<PointCart, int> seg_9 = Segment<PointCart, int>(
-    //     PointCart(51, 11), PointCart(91, 41), 9
-    // );
-    // Segment<PointCart, int> seg_10 = Segment<PointCart, int>(
-    //     PointCart(11, 11), PointCart(51, 11), 10
-    // );
-    // Segment<PointCart, int> seg_11 = Segment<PointCart, int>(
-    //     PointCart(6, 91), PointCart(96, 91), 11
-    // );
-    // Segment<PointCart, int> seg_12 = Segment<PointCart, int>(
-    //     PointCart(4, 99), PointCart(98, 4), 12
-    // );
+//     // Segment<PointCart, int> seg_9 = Segment<PointCart, int>(
+//     //     PointCart(51, 11), PointCart(91, 41), 9
+//     // );
+//     // Segment<PointCart, int> seg_10 = Segment<PointCart, int>(
+//     //     PointCart(11, 11), PointCart(51, 11), 10
+//     // );
+//     // Segment<PointCart, int> seg_11 = Segment<PointCart, int>(
+//     //     PointCart(6, 91), PointCart(96, 91), 11
+//     // );
+//     // Segment<PointCart, int> seg_12 = Segment<PointCart, int>(
+//     //     PointCart(4, 99), PointCart(98, 4), 12
+//     // );
 
-    // Segment<PointCart, int> seg_13 = Segment<PointCart, int>(
-    //     PointCart(4, 99), PointCart(4, 72), 13
-    // );
+//     // Segment<PointCart, int> seg_13 = Segment<PointCart, int>(
+//     //     PointCart(4, 99), PointCart(4, 72), 13
+//     // );
 
-    // Segment<PointCart, int> seg_14 = Segment<PointCart, int>(
-    //     PointCart(3, 89), PointCart(99.999, 89), 14
-    // );
-        std::mt19937 generator (1235);
-        std::uniform_real_distribution<double> dis(0.0, 1.0);
+//     // Segment<PointCart, int> seg_14 = Segment<PointCart, int>(
+//     //     PointCart(3, 89), PointCart(99.999, 89), 14
+//     // );
+//         std::mt19937 generator (1236);
+//         std::uniform_real_distribution<double> dis(0.0, 1.0);
 
-        auto segments = std::vector<Segment<PointCart, int>*>();
+//         auto segments = std::vector<Segment<PointCart, int>*>();
 
-        std::cout << "start...\n";
-        for (int i = 1; i <= 100; ++i) {
+//         // std::cout << "start...\n";
+//         for (int i = 1; i <= 500; ++i) {
 
-            std::cout << i << std::endl;
-            PointCart s = PointCart(0, 0);
-            PointCart t = PointCart(0, 0);
+//             // std::cout << i << std::endl;
+//             PointCart s = PointCart(0, 0);
+//             PointCart t = PointCart(0, 0);
 
-            bool segment_exists = true;
+//             bool segment_exists = true;
 
-            while (segment_exists) {
-                s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
-                t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
-                while (s.x() == t.x() && s.y() == t.y())
-                    t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
-                auto temp = Segment<PointCart, int>(s, t, i);
+//             while (segment_exists) {
+//                 s = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+//                 t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+//                 while (s.x() == t.x() && s.y() == t.y())
+//                     t = PointCart(std::floor((double)10* dis(generator)) * 10, std::floor((double)10 * dis(generator)) * 10);
+//                 auto temp = Segment<PointCart, int>(s, t, i);
 
-                bool found_seg = false;
-                for (auto s: segments)
-                    if (*s == temp) {
-                        std::cout << "OOPS\n";
-                        found_seg = true;
-                    }
-                segment_exists = found_seg;
-            }
+//                 bool found_seg = false;
+//                 for (auto s: segments)
+//                     if (*s == temp) {
+//                         // std::cout << "OOPS\n";
+//                         found_seg = true;
+//                     }
+//                 segment_exists = found_seg;
+//             }
 
 
-            auto seg = new Segment<PointCart, int>(s, t, i); 
-            segments.push_back(seg);
-            // std::cout << seg->get_source().x() << " " << seg->get_source().y()
-            //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
-            // if (i == 21) {
-            //     std::cout << "hello\n";
-            // }
-            // if (i == 500) {
-            //     std::cout << seg->get_source().x() << " " << seg->get_source().y()
-            //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
-            //     tsd.affected_subdag_roots(seg, true);
-            //     std::vector<BoundingTrap<PointCart, int>> roots = std::vector<BoundingTrap<PointCart, int>>();
-            //     for (auto node: tsd.get_subdag_roots()) {
-            //         roots.push_back(node->get_trapezoid());
-            //     }
-            //     io::write_trapezoids(roots, "plotting/roots.dat");
-            //     // tsd.insert_segment(*seg);
-            // } else {
-            //     tsd.insert_segment(*seg);
-            // }
-        }
+//             auto seg = new Segment<PointCart, int>(s, t, i); 
+//             segments.push_back(seg);
+//             // std::cout << seg->get_source().x() << " " << seg->get_source().y()
+//             //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+//             // if (i == 21) {
+//             //     std::cout << "hello\n";
+//             // }
+//             // if (i == 500) {
+//             //     std::cout << seg->get_source().x() << " " << seg->get_source().y()
+//             //     << " " << seg->get_target().x() << " " << seg->get_target().y() << "\n";
+//             //     tsd.affected_subdag_roots(seg, true);
+//             //     std::vector<BoundingTrap<PointCart, int>> roots = std::vector<BoundingTrap<PointCart, int>>();
+//             //     for (auto node: tsd.get_subdag_roots()) {
+//             //         roots.push_back(node->get_trapezoid());
+//             //     }
+//             //     io::write_trapezoids(roots, "plotting/roots.dat");
+//             //     // tsd.insert_segment(*seg);
+//             // } else {
+//                 // tsd.insert_segment(*seg);
+//             // }
+//         }
 
-        for (int i = 0; i < segments.size(); ++i) {
-            // std::cout << i << std::endl;
-            // tsd.insert_segment(*segments[i]);
-        }
+//         for (int i = 0; i < segments.size(); ++i) {
+//             // std::cout << i << std::endl;
+//             // tsd.insert_segment(*segments[i]);
+//         }
 
-        for (int i = segments.size() - 1; i >= 0; --i) {
-            // std::cout << i << std::endl;
-            // tsd.delete_segment(*segments[i]);
-        }
+//         for (int i = segments.size() - 1; i >= 0; --i) {
+//             // std::cout << i << std::endl;
+//             // tsd.delete_segment(*segments[i]);
+//         }
 
-        std::cout << "end...\n";
+//         // std::cout << "end...\n";
 
-        // tsd.insert_segment(seg_2);
-        // tsd.insert_segment(seg_1);
-        // tsd.insert_segment(seg_3);
-        // tsd.affected_subdag_roots(&seg_3);
-        // std::cout << tsd.get_subdag_roots().size() << "\n";
-        // tsd.insert_segment(seg_4);
-        // tsd.insert_segment(seg_5);
-        // tsd.insert_segment(seg_6);
-        // tsd.insert_segment(seg_7);
-        // tsd.insert_segment(seg_8);
-        // tsd.insert_segment(seg_9);
-        // tsd.insert_segment(seg_10);
-        // tsd.insert_segment(seg_11);
-        // tsd.insert_segment(seg_12);
-        // tsd.insert_segment(seg_13);
-        // tsd.insert_segment(seg_14);
-        // tsd.affected_subdag_roots(&seg_12);
+//         // tsd.insert_segment(seg_2);
+//         // tsd.insert_segment(seg_1);
+//         // tsd.insert_segment(seg_3);
+//         // tsd.affected_subdag_roots(&seg_3);
+//         // std::cout << tsd.get_subdag_roots().size() << "\n";
+//         // tsd.insert_segment(seg_4);
+//         // tsd.insert_segment(seg_5);
+//         // tsd.insert_segment(seg_6);
+//         // tsd.insert_segment(seg_7);
+//         // tsd.insert_segment(seg_8);
+//         // tsd.insert_segment(seg_9);
+//         // tsd.insert_segment(seg_10);
+//         // tsd.insert_segment(seg_11);
+//         // tsd.insert_segment(seg_12);
+//         // tsd.insert_segment(seg_13);
+//         // tsd.insert_segment(seg_14);
+//         // tsd.affected_subdag_roots(&seg_12);
 
-        // auto subdag_traps = std::vector<BoundingTrap<PointCart,int>>();
-        // for (auto node: tsd.get_subdag_roots()) {
-        //     subdag_traps.push_back(node->get_trapezoid());
-        // }
+//         // auto subdag_traps = std::vector<BoundingTrap<PointCart,int>>();
+//         // for (auto node: tsd.get_subdag_roots()) {
+//         //     subdag_traps.push_back(node->get_trapezoid());
+//         // }
 
-        // io::write_trapezoids(subdag_traps, "plotting/subdag_roots_2.dat");
+//         // io::write_trapezoids(subdag_traps, "plotting/subdag_roots_2.dat");
 
-        // ASSERT_FALSE(tsd.get_root()->is_leaf());
-        // ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
+//         // ASSERT_FALSE(tsd.get_root()->is_leaf());
+//         // ASSERT_EQ(tsd.get_root()->get_dest_pattern(), VVE);
 
-        auto traps = std::vector<BoundingTrap<PointCart, int>>();
+//         auto traps = std::vector<BoundingTrap<PointCart, int>>();
 
-        write_leaf_traps(tsd.get_root(), traps);
+//         write_leaf_traps(tsd.get_root(), traps);
 
-        io::write_trapezoids(traps, "plotting/leaf_insert.dat");
+//         io::write_trapezoids(traps, "plotting/leaf_insert.dat");
      
-}
+// }

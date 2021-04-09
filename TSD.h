@@ -62,11 +62,36 @@ class TSD {
 
         int leaf_count;
 
+        int node_visits;
+
+        int naive_node_visits;
+
+        /*
+        * @param query_seg
+        * @param root_of_search
+        * @return the leaf of the TSD whose region covers the left endpoint
+        * of query_seg. The search is started at root_of_search.
+        */
+        Node<PointType, OrderType>* left_endpoint_leaf(
+            Segment<PointType, OrderType>* query_seg, 
+            Node<PointType, OrderType>* root_of_search);
+
+        /*
+        * @param query_seg
+        * @return a vector of leaf-level nodes whose regions cover query seg
+        * in left-to-right order
+        */
+        std::vector<Node<PointType, OrderType>*> covering_leaves(
+            Segment<PointType, OrderType>* query_seg);
+
     public:
 
         TSD();
 
         std::string visMe;
+
+        int get_node_visits() { return node_visits; }
+        int get_naive_node_visits() { return naive_node_visits; }
 
         Node<PointType, OrderType>* get_root() { return root; }
         std::vector<Node<PointType, OrderType>*> get_subdag_roots() { return subdag_roots; }
@@ -105,6 +130,13 @@ class TSD {
         bool assert_has_parent(Node<PointType, OrderType>* node, 
         Node<PointType, OrderType>* parent, 
         Node<PointType, OrderType>* root_of_search);
+
+        /*
+        * @param query_seg
+        * @return a vector containing all segments which intersect
+        * query_seg in left-to-right order of intersection point
+        */
+        std::vector<Segment<PointType, OrderType>*> naive_intersection_query(Segment<PointType, OrderType>* query_seg);
 };
 
 #include "TSD.cpp"
@@ -112,3 +144,6 @@ class TSD {
 #include "TSD_algorithms/v_partition.cpp"
 #include "TSD_algorithms/merge.cpp"
 #include "TSD_algorithms/v_merge.cpp"
+#include "search/left_endpoint_leaf.cpp"
+#include "search/covering_leaves.cpp"
+#include "search/naive_intersection_query.cpp"

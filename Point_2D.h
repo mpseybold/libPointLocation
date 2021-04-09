@@ -5,11 +5,16 @@
 #include <CGAL/Vector_2.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/enum.h>
+#include <CGAL/Segment_2.h>
+
+#define EXACT false
+
 
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point_2 = CGAL::Point_2<Kernel>;
 using Line_2 = CGAL::Line_2<Kernel>;
 using Vector_2 = CGAL::Vector_2<Kernel>;
+using Segment_2 = CGAL::Segment_2<Kernel>;
 using lazy = CGAL::Lazy_exact_nt<CGAL::Epeck_ft>;
 
 class PointCart {
@@ -21,10 +26,10 @@ class PointCart {
 
     public:
 
-        const static int EXTREME_LEFT = -10000;
-        const static int EXTREME_RIGHT = 10000;
-        const static int EXTREME_TOP = 10000;
-        const static int EXTREME_BOTTOM = -10000;
+        const static int EXTREME_LEFT = -1000000;
+        const static int EXTREME_RIGHT = 1000000;
+        const static int EXTREME_TOP = 1000000;
+        const static int EXTREME_BOTTOM = -1000000;
         const static int EPS = 1;
 
         PointCart(double x, double y) {
@@ -32,6 +37,9 @@ class PointCart {
             Y = y;
             cgal_point = Point_2(x, y);
         }
+
+        double X_() { return X; }
+        double Y_() { return Y; }
 
         Point_2 get_cgal_point() {
             return cgal_point;
@@ -101,6 +109,11 @@ class PointCart {
         );
 
         static int slope_comparison(
+            PointCart s_1, PointCart t_1,
+            PointCart s_2, PointCart t_2
+        );
+
+        static PointCart intersection(
             PointCart s_1, PointCart t_1,
             PointCart s_2, PointCart t_2
         );

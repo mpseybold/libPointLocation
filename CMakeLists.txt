@@ -54,6 +54,11 @@ add_executable( main
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 
+find_package(OpenMP 3.0)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(main OpenMP::OpenMP_CXX)
+endif()
+
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(main   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 

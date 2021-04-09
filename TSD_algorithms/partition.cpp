@@ -133,9 +133,6 @@ void TSD<PointType, OrderType>::partition_E_case(Node<PointType, OrderType>* nod
 
         auto pattern = node->get_dest_pattern();
 
-        if (e_cut->get_priority() == 3 && node->get_priority() == 9)
-            std::cout << "hello\n";
-
         if (pattern == VE || pattern == VVE) {
             l_visited = (node->get_L()->get_priority() == e_cut->get_priority());
             partition(node->get_L(), e_cut, node);
@@ -514,7 +511,7 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
     assert(node->get_L() != nullptr);
     assert(node->get_R() != nullptr);
     if (node->get_A() != nullptr) {
-        std::cout << "hello\n";
+        // std::cout << "hello\n";
     }
     assert(node->get_A() == nullptr);
     assert(node->get_B() == nullptr);
@@ -539,8 +536,6 @@ void TSD<PointType, OrderType>::partition_V_case(Node<PointType, OrderType>* nod
         if (node->get_R() == nullptr)
             std::cout << "oops";
 
-        if (e_cut->get_priority() == 16)
-            std::cout << "hello\n";
 
         if (old_L->get_left() != nullptr) {
             old_L->get_left()->set_right(node);
@@ -655,9 +650,6 @@ void TSD<PointType, OrderType>::partition(Node<PointType, OrderType>* node, Cut<
 
     assert(node != nullptr);
     DestructionPattern pattern = node->get_dest_pattern();
-
-    if (cut->get_priority() == 23 && node->get_trapezoid().get_bottom()->get_priority() == 99)
-        std::cout << "hello\n";
 
     if (cut == node->get_e())
         return;

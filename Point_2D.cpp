@@ -2,7 +2,20 @@
 
 
 int PointCart::orientV(PointCart p, PointCart other_p, bool shear) {
-    
+    if (!EXACT) {
+       if (p.X_() > other_p.X_()) 
+        return -1;
+        if (p.X_() < other_p.X_())
+            return 1;
+        if (shear) {
+            if (p.Y_() < other_p.Y_())
+                return -1;
+            if (p.Y_() > other_p.Y_())
+                return 1;
+        }
+
+        return 0;
+    } 
     Point_2 p_cgal = p.get_cgal_point();
     Point_2 other_p_cgal = other_p.get_cgal_point();
 
@@ -25,6 +38,16 @@ int PointCart::orientE(
 
     // if (source.x() == target.x())
     //     return v_orientation(source, p);
+
+    if (!EXACT) {
+        double m = (target.Y_() - source.Y_())/(target.X_() - source.X_());
+        if (p.Y_() > m*(p.X_()-source.X_()) + source.Y_())
+            return 1;
+        else if (p.Y_() < m*(p.X_()-source.X_()) + source.Y_())
+            return -1;
+        else 
+            return 0;
+    }
 
     Line_2 line = Line_2(source.get_cgal_point(), target.get_cgal_point());
 
@@ -56,6 +79,27 @@ int PointCart::orientV(
             PointCart s_2, PointCart t_2,
             PointCart p, bool shear
         ) {
+
+    if (!EXACT) {
+        double m_1 = (t_1.Y_() - s_1.Y_())/(t_1.X_() - s_1.X_());
+        double m_2 = (t_2.Y_() - s_2.Y_())/(t_2.X_() - s_2.X_());
+
+        double int_x;
+
+        if (t_1.X_() == s_1.X_())
+            int_x = t_1.X_();
+        else if (t_2.X_() == s_2.X_())
+            int_x = t_2.X_();
+        else
+            int_x = (s_2.Y_() - m_2*s_2.X_() - s_1.Y_() + m_1*s_1.X_())/(m_1-m_2);
+
+        if (p.X_() < int_x)
+            return -1;
+        else if (p.X_() > int_x)
+            return 1;
+        else 
+            return 0;
+    }
 
     Line_2 line1 = Line_2(s_1.get_cgal_point(), t_1.get_cgal_point());
     Line_2 line2 = Line_2(s_2.get_cgal_point(), t_2.get_cgal_point());
@@ -94,7 +138,6 @@ int PointCart::orientE(
     Line_2 line_1 = Line_2(s_1.get_cgal_point(), t_1.get_cgal_point());
     Line_2 line_2 = Line_2(s_2.get_cgal_point(), t_2.get_cgal_point());
     Line_2 line_3 = Line_2(s_3.get_cgal_point(), t_3.get_cgal_point());
-
 
     auto intersection = CGAL::intersection(line_2, line_3);
     Point_2 ip;
@@ -252,6 +295,26 @@ int PointCart::slope_comparison(
     PointCart s_1, PointCart t_1,
     PointCart s_2, PointCart t_2
 ) {
+    if (!EXACT) {
+        if (s_1.X_() == t_1.X_() && s_2.X_() != t_2.X_())
+        return 1;
+
+        if (s_2.X_() == t_2.X_() && s_1.X_() != t_1.X_())
+            return -1;
+
+        if (s_2.X_() == t_2.X_() && s_1.X_() == t_1.X_())
+            return 0;
+
+        double d_diff = (t_2.Y_() - s_2.Y_()) / (t_2.X_() - s_2.X_()) - 
+        (t_1.Y_() - s_1.Y_()) / (t_1.X_() - s_1.X_());
+
+        if (d_diff < 0)
+            return -1;
+        if (d_diff > 0)
+            return 1;
+
+        return 0;    
+    }
     if (s_1.x() == t_1.x() && s_2.x() != t_2.x())
         return 1;
 
@@ -270,4 +333,26 @@ int PointCart::slope_comparison(
         return 1;
 
     return 0;    
+}
+
+PointCart PointCart::intersection(
+    PointCart s_1, PointCart t_1,
+    PointCart s_2, PointCart t_2
+) {
+    Segment_2 seg_1 = Segment_2(
+        s_1.get_cgal_point(), t_1.get_cgal_point()
+    );
+
+    Segment_2 seg_2 = Segment_2(
+        s_2.get_cgal_point(), t_2.get_cgal_point()
+    );
+
+    auto ip = CGAL::intersection(seg_1, seg_2);
+
+    if (!ip)
+        assert(false);
+
+    Point_2 i_point = boost::get<Point_2>(*ip);
+
+    return PointCart(CGAL::to_double(i_point.x()), CGAL::to_double(i_point.y()));
 }

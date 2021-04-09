@@ -128,6 +128,25 @@ class BoundingTrap {
 
         static BoundingTrap<PointType, OrderType> merge(BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2);
 
+        // void operator==(BoundingTrapezoid<PointType, OrderType>& other) {
+        //     return other.get_v_left() == get_v_left() &&
+        //     other.get_v_right() == get_v_right() &&
+        //     other.get_top() == get_top() &&
+        //     other.get_bottom() == get_bottom(); 
+        // }
+
+        bool contains_trap(BoundingTrap<PointType, OrderType>& other) {
+            return get_left()->defining_point_cut_comparison(*other.get_left()) < 1 
+            && get_right()->defining_point_cut_comparison(*other.get_right()) > -1;
+        }
+
+        bool overlaps(BoundingTrap<PointType, OrderType>& other) {
+            return (other.get_left()->defining_point_cut_comparison(*get_left()) == 1
+            && other.get_left()->defining_point_cut_comparison(*get_right()) == -1)
+            || (other.get_right()->defining_point_cut_comparison(*get_left()) == 1
+            && other.get_right()->defining_point_cut_comparison(*get_right()) == -1);
+        }
+
         bool contains_segment(Segment<PointType, OrderType>* seg);
         bool intersect_corner(Segment<PointType, OrderType>* seg);
         bool through_corner(Segment<PointType, OrderType>* seg);

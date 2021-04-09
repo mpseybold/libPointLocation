@@ -142,5 +142,17 @@ int Cut<PointType, OrderType>::v_cut_edge_orientation(Cut<PointType, OrderType>&
     return def_point_orientation;
 }
 
+template <class PointType, class OrderType>
+PointType Cut<PointType, OrderType>::get_defining_point() {
+    if (cut_type == INTERSECTION) {
+        return PointType::intersection(
+            segment->get_source(), segment->get_target(),
+            intersecting_seg->get_source(), intersecting_seg->get_target()
+        );
+    }
+
+    assert(false);
+}
+
 template class Cut<PointCart, int>;
 // template class Cut<PointS2ratss, int>;

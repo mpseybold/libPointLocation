@@ -34,5 +34,10 @@ add_executable(Google_Tests_run
   tsd_tests.cpp
 )
 
+find_package(OpenMP 3.0)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Google_Tests_run gtest gtest_main OpenMP::OpenMP_CXX)
+endif()
+
 #target_link_libraries(Google_Tests_run main_lib)
 target_link_libraries(Google_Tests_run gtest gtest_main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})

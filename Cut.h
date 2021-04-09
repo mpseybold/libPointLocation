@@ -72,4 +72,6 @@ class Cut {
         bool has_seg_on_pos_side(Segment<PointType, OrderType>* seg);
         bool has_seg_on_neg_side(Segment<PointType, OrderType>* seg);
         bool has_on(Segment<PointType, OrderType>* seg);
+
+        PointType get_defining_point();
 };
