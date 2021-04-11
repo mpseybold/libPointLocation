@@ -700,8 +700,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         // visMe = asJsonGraph(subdag_roots);
     }
 
-    if (e_cut->get_priority() == 5)
-        std::cout << "hello\n";
     // final pass to merge nodes
     for (auto& indices: merge_indices) {
         Node<PointType, OrderType>* merged_node = indices.side == -1 

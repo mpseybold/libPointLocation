@@ -58,9 +58,6 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_right_lower_prior
     assert(right != nullptr);
     assert(left->get_trapezoid().get_right() == right->get_trapezoid().get_left());
 
-    if (right->get_priority() == 7)
-        std::cout << "hello\n";
-
     
     auto new_trap = BoundingTrap<PointType, OrderType>::merge(left->get_trapezoid(), right->get_trapezoid());
     auto new_node = new Node<PointType, OrderType>(new_trap);
@@ -251,14 +248,14 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_partial(Node<Poin
 
             Node<PointType, OrderType>* right_desc = left->get_R();
             while (right_desc != right && right_desc != nullptr) {
-                std::cout << "right_desc...\n";
+                // std::cout << "right_desc...\n";
                 // if (right_desc == nullptr)
                 //     assert(false);
                 right_desc = right_desc->get_R();
             }
             Node<PointType, OrderType>* left_desc = right->get_L();
             while (left_desc != left && left_desc != nullptr) {
-                std::cout << "left_desc...\n";
+                // std::cout << "left_desc...\n";
                 // if (left_desc == nullptr)
                     // assert(false);
                 left_desc = left_desc->get_L();
@@ -295,7 +292,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_partial(Node<Poin
                 left->set_R(right);
                 right->set_left(left_old_R);
             } else if (right_desc == right) {
-                std::cout << "good\n";
+                // std::cout << "good\n";
             } else {
                 v_merge(left->get_R(), right);
                 return left;
@@ -327,14 +324,14 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_partial(Node<Poin
 
             Node<PointType, OrderType>* right_desc = left->get_R();
             while (right_desc != right && right_desc != nullptr) {
-                std::cout << "right_desc...\n";
+                // std::cout << "right_desc...\n";
                 // if (right_desc == nullptr)
                 //     assert(false);
                 right_desc = right_desc->get_R();
             }
             Node<PointType, OrderType>* left_desc = right->get_L();
             while (left_desc != left && left_desc != nullptr) {
-                std::cout << "left_desc...\n";
+                // std::cout << "left_desc...\n";
                 // if (left_desc == nullptr)
                     // assert(false);
                 left_desc = left_desc->get_L();
@@ -371,7 +368,7 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge_partial(Node<Poin
                 right->set_L(left);
                 left->set_right(right_old_L);
             }   else if (left_desc == left) {
-                std::cout << "good\n";
+                // std::cout << "good\n";
             } else {
                 v_merge(left, right->get_L());
                 return right;
@@ -422,9 +419,6 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
     }
 
     Node<PointType, OrderType>* result;
-
-    if (right->get_priority() == 7 && left->get_priority() == 6)
-        std::cout << "hello\n";
 
     if (left->get_trapezoid().get_right() != right->get_trapezoid().get_left()) {
         result = v_merge_partial(left, right);
