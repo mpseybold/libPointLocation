@@ -1180,11 +1180,11 @@ template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::cleanup() {
     // if (TESTING >= 1000) {
        
-        // for (auto node: retired_nodes) {
-        //     delete node;
-        // }
+        for (auto node: retired_nodes) {
+            delete node;
+        }
 
-        // retired_nodes.clear();
+        retired_nodes.clear();
     // }
 }
 
