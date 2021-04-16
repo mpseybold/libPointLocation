@@ -317,6 +317,14 @@ class V_Cut {
             return up;
         }
 
+        Cut<PointType, OrderType>* get_up() {
+            return up;
+        }
+
+        Cut<PointType, OrderType>* get_down() {
+            return down;
+        }
+
         OrderType get_priority() {
             return std::min(up->get_priority(), down->get_priority());
         }

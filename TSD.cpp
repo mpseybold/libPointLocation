@@ -6,6 +6,8 @@
 
 template <class PointType, class OrderType>
 V_Cut<PointType, OrderType>* TSD<PointType, OrderType>::find_v_cut(Cut<PointType, OrderType>* cut, Node<PointType, OrderType>* node) {
+    return nullptr;
+    
     if (node->get_trapezoid().get_left()
     ->defining_point_cut_comparison(*cut) == 0)
         return node->get_trapezoid().get_v_left();
@@ -1240,3 +1242,67 @@ bool TSD<PointType, OrderType>::assert_has_parent(
 //     auto trap = node->get_trapezoid();
 
 // }
+
+template <class PointType, class OrderType>
+void TSD<PointType, OrderType>::delete_cuts(Node<PointType, OrderType>* node) {
+    if (node->get_v_1() != nullptr 
+    && retired_v_cuts.find(node->get_v_1()) 
+    != retired_v_cuts.end()) {
+        if (node->get_v_1()->get_up() != nullptr
+        && retired_cuts.find(node->get_v_1()->get_up()) 
+        != retired_cuts.end()) {
+            delete node->get_v_1()->get_up();
+            retired_cuts.insert(node->get_v_1()->get_up());
+        }
+        if (node->get_v_1()->get_down() != nullptr
+        && retired_cuts.find(node->get_v_1()->get_down()) 
+        != retired_cuts.end()) {
+            delete node->get_v_1()->get_down();
+            retired_cuts.insert(node->get_v_1()->get_up());
+        }
+            
+        delete node->get_v_1();
+        retired_v_cuts.insert(node->get_v_1());
+    }
+
+    if (node->get_v_2() != nullptr 
+    && retired_v_cuts.find(node->get_v_2()) 
+    != retired_v_cuts.end()) {
+        if (node->get_v_2()->get_up() != nullptr
+        && retired_cuts.find(node->get_v_2()->get_up()) 
+        != retired_cuts.end()) {
+            delete node->get_v_2()->get_up();
+            retired_cuts.insert(node->get_v_2()->get_up());
+        }
+        if (node->get_v_2()->get_down() != nullptr
+        && retired_cuts.find(node->get_v_2()->get_down()) 
+        != retired_cuts.end()) {
+            delete node->get_v_2()->get_down();
+            retired_cuts.insert(node->get_v_2()->get_up());
+        }
+            
+        delete node->get_v_2();
+        retired_v_cuts.insert(node->get_v_2());
+    }
+
+
+    if (node->get_e() != nullptr
+        && retired_cuts.find(node->get_e()) != retired_cuts.end()) {
+        delete node->get_e();
+        retired_cuts.insert(node->get_e());
+    }
+
+    if (node->get_L() != nullptr)
+        delete_cuts(node->get_L());
+    if (node->get_R() != nullptr)
+        delete_cuts(node->get_R());
+    if (node->get_A() != nullptr)
+        delete_cuts(node->get_A());
+    if (node->get_B() != nullptr)
+        delete_cuts(node->get_B());
+}
+
+template <class PointType, class OrderType>
+TSD<PointType, OrderType>::~TSD() {
+    delete_cuts(root);
+}

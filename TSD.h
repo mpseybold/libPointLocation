@@ -66,6 +66,9 @@ class TSD {
 
         int naive_node_visits;
 
+        std::unordered_set<Cut<PointType, OrderType>*> retired_cuts;
+        std::unordered_set<V_Cut<PointType, OrderType>*> retired_v_cuts;
+
         /*
         * @param query_seg
         * @param root_of_search
@@ -84,9 +87,13 @@ class TSD {
         std::vector<Node<PointType, OrderType>*> covering_leaves(
             Segment<PointType, OrderType>* query_seg);
 
+        void delete_cuts(Node<PointType, OrderType>* node);
+
     public:
 
         TSD();
+
+        ~TSD();
 
         std::string visMe;
 
