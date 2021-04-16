@@ -13,12 +13,12 @@ void vertical_query_exp_2() {
     // else
     //     std::cout << "file open...\n";
     results << "n,visits,seg_ds\n";
-    for (int seg_count = 10000; seg_count <= 400000; seg_count+=10000) {
+    for (int seg_count = 100000; seg_count <= 100000; seg_count+=10000) {
         int total = 0;
         int total_seg_ds = 0;
         std::cout << "seg_count: " << seg_count << std::endl;
-        #pragma omp parallel for
-        for (int seed = 1; seed <= 10; seed++) {
+        // #pragma omp parallel for
+        for (int seed = 1; seed <= 1; seed++) {
             std::vector<Segment<PointCart, int>*> segments;
             std::vector<SegmentDS::Segment*> o_segs = std::vector<SegmentDS::Segment*>();
 

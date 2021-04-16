@@ -16,6 +16,17 @@ class Cut {
 
     public:
 
+        void* operator new( size_t size )
+        {
+            std::cout << "cut created...\n";
+            return ::operator new( size );
+        }
+        void operator delete( void* ptr )
+        {
+            std::cout << "cut deleted...\n";
+            ::operator delete( ptr );
+        }
+
         Cut(CutType ct, Segment<PointType, OrderType>* s, Segment<PointType, OrderType>* is) :
         cut_type(ct), segment(s), intersecting_seg(is) {
             if (ct == INTERSECTION) {
