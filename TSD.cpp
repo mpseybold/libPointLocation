@@ -40,6 +40,8 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
        
     intersecting_descendants = { nullptr, nullptr, nullptr, nullptr };
 
+    // node->last_seg_priority = seg->get_priority();
+
     if (VERBOSITY_LEVEL >= 2) {
         auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
 
@@ -85,14 +87,16 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
         );
 
         if (slope_comp > 0) {
-            if (node->get_A()->get_trapezoid().intersects_segment(seg))
+            if (node->get_A()->last_seg_priority != seg->get_priority() &&
+            node->get_A()->get_trapezoid().intersects_segment(seg))
                 intersecting_descendants[1] = node->get_A();
             // If B intersects the region adjacent to the right of
             // nodes' trapezoid, we don't check for the intersection
             // here to ensure the nodes are reported in the
             // correct order.
             if (A_right.defining_point_cut_comparison(B_right) > -1) {
-                if (node->get_B()->get_trapezoid().intersects_segment(seg)) {
+                if (node->get_B()->last_seg_priority != seg->get_priority() &&
+                node->get_B()->get_trapezoid().intersects_segment(seg)) {
                     intersecting_descendants[2] = node->get_B();
                 }
             }
@@ -102,7 +106,8 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                         INTERSECTION, seg, node->get_e()->get_segment()
                     );
                     if (seg_intersection.defining_point_cut_comparison(A_right) == -1) {
-                        if (node->get_B()->get_trapezoid().intersects_segment(seg))
+                        if (node->get_B()->last_seg_priority != seg->get_priority() &&
+                        node->get_B()->get_trapezoid().intersects_segment(seg))
                             intersecting_descendants[2] = node->get_B();
                     }
                 } else {
@@ -111,10 +116,12 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                         || (node->get_B()->get_trapezoid().contains_endpoint(seg, 1)
                         && A_right.orientation(seg->get_target()) == -1)
                     ) {
-                        if (node->get_B()->get_trapezoid().intersects_segment(seg)) {
+                        if (node->get_B()->last_seg_priority != seg->get_priority() &&
+                        node->get_B()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_B();
                         }
-                    } else if (!(node->get_B()->get_trapezoid().contains_endpoint(seg, 0))
+                    } else if (node->get_B()->last_seg_priority != seg->get_priority() &&
+                    !(node->get_B()->get_trapezoid().contains_endpoint(seg, 0))
                         && !(node->get_B()->get_trapezoid().contains_endpoint(seg, 1))
                         && node->get_B()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_B();
@@ -135,16 +142,20 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                 // }
             }
         } else if (slope_comp < 0) {
-            if (node->get_B()->get_trapezoid().intersects_segment(seg))
-                intersecting_descendants[1] = node->get_B();
+            if (node->get_B()->last_seg_priority != seg->get_priority())
+                if (node->get_B()->get_trapezoid().intersects_segment(seg))
+                    intersecting_descendants[1] = node->get_B();
             // If A intersects the region to the right of
             // nodes' trapezoid, we don't check for the intersection
             // here to ensure the nodes are reported in the
             // correct order.
             if (A_right.defining_point_cut_comparison(B_right) < 1) {
-                if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
-                    intersecting_descendants[2] = node->get_A();
-                }
+                if (node->get_A()->last_seg_priority != seg->get_priority())
+                    if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
+                        intersecting_descendants[2] = node->get_A();
+                    }
+                // else
+                //     std::cout << "same priority...\n";
             } else {
                 if (node->get_e()->has_seg_on_neg_side(seg) && node->get_e()->has_seg_on_pos_side(seg)) {
                     auto seg_intersection = Cut<PointType, OrderType>(
@@ -154,7 +165,8 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                         seg_intersection.defining_point_cut_comparison(
                         *(node->get_B()->get_trapezoid().get_right())
                     ) == -1) {
-                        if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
+                        if (node->get_A()->last_seg_priority != seg->get_priority() &&
+                        node->get_A()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_A();
                         }
                     }
@@ -164,10 +176,12 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                         || (node->get_A()->get_trapezoid().contains_endpoint(seg, 1)
                         && B_right.orientation(seg->get_target()) == -1)
                     ) {
-                        if (node->get_A()->get_trapezoid().intersects_segment(seg)) {
+                        if (node->get_A()->last_seg_priority != seg->get_priority() &&
+                            node->get_A()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_A();
                         }
-                    } else if (!(node->get_A()->get_trapezoid().contains_endpoint(seg, 0))
+                    } else if (node->get_A()->last_seg_priority != seg->get_priority() &&
+                    !(node->get_A()->get_trapezoid().contains_endpoint(seg, 0))
                         && !(node->get_A()->get_trapezoid().contains_endpoint(seg, 1))
                         && node->get_A()->get_trapezoid().intersects_segment(seg)) {
                             intersecting_descendants[2] = node->get_A();
@@ -175,9 +189,11 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
                 }
             }
         } else {
-            if (node->get_A()->get_trapezoid().intersects_segment(seg))
+            if (node->get_A()->last_seg_priority != seg->get_priority() &&
+            node->get_A()->get_trapezoid().intersects_segment(seg))
                 intersecting_descendants[1] = node->get_A();
-            if (node->get_B()->get_trapezoid().intersects_segment(seg))
+            if (node->get_B()->last_seg_priority != seg->get_priority() &&
+            node->get_B()->get_trapezoid().intersects_segment(seg))
                 intersecting_descendants[1] = node->get_B();
         }
     }
@@ -248,6 +264,21 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
     int num_visited = 0;
     int num_subdag_roots = 0;
 
+    if (root->last_seg_priority != -1) {
+        std::cout << "this is not right...\n";
+        exit(0);
+    }
+    if (root->get_A() != nullptr && root->get_A()->last_seg_priority != -1) {
+        std::cout << "this is not right...\n";
+        exit(0);
+    }
+    if (root->get_B() != nullptr && root->get_B()->last_seg_priority != -1) {
+        std::cout << "this is not right...\n";
+        exit(0);
+    }
+
+    int pre_intersection_calls = BoundingTrap<PointCart, int>::intersection_calls;
+
     visited_nodes = std::vector<Node<PointType, OrderType>*>();
     subdag_roots = std::vector<Node<PointType, OrderType>*>();
     
@@ -255,11 +286,13 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
     search_stack = std::stack<Node<PointType, OrderType>*>();
     search_stack.push(root);
 
+    auto set = std::unordered_map<Node<PointCart, int>*, int>();
+
     while (!search_stack.empty()) {
         num_visited++;
 
         Node<PointType, OrderType>* top = search_stack.top();
-        while(top->is_visited()) {
+        while(top->is_visited() /*top->last_seg_priority == seg->get_priority()*/) {
             search_stack.pop();
             if (search_stack.empty())
                 break;
@@ -269,6 +302,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
         if (search_stack.empty())
             continue;
         search_stack.pop();
+        total_search_visits++;
 
         if ((insert && (top->is_leaf() || top->get_priority() > seg->get_priority())) 
         || (!insert && top->get_priority() == seg->get_priority())) {
@@ -279,14 +313,40 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
             continue;
         }
 
+        // if (seg->get_priority() == 1000) {
+        //     auto it = set.find(top);
+        //     if (it != set.end()) {
+        //         std::cout << "duplicate count: " << it->second << std::endl;
+        //         std::cout << "seg priority: " << seg->get_priority() << std::endl;
+        //         it->second += 1;
+        //         // exit(0);
+        //     }   
+        //     else {
+        //         std::cout << "looks good...\n";
+        //         set.insert({top, 0});   
+        //     }
+        // }
 
         search_refinement(seg, top);
+
+        for (auto desc: intersecting_descendants) {
+            if (desc != nullptr) {
+                desc->last_seg_priority = seg->get_priority();
+                visited_nodes.push_back(desc);
+            }
+        }
+
+        // if (top->last_seg_priority != seg->get_priority()) {
+        //     std::cout << "node good\n";
+        //     exit(0);
+        // }
 
         bool non_null_seen = false;
 
         for (int i = 0; i < intersecting_descendants.size(); ++i) {
             Node<PointType, OrderType>* node = intersecting_descendants[i];
-            if (node != nullptr && !node->is_visited()) {
+    
+            if (node != nullptr && !node->is_visited() /*node->last_seg_priority != seg->get_priority()*/) {
                 bool condition = insert ? node->get_priority() > seg->get_priority() :
                 (node->get_priority() == seg->get_priority());
                 if (condition) {
@@ -319,11 +379,15 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
 
     for (auto node: visited_nodes) {
         assert(node != nullptr);
-        node->toggle_visited();
+        // node->toggle_visited();
+        node->set_visited(false);
+        node->last_seg_priority = -1;
     }
 
     // std::cout << subdag_roots.size() << "\n";
     node_visits = num_visited;
+
+    intersection_calls = BoundingTrap<PointType, OrderType>::intersection_calls - pre_intersection_calls;
 
     if (VERBOSITY_LEVEL >= 100) {
         std::cout << "number of nodes visited:\t" << num_visited << "\n";
@@ -354,6 +418,10 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     segments.push_back(seg);
     affected_subdag_roots(&seg, true);
 
+    if (segments.size() > 5000 && subdag_roots.size() > (double)segments.size() / 100) {
+        std::cout << "UNFORTUNATE INSERT...\n";
+        std::cout << subdag_roots.size() << std::endl;
+    }
     //debug
     auto traps = std::vector<BoundingTrap<PointType, OrderType>>();
     for (auto node: subdag_roots) {
@@ -639,9 +707,6 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // std::cout << "e_partitions..\n";
     for (int i = 0; i < subdag_roots.size(); ++i) {
 
-        // if (e_cut->get_priority() == 7 && i == 3)
-            // std::cout << "hello\n";
-
         auto node = subdag_roots[i];
         partition(node, e_cut, nullptr);
         visMe = asJsonGraph(subdag_roots);
@@ -741,6 +806,7 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
         // reachable_nodes_valid(root);
     }
 
+    node_count = Node<PointType, OrderType>::node_count;
     cleanup();
 }
 
@@ -1149,14 +1215,14 @@ bool TSD<PointType, OrderType>::is_reachable(Node<PointType, OrderType>* from, N
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_node(Node<PointType, OrderType>* node) {
 
-    if (node->get_A() != nullptr)
-        node->get_A()->remove_parent(node);
-    if (node->get_B() != nullptr)
-        node->get_B()->remove_parent(node);
-    if (node->get_L() != nullptr)
-        node->get_L()->remove_parent(node);
-    if (node->get_R() != nullptr)
-        node->get_R()->remove_parent(node);
+    // if (node->get_A() != nullptr)
+    //     node->get_A()->remove_parent(node);
+    // if (node->get_B() != nullptr)
+    //     node->get_B()->remove_parent(node);
+    // if (node->get_L() != nullptr)
+    //     node->get_L()->remove_parent(node);
+    // if (node->get_R() != nullptr)
+    //     node->get_R()->remove_parent(node);
 
     if (TESTING >= 1000) {
         if (node->get_right() != nullptr && node->get_right()->get_left() == node) {
@@ -1245,20 +1311,33 @@ bool TSD<PointType, OrderType>::assert_has_parent(
 
 template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::delete_cuts(Node<PointType, OrderType>* node) {
+    if (node->get_e() != nullptr
+        && retired_cuts.find(node->get_e()) == retired_cuts.end()) {
+        delete node->get_e();
+        retired_cuts.insert(node->get_e());
+    } 
+
     if (node->get_v_1() != nullptr 
     && retired_v_cuts.find(node->get_v_1()) 
-    != retired_v_cuts.end()) {
+    == retired_v_cuts.end()) {
         if (node->get_v_1()->get_up() != nullptr
         && retired_cuts.find(node->get_v_1()->get_up()) 
-        != retired_cuts.end()) {
+        == retired_cuts.end()) {
             delete node->get_v_1()->get_up();
             retired_cuts.insert(node->get_v_1()->get_up());
+
+            if (node->get_v_1()->get_up() == node->get_e())
+                std::cout << "interesting...\n";
         }
         if (node->get_v_1()->get_down() != nullptr
         && retired_cuts.find(node->get_v_1()->get_down()) 
-        != retired_cuts.end()) {
+        == retired_cuts.end()) {
             delete node->get_v_1()->get_down();
-            retired_cuts.insert(node->get_v_1()->get_up());
+            retired_cuts.insert(node->get_v_1()->get_down());
+
+            if (node->get_v_1()->get_down() == node->get_e())
+                std::cout << "interesting...\n";
+
         }
             
         delete node->get_v_1();
@@ -1267,30 +1346,30 @@ void TSD<PointType, OrderType>::delete_cuts(Node<PointType, OrderType>* node) {
 
     if (node->get_v_2() != nullptr 
     && retired_v_cuts.find(node->get_v_2()) 
-    != retired_v_cuts.end()) {
+    == retired_v_cuts.end()) {
         if (node->get_v_2()->get_up() != nullptr
         && retired_cuts.find(node->get_v_2()->get_up()) 
-        != retired_cuts.end()) {
+        == retired_cuts.end()) {
             delete node->get_v_2()->get_up();
             retired_cuts.insert(node->get_v_2()->get_up());
+
+            if (node->get_v_2()->get_up() == node->get_e())
+                std::cout << "interesting...\n";
         }
         if (node->get_v_2()->get_down() != nullptr
         && retired_cuts.find(node->get_v_2()->get_down()) 
-        != retired_cuts.end()) {
+        == retired_cuts.end()) {
             delete node->get_v_2()->get_down();
-            retired_cuts.insert(node->get_v_2()->get_up());
+            retired_cuts.insert(node->get_v_2()->get_down());
+
+            if (node->get_v_2()->get_down() == node->get_e())
+                std::cout << "interesting...\n";
         }
-            
+           
         delete node->get_v_2();
         retired_v_cuts.insert(node->get_v_2());
     }
 
-
-    if (node->get_e() != nullptr
-        && retired_cuts.find(node->get_e()) != retired_cuts.end()) {
-        delete node->get_e();
-        retired_cuts.insert(node->get_e());
-    }
 
     if (node->get_L() != nullptr)
         delete_cuts(node->get_L());
@@ -1303,6 +1382,34 @@ void TSD<PointType, OrderType>::delete_cuts(Node<PointType, OrderType>* node) {
 }
 
 template <class PointType, class OrderType>
+void TSD<PointType, OrderType>::retire_nodes(Node<PointType, OrderType>* node) {
+    retired_nodes.insert(node);
+
+    if (node->get_L() != nullptr)
+        retire_nodes(node->get_L());
+    if (node->get_R() != nullptr)
+        retire_nodes(node->get_R());
+    if (node->get_A() != nullptr)
+        retire_nodes(node->get_A());
+    if (node->get_B() != nullptr)
+        retire_nodes(node->get_B());
+}
+
+template <class PointType, class OrderType>
 TSD<PointType, OrderType>::~TSD() {
     delete_cuts(root);
+
+    retire_nodes(root);
+
+    cleanup();
 }
+
+template <class PointType, class OrderType>
+int TSD<PointType, OrderType>::total_search_visits = 0;
+
+template <class PointType, class OrderType>
+int TSD<PointType, OrderType>::node_count = 0;
+
+template <class PointType, class OrderType>
+int TSD<PointType, OrderType>::intersection_calls = 0;
+

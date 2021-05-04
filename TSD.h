@@ -11,8 +11,6 @@
 
 #define TESTING 1000
 
-
-
 enum MergeSide {LEFT, RIGHT};
     
 template <class PointType, class OrderType>
@@ -56,7 +54,7 @@ class TSD {
 
         std::list<Cut<PointType, OrderType>> v_cuts;
 
-        std::set<Node<PointType, OrderType>*> retired_nodes = std::set<Node<PointType, OrderType>*>();
+        std::unordered_set<Node<PointType, OrderType>*> retired_nodes = std::unordered_set<Node<PointType, OrderType>*>();
 
         void walk_to_fix_desc(Node<PointType, OrderType>* node, Node<PointType, OrderType>* new_desc, Node<PointType, OrderType>* old_desc);
 
@@ -87,9 +85,14 @@ class TSD {
         std::vector<Node<PointType, OrderType>*> covering_leaves(
             Segment<PointType, OrderType>* query_seg);
 
-        void delete_cuts(Node<PointType, OrderType>* node);
-
     public:
+
+    void delete_cuts(Node<PointType, OrderType>* node);
+    void retire_nodes(Node<PointType, OrderType>* node);
+
+    static int total_search_visits;
+    static int node_count;
+    static int intersection_calls;
 
         TSD();
 

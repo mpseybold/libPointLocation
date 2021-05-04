@@ -395,28 +395,28 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
     OrderType left_priority = left->get_priority();
     OrderType right_priority = right->get_priority();
 
-    auto left_parents = left->get_parents();
-    auto right_parents = right->get_parents();
+    // auto left_parents = left->get_parents();
+    // auto right_parents = right->get_parents();
 
-    std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>
-    left_parent_desc = std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>();
+    // std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>
+    // left_parent_desc = std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>();
 
-    std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>
-    right_parent_desc = std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>();
+    // std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>
+    // right_parent_desc = std::unordered_map<Node<PointType, OrderType>*, std::vector<Node<PointType, OrderType>*>>();
 
-    for (auto p: left_parents) {
+    // for (auto p: left_parents) {
 
-        std::vector<Node<PointType, OrderType>*> desc{p->get_L(), p->get_R(), p->get_A(), p->get_B()};
+    //     std::vector<Node<PointType, OrderType>*> desc{p->get_L(), p->get_R(), p->get_A(), p->get_B()};
 
-        left_parent_desc.insert({{p, desc}});
-    }
+    //     left_parent_desc.insert({{p, desc}});
+    // }
 
-    for (auto p: right_parents) {
+    // for (auto p: right_parents) {
 
-        std::vector<Node<PointType, OrderType>*> desc{p->get_L(), p->get_R(), p->get_A(), p->get_B()};
+    //     std::vector<Node<PointType, OrderType>*> desc{p->get_L(), p->get_R(), p->get_A(), p->get_B()};
 
-        right_parent_desc.insert({{p, desc}});
-    }
+    //     right_parent_desc.insert({{p, desc}});
+    // }
 
     Node<PointType, OrderType>* result;
 
@@ -443,58 +443,58 @@ Node<PointType, OrderType>* TSD<PointType, OrderType>::v_merge(Node<PointType, O
     }
 
 
-    for (auto& p_desc: left_parent_desc) {
-        auto parent = p_desc.first;
-        auto descendants = p_desc.second;
+    // for (auto& p_desc: left_parent_desc) {
+    //     auto parent = p_desc.first;
+    //     auto descendants = p_desc.second;
 
-        if (parent->get_priority() >= result->get_priority()
-        && (right->get_trapezoid().overlaps(parent->get_trapezoid())
-        || left->get_trapezoid().overlaps(parent->get_trapezoid()))) {
-            continue;
-        }
-        if (parent == right || parent == left)
-            continue;
+    //     if (parent->get_priority() >= result->get_priority()
+    //     && (right->get_trapezoid().overlaps(parent->get_trapezoid())
+    //     || left->get_trapezoid().overlaps(parent->get_trapezoid()))) {
+    //         continue;
+    //     }
+    //     if (parent == right || parent == left)
+    //         continue;
 
-        if (descendants[0] == left) {
-            parent->set_L(result);
-        }
-        if (descendants[1] == left) {
-            parent->set_R(result);
-        }
-        if (descendants[2] == left) {
-            parent->set_A(result);
-        }
-        if (descendants[3] == left) {
-            parent->set_B(result);
-        }
-    }
+    //     if (descendants[0] == left) {
+    //         parent->set_L(result);
+    //     }
+    //     if (descendants[1] == left) {
+    //         parent->set_R(result);
+    //     }
+    //     if (descendants[2] == left) {
+    //         parent->set_A(result);
+    //     }
+    //     if (descendants[3] == left) {
+    //         parent->set_B(result);
+    //     }
+    // }
 
-    for (auto& p_desc: right_parent_desc) {
-        auto parent = p_desc.first;
-        auto descendants = p_desc.second;
+    // for (auto& p_desc: right_parent_desc) {
+    //     auto parent = p_desc.first;
+    //     auto descendants = p_desc.second;
 
-        if (parent->get_priority() >= result->get_priority()
-        && (right->get_trapezoid().overlaps(parent->get_trapezoid())
-        || left->get_trapezoid().overlaps(parent->get_trapezoid()))) {
-            continue;
-        }
-        if (parent == right || parent == left)
-            continue;
+    //     if (parent->get_priority() >= result->get_priority()
+    //     && (right->get_trapezoid().overlaps(parent->get_trapezoid())
+    //     || left->get_trapezoid().overlaps(parent->get_trapezoid()))) {
+    //         continue;
+    //     }
+    //     if (parent == right || parent == left)
+    //         continue;
 
 
-        if (descendants[0] == right) {
-            parent->set_L(result);
-        }
-        if (descendants[1] == right) {
-            parent->set_R(result);
-        }
-        if (descendants[2] == right) {
-            parent->set_A(result);
-        }
-        if (descendants[3] == right) {
-            parent->set_B(result);
-        }
-    }
+    //     if (descendants[0] == right) {
+    //         parent->set_L(result);
+    //     }
+    //     if (descendants[1] == right) {
+    //         parent->set_R(result);
+    //     }
+    //     if (descendants[2] == right) {
+    //         parent->set_A(result);
+    //     }
+    //     if (descendants[3] == right) {
+    //         parent->set_B(result);
+    //     }
+    // }
 
     visMe = asJsonGraph(subdag_roots);
     return result;

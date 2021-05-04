@@ -88,6 +88,8 @@ class BoundingTrap {
             bottom = nullptr;
         }
 
+        static int intersection_calls;
+
         void set_type(TrapType _type) { type = _type; }
         TrapType get_type() { return type; };
 
@@ -119,14 +121,14 @@ class BoundingTrap {
         std::pair<BoundingTrap<PointType, OrderType>, BoundingTrap<PointType, OrderType>> destroy(V_Cut<PointType, OrderType>* v_cut, int side);
 
         static BoundingTrap<PointType, OrderType> vertical_merge(
-            BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
+            BoundingTrap<PointType, OrderType>& trap_1, BoundingTrap<PointType, OrderType>& trap_2
         );
 
         static BoundingTrap<PointType, OrderType> edge_merge(
-            BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
+            BoundingTrap<PointType, OrderType>& trap_1, BoundingTrap<PointType, OrderType>& trap_2
         );
 
-        static BoundingTrap<PointType, OrderType> merge(BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2);
+        static BoundingTrap<PointType, OrderType> merge(BoundingTrap<PointType, OrderType>& trap_1, BoundingTrap<PointType, OrderType>& trap_2);
 
         // void operator==(BoundingTrapezoid<PointType, OrderType>& other) {
         //     return other.get_v_left() == get_v_left() &&
@@ -172,3 +174,7 @@ class BoundingTrap {
 
         bool contains_defining_point(Cut<PointType, OrderType>* cut);
 };
+
+
+template <class PointType, class OrderType>
+int BoundingTrap<PointType, OrderType>::intersection_calls = 0;

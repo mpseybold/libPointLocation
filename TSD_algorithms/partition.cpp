@@ -16,8 +16,8 @@ void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* 
     auto A = new Node<PointType, OrderType>(pos_neg.first);
     auto B = new Node<PointType, OrderType>(pos_neg.second);
 
-    A->set_leaf_below(B);
-    B->set_leaf_above(A);
+    // A->set_leaf_below(B);
+    // B->set_leaf_above(A);
 
     node->set_A(A);
     node->set_B(B);
@@ -32,7 +32,7 @@ void TSD<PointType, OrderType>::partition_leaf_case(Node<PointType, OrderType>* 
 // Walk left/right from 'node'
 // and reassign either the A or B descendant to 'new_desc'
 // to all merge neighbours which are parents of 'old_desc'
-template <class PointType , class OrderType>
+template <class PointType, class OrderType>
 void TSD<PointType, OrderType>::walk_to_fix_desc(Node<PointType, OrderType>* node, Node<PointType, OrderType>* new_desc, Node<PointType, OrderType>* old_desc) {
     
     auto next = node->get_right();

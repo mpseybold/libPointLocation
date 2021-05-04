@@ -52,6 +52,14 @@ add_executable( main
   BoundingTrap.cpp
 )
 
+add_executable( run_experiments
+  run_experiments.cpp
+  Point_2D.cpp
+  Point_S2ratss.cpp
+  Cut.cpp
+  BoundingTrap.cpp
+)
+
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 
 find_package(OpenMP 3.0)
@@ -60,6 +68,8 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(main   ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(main  ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
+target_link_libraries(run_experiments ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
 target_compile_options(main PRIVATE -pg)

@@ -7,7 +7,7 @@
 #include <CGAL/enum.h>
 #include <CGAL/Segment_2.h>
 
-#define EXACT false
+#define EXACT true
 
 
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;
@@ -26,13 +26,18 @@ class PointCart {
 
     public:
 
-        const static int EXTREME_LEFT = -1000000;
-        const static int EXTREME_RIGHT = 1000000;
-        const static int EXTREME_TOP = 1000000;
-        const static int EXTREME_BOTTOM = -1000000;
+        const static int EXTREME_LEFT = -100000000;
+        const static int EXTREME_RIGHT = 100000000;
+        const static int EXTREME_TOP = 100000000;
+        const static int EXTREME_BOTTOM = -100000000;
         const static int EPS = 1;
 
+        static long long predicate_count;
+
+        static int points_created;
+
         PointCart(double x, double y) {
+            // std::cout << "points created: " << points_created++ << std::endl;
             X = x;
             Y = y;
             cgal_point = Point_2(x, y);
@@ -51,7 +56,7 @@ class PointCart {
         // -1 if b is left of a
         // 0 if a and b conincide
         // 1 if b is right of a 
-        static int orientV(PointCart p, PointCart other_p, bool shear=true);
+        static int orientV(PointCart& p, PointCart& other_p, bool shear=true);
 
         // Determines the oriented side of the line through
         // source and target which contains p
@@ -59,34 +64,34 @@ class PointCart {
         // 1 positive
         // 0 on the line
         static int orientE(
-            PointCart source, PointCart target, PointCart p);
+            PointCart& source, PointCart& target, PointCart& p);
 
         // Detmines the oriented side of the vertical
         // line through the intersection of line(s1, t2)
         // and line line(s2, t2) which contains p
         static int orientV(
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2,
-            PointCart p, bool shear=true
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2,
+            PointCart& p, bool shear=true
         );
         
         // Detmines the side of the line through the intersection 
         // of l(s, t) and l(s_1, t_1) contains the intersection of
         // l(s, t) and l(s_2, t_2)
         static int orientV(
-            PointCart s, PointCart t,
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2,
+            PointCart& s, PointCart& t,
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2,
             bool shear=true
         );
 
         // compares vertical lines of intersection of l(s_1, t_1) and l(s_2, t_2)
         // with the intersection of l(s_3, t_3) and l(s_4, t_4)
         static int orientV(
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2,
-            PointCart s_3, PointCart t_3,
-            PointCart s_4, PointCart t_4,
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2,
+            PointCart& s_3, PointCart& t_3,
+            PointCart& s_4, PointCart& t_4,
             bool shear=true
         );
 
@@ -94,28 +99,28 @@ class PointCart {
         // which contains the intersection
         // of l(s_2, t_2) and l(s_3, t_3)
         static int orientE(
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2,
-            PointCart s_3, PointCart t_3
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2,
+            PointCart& s_3, PointCart& t_3
         );
 
         // compares horizontal lines of intersection of l(s_1, t_1) and l(s_2, t_2)
         // with the intersection of l(s_3, t_3) and l(s_4, t_4)
         static int intersection_h_orientation(
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2,
-            PointCart s_3, PointCart t_3,
-            PointCart s_4, PointCart t_4
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2,
+            PointCart& s_3, PointCart& t_3,
+            PointCart& s_4, PointCart& t_4
         );
 
         static int slope_comparison(
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2
         );
 
         static PointCart intersection(
-            PointCart s_1, PointCart t_1,
-            PointCart s_2, PointCart t_2
+            PointCart& s_1, PointCart& t_1,
+            PointCart& s_2, PointCart& t_2
         );
 
         lazy x() { return cgal_point.x(); }

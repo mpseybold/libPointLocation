@@ -119,7 +119,7 @@ BoundingTrap<PointType, OrderType>::destroy(V_Cut<PointType, OrderType>* cut, in
 
 template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_merge(
-    BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
+    BoundingTrap<PointType, OrderType>& trap_1, BoundingTrap<PointType, OrderType>& trap_2
 ) { 
     if (trap_1.get_top() != trap_2.get_top())
         assert(trap_1.get_top() == trap_2.get_top());
@@ -133,7 +133,7 @@ BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::vertical_
 
 template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::edge_merge(
-    BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
+    BoundingTrap<PointType, OrderType>& trap_1, BoundingTrap<PointType, OrderType>& trap_2
 ) { 
     // assert(trap_1.get_left() == trap_2.get_left());
     // assert(trap_1.get_right() == trap_2.get_right());
@@ -152,7 +152,7 @@ BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::edge_merg
 
 template <class PointType, class OrderType>
 BoundingTrap<PointType, OrderType> BoundingTrap<PointType, OrderType>::merge(
-    BoundingTrap<PointType, OrderType> trap_1, BoundingTrap<PointType, OrderType> trap_2
+    BoundingTrap<PointType, OrderType>& trap_1, BoundingTrap<PointType, OrderType>& trap_2
 ) {
     // if (trap_1.get_right() != nullptr 
     // && trap_1.get_right() == trap_2.get_left()) 
@@ -170,8 +170,8 @@ template <class PointType, class OrderType>
 int BoundingTrap<PointType, OrderType>::trap_cut_region(Segment<PointType, OrderType>* seg, int endpoint) {
 
     assert(endpoint == 0 || endpoint == 1);
-    PointType p = endpoint == 0 ? seg->get_source() : seg->get_target();
-    PointType other_p = endpoint == 0 ? seg->get_target() : seg->get_source();
+    PointType& p = endpoint == 0 ? seg->get_source() : seg->get_target();
+    PointType& other_p = endpoint == 0 ? seg->get_target() : seg->get_source();
 
     Cut<PointType, OrderType> _left_cut = get_left() == nullptr 
     ? Cut<PointType, OrderType>(INTERSECTION, top->get_segment(), bottom->get_segment())
@@ -237,8 +237,8 @@ std::pair<int, int> BoundingTrap<PointType, OrderType>::trap_cut_regions(Segment
     if (bottom->has_seg_on_neg_side(seg) && !bottom->has_seg_on_pos_side(seg))
         return {9, 9};
 
-    // PointType src = seg->get_source();
-    // PointType tgt = seg->get_target();
+    // PointType& src = seg->get_source();
+    // PointType& tgt = seg->get_target();
 
     return {trap_cut_region(seg, 0), trap_cut_region(seg, 1)};
     // int src_region, tgt_region;
@@ -696,6 +696,7 @@ bool BoundingTrap<PointType, OrderType>::intersect_seg_trap(Segment<PointType, O
 
 template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::intersects_segment(Segment<PointType, OrderType>* seg) {
+    intersection_calls++;
     return intersect_seg_trap(seg);
 }
 
@@ -703,10 +704,10 @@ template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::contains_endpoint(Segment<PointType, OrderType>* seg, int endpoint) {
     assert(endpoint == 0 || endpoint == 1);
     assert(seg != nullptr);
-    PointType p = endpoint == 0 ? seg->get_source()
+    PointType& p = endpoint == 0 ? seg->get_source()
     : seg->get_target();
 
-    PointType other_p = endpoint == 0 ? seg->get_target()
+    PointType& other_p = endpoint == 0 ? seg->get_target()
     : seg->get_source();
 
     bool bottom_test, right_test, top_test, left_test;
@@ -740,10 +741,10 @@ template <class PointType, class OrderType>
 bool BoundingTrap<PointType, OrderType>::contains_endpoint_strict(Segment<PointType, OrderType>* seg, int endpoint) {
     assert(endpoint == 0 || endpoint == 1);
     assert(seg != nullptr);
-    PointType p = endpoint == 0 ? seg->get_source()
+    PointType& p = endpoint == 0 ? seg->get_source()
     : seg->get_target();
 
-    PointType other_p = endpoint == 0 ? seg->get_target()
+    PointType& other_p = endpoint == 0 ? seg->get_target()
     : seg->get_source();
 
     bool bottom_test, right_test, top_test, left_test;

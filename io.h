@@ -129,18 +129,44 @@ namespace io {
         file.close();
     }
 
-    template <class PointType, class OrderType>
-    std::vector<Segment<PointType, OrderType>> read_segments(std::string filename) {
-        std::string path = "data/" + filename;
+    void write_segments(std::vector<std::vector<double>> segments, std::string filename) {
+        std::cout << "writing...";
+        std::ofstream file(filename);
+        file << std::setprecision(std::numeric_limits<long double>::digits10);
 
-        std::cout << path << std::endl;
+        for (auto seg: segments) {
+            std::cout << seg[0] << std::endl;
+            file << seg[0] << " " << seg[1] 
+            << " " << seg[2] << " " << seg[3] << std::endl; 
+        }
+
+        file.close();
+    }
+
+    void write_segments(std::vector<std::vector<long double>> segments, std::string filename) {
+        std::cout << "writing...";
+        std::ofstream file(filename);
+        file << std::setprecision(std::numeric_limits<long double>::digits10);
+
+        for (auto seg: segments) {
+            std::cout << seg[0] << std::endl;
+            file << seg[0] << " " << seg[1] 
+            << " " << seg[2] << " " << seg[3] << std::endl; 
+        }
+
+        file.close();
+    }
+
+    std::vector<std::vector<long double>> read_segments(std::string filename) {
+        std::string path = filename;
+        
         std::ifstream file(path);
 
         if (!file.is_open()) {
             std::cout << "failed to open file\n";
         } 
 
-        std::vector<Segment<PointType, OrderType>> output;
+        std::vector<std::vector<long double>> output;
         std::vector<std::vector<long double>> seg_coords;
         long double x_1, y_1, x_2, y_2;
         while (file >> x_1 >> y_1 >> x_2 >> y_2) {
@@ -154,19 +180,51 @@ namespace io {
 
         file.close();
 
-        // std::random_device rd;
-        // std::mt19937 g(rd());
-
-        std::random_shuffle(seg_coords.begin(), seg_coords.end());
-
         for (int i = 0; i < seg_coords.size(); ++i) {
-            output.push_back(
-                Segment<PointType, OrderType>(
-                    PointType(seg_coords[i][0], seg_coords[i][1]), PointType(seg_coords[i][2], seg_coords[i][3]), i
-                )
-            );
+            output.push_back(seg_coords[i]);
         }
 
         return output;
     }
+
+    // template <class PointType, class OrderType>
+    // std::vector<Segment<PointType, OrderType>> read_segments(std::string filename) {
+    //     std::string path = "data/" + filename;
+
+    //     std::cout << path << std::endl;
+    //     std::ifstream file(path);
+
+    //     if (!file.is_open()) {
+    //         std::cout << "failed to open file\n";
+    //     } 
+
+    //     std::vector<Segment<PointType, OrderType>> output;
+    //     std::vector<std::vector<long double>> seg_coords;
+    //     long double x_1, y_1, x_2, y_2;
+    //     while (file >> x_1 >> y_1 >> x_2 >> y_2) {
+    //         std::vector<long double> coords;
+    //         coords.push_back(x_1);
+    //         coords.push_back(y_1);
+    //         coords.push_back(x_2);
+    //         coords.push_back(y_2);
+    //         seg_coords.push_back(coords);
+    //     }
+
+    //     file.close();
+
+    //     // std::random_device rd;
+    //     // std::mt19937 g(rd());
+
+    //     std::random_shuffle(seg_coords.begin(), seg_coords.end());
+
+    //     for (int i = 0; i < seg_coords.size(); ++i) {
+    //         output.push_back(
+    //             Segment<PointType, OrderType>(
+    //                 PointType(seg_coords[i][0], seg_coords[i][1]), PointType(seg_coords[i][2], seg_coords[i][3]), i
+    //             )
+    //         );
+    //     }
+
+    //     return output;
+    // }
 }

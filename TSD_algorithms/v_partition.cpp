@@ -14,8 +14,8 @@ V_Cut<PointType, OrderType>* v_cut, int side) {
     auto L = new Node<PointType, OrderType>(pos_neg.second);
     auto R = new Node<PointType, OrderType>(pos_neg.first);
 
-    L->set_leaf_right(R);
-    R->set_leaf_left(L);
+    // L->set_leaf_right(R);
+    // R->set_leaf_left(L);
 
     node->set_v_1(v_cut);
     node->set_L(L);

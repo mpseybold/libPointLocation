@@ -23,6 +23,11 @@
 
 #include "experiments/vertical_query_exp.h"
 #include "experiments/vertical_query_exp_2.h"
+#include "experiments/r_tree.h"
+#include "experiments/experiments.h"
+#include "data/data_generators.h"
+
+#include "experiments/query_segs.h"
 
 typedef CGAL::Arr_segment_traits_2<Kernel>            Traits_2;
 typedef Traits_2::Point_2                             Point_2;
@@ -56,9 +61,14 @@ void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<Point
 int main() {
 
 
+    query_seg_utility::get_query_segs("data/osm/australia-200601.plot", 10000);
     // example();
     // vertical_query_exp();
-    vertical_query_exp_2();
+    // vertical_query_exp_2();
+    // r_tree_exp();
+    // generate_data();
+    // experiments::run_synthetic(512, "random_horizontal", 200, "r_tree");
+    // experiments::run_synthetic(512, "seg_tree_worst_case", 2);
     // auto new_calidonia = io::read_segments<PointCart, int>("new-caledonia-200601.plot.lonlat");
     
 //    TSD<PointCart, int> tsd = TSD<PointCart, int>();

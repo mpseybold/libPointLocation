@@ -23,8 +23,8 @@ class V_Cut {
             if (int_seg != nullptr)
                 segs.push_back(int_seg);
 
-            if (up->orientation(PointCart(60, 50)) == 0)
-                std::cout << "hello\n";
+            // if (up->orientation(PointCart(60, 50)) == 0)
+            //     std::cout << "hello\n";
         }
 
         int defining_point_cut_comparison(V_Cut<PointType, OrderType>& cut) {
@@ -277,8 +277,8 @@ class V_Cut {
                     }
                 }
 
-                if (up->orientation(PointCart(60, 50)) == 0)
-                    std::cout << "hello\n";
+                // if (up->orientation(PointCart(60, 50)) == 0)
+                //     std::cout << "hello\n";
 
                 update();
         }
@@ -295,8 +295,8 @@ class V_Cut {
 
             update();
 
-            if (up->orientation(PointCart(60, 50)) == 0)
-                std::cout << "hello\n";
+            // if (up->orientation(PointCart(60, 50)) == 0)
+            //     std::cout << "hello\n";
         }
 
         bool contains(Segment<PointType, OrderType>* seg) {

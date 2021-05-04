@@ -3,6 +3,7 @@
 #include "Point_2D.h"
 #include "Point_S2ratss.h"
 
+
 template <class PointType, class OrderType>
 class Segment {
 
@@ -12,7 +13,7 @@ class Segment {
         PointType target;
         OrderType priority;
 
-        double source_x, source_y, target_x, target_y;
+        // double source_x, source_y, target_x, target_y;
     
     public:
 
@@ -25,10 +26,10 @@ class Segment {
                 target = s;
             }
 
-            source_x = CGAL::to_double(source.get_cgal_point().x());
-            source_y = CGAL::to_double(source.get_cgal_point().y());
-            target_x = CGAL::to_double(target.get_cgal_point().x());
-            target_y = CGAL::to_double(target.get_cgal_point().y());
+            // source_x = CGAL::to_double(source.get_cgal_point().x());
+            // source_y = CGAL::to_double(source.get_cgal_point().y());
+            // target_x = CGAL::to_double(target.get_cgal_point().x());
+            // target_y = CGAL::to_double(target.get_cgal_point().y());
             // std::cout << CGAL::to_double(s.get_cgal_point().x()) << " " << CGAL::to_double(s.get_cgal_point().y()) << "\n";
         }
 

@@ -3,12 +3,13 @@
 #include "BoundingTrap.h"
 #include "DestructionCuts.h"
 
+
 template <class PointType, class OrderType>
 class Node {
 
     private:
-        Node<PointType, OrderType>* negative_child; // delete
-        Node<PointType, OrderType>* positive_child; // delete
+        // Node<PointType, OrderType>* negative_child; // delete
+        // Node<PointType, OrderType>* positive_child; // delete
         Node<PointType, OrderType>* L = nullptr;
         Node<PointType, OrderType>* R = nullptr;
         Node<PointType, OrderType>* A = nullptr;
@@ -18,10 +19,10 @@ class Node {
         Node<PointType, OrderType>* left = nullptr;
         Node<PointType, OrderType>* right = nullptr;
 
-        Node<PointType, OrderType>* leaf_above;
-        Node<PointType, OrderType>* leaf_below;
-        Node<PointType, OrderType>* leaf_left;
-        Node<PointType, OrderType>* leaf_right;
+        // Node<PointType, OrderType>* leaf_above;
+        // Node<PointType, OrderType>* leaf_below;
+        // Node<PointType, OrderType>* leaf_left;
+        // Node<PointType, OrderType>* leaf_right;
 
         DestructionCuts<PointType, OrderType> destruction_cuts;
         // Cut<PointType, OrderType> destroying_cut;
@@ -31,11 +32,31 @@ class Node {
         bool partition_visited = false;
         bool v_partition_visited = false;
 
-        std::set<Node<PointType, OrderType>*> parents;
+        // std::unordered_set<Node<PointType, OrderType>*> parents;
 
         OrderType partition_priority = -1;
 
     public:
+
+        int last_seg_priority = -1;
+
+        static int nodes_created;
+        static int nodes_deleted;
+
+        static int node_count;
+
+        void* operator new( size_t size )
+            {
+                node_count++;
+                nodes_created++;
+                return ::operator new( size );
+            }
+            void operator delete( void* ptr )
+            {
+                node_count--;
+                nodes_deleted++;
+                ::operator delete( ptr );
+            }
 
         //for debugging purposes only
         std::string name = "";
@@ -43,7 +64,7 @@ class Node {
         Node(BoundingTrap<PointType, OrderType> trap) {
             trapezoid = trap;
             destruction_cuts = DestructionCuts<PointType, OrderType>();
-            parents = std::set<Node<PointType, OrderType>*>();
+            // parents = std::unordered_set<Node<PointType, OrderType>*>();
         }
 
         DestructionCuts<PointType, OrderType>& get_destruction_cuts() { return destruction_cuts; }
@@ -107,6 +128,8 @@ class Node {
         OrderType get_priority() { 
             return destruction_cuts.priority(); 
         }
+
+        void set_visited(bool _visited) { visited = _visited; }
         
         bool is_visited() { return visited; }
 
@@ -139,8 +162,8 @@ class Node {
 
         // Cut<PointType, OrderType>& get_cut() { return destroying_cut; }
         BoundingTrap<PointType, OrderType>& get_trapezoid() { return trapezoid; }
-        Node<PointType, OrderType>* get_negative_child() { return negative_child; }
-        Node<PointType, OrderType>* get_positive_child() { return positive_child; }
+        // Node<PointType, OrderType>* get_negative_child() { return negative_child; }
+        // Node<PointType, OrderType>* get_positive_child() { return positive_child; }
         Node<PointType, OrderType>* get_L() { return L; }
         Node<PointType, OrderType>* get_R() { return R; }
         Node<PointType, OrderType>* get_A() { return A; }
@@ -149,16 +172,16 @@ class Node {
         Node<PointType, OrderType>* get_left() { return left; }
         Node<PointType, OrderType>* get_right() { return right; }
 
-        void set_negative_child(Node<PointType, OrderType>* node) { negative_child = node; }
-        void set_positive_child(Node<PointType, OrderType>* node) { positive_child = node; }
+        // void set_negative_child(Node<PointType, OrderType>* node) { negative_child = node; }
+        // void set_positive_child(Node<PointType, OrderType>* node) { positive_child = node; }
         void set_L(Node<PointType, OrderType>* node) { 
-            if (parents.find(node) != parents.end())
-                return;
-            if (L != nullptr)
-                L->remove_parent(this);
+            // if (parents.find(node) != parents.end())
+                // return;
+            // if (L != nullptr)
+                // L->remove_parent(this);
             L = node;
-            if (L != nullptr)
-                L->add_parent(this);
+            // if (L != nullptr)
+                // L->add_parent(this);
 
             if (L != nullptr)
                 trapezoid.set_left(
@@ -167,13 +190,13 @@ class Node {
                 ); 
         }
         void set_R(Node<PointType, OrderType>* node) {
-            if (parents.find(node) != parents.end())
-                return; 
-            if (R != nullptr)
-                R->remove_parent(this);
+            // if (parents.find(node) != parents.end())
+            //     return; 
+            // if (R != nullptr)
+            //     R->remove_parent(this);
             R = node;
-            if (R != nullptr)
-                R->add_parent(this);
+            // if (R != nullptr)
+                // R->add_parent(this);
             
             if (R != nullptr)
                 trapezoid.set_right(
@@ -182,36 +205,36 @@ class Node {
                 ); 
         }
         void set_A(Node<PointType, OrderType>* node) {
-            if (parents.find(node) != parents.end())
-                return; 
-            if (A != nullptr)
-                A->remove_parent(this);
+            // if (parents.find(node) != parents.end())
+            //     return; 
+            // if (A != nullptr)
+            //     A->remove_parent(this);
             A = node;
-            if (A != nullptr)
-                A->add_parent(this); 
+            // if (A != nullptr)
+            //     A->add_parent(this); 
         }
         void set_B(Node<PointType, OrderType>* node) {
-            if (parents.find(node) != parents.end())
-                return;  
-            if (B != nullptr)
-                B->remove_parent(this);
+            // if (parents.find(node) != parents.end())
+            //     return;  
+            // if (B != nullptr)
+            //     B->remove_parent(this);
             B = node;
-            if (B != nullptr)
-                B->add_parent(this);
+            // if (B != nullptr)
+            //     B->add_parent(this);
         }
 
         void set_left(Node<PointType, OrderType>* _left) { left = _left; }
         void set_right(Node<PointType, OrderType>* _right) { right = _right; }
 
-        void set_leaf_above(Node<PointType, OrderType>* node) { leaf_above = node; }
-        void set_leaf_below(Node<PointType, OrderType>* node) { leaf_below = node; }
-        void set_leaf_left(Node<PointType, OrderType>* node) { leaf_left = node; }
-        void set_leaf_right(Node<PointType, OrderType>* node) { leaf_right = node; }
+        // void set_leaf_above(Node<PointType, OrderType>* node) { leaf_above = node; }
+        // void set_leaf_below(Node<PointType, OrderType>* node) { leaf_below = node; }
+        // void set_leaf_left(Node<PointType, OrderType>* node) { leaf_left = node; }
+        // void set_leaf_right(Node<PointType, OrderType>* node) { leaf_right = node; }
 
-        Node<PointType, OrderType>* get_leaf_above() { return leaf_above; }
-        Node<PointType, OrderType>* get_leaf_below() { return leaf_below; }
-        Node<PointType, OrderType>* get_leaf_left() { return leaf_left; }
-        Node<PointType, OrderType>* get_leaf_right() { return leaf_right; }
+        // Node<PointType, OrderType>* get_leaf_above() { return leaf_above; }
+        // Node<PointType, OrderType>* get_leaf_below() { return leaf_below; }
+        // Node<PointType, OrderType>* get_leaf_left() { return leaf_left; }
+        // Node<PointType, OrderType>* get_leaf_right() { return leaf_right; }
 
         //TODO: Implement this properly 
         DestructionPattern get_dest_pattern() { 
@@ -237,18 +260,18 @@ class Node {
             set_B(B);
         }
 
-        void add_parent(Node<PointType, OrderType>* parent) {
-            assert(this != parent);
-            parents.insert(parent);
-        }
+        // void add_parent(Node<PointType, OrderType>* parent) {
+        //     assert(this != parent);
+        //     parents.insert(parent);
+        // }
 
-        void remove_parent(Node<PointType, OrderType>* parent) {
-            parents.erase(parent);
-        }
+        // void remove_parent(Node<PointType, OrderType>* parent) {
+        //     parents.erase(parent);
+        // }
 
-        std::set<Node<PointType, OrderType>*> get_parents() {
-            return parents;
-        }
+        // std::unordered_set<Node<PointType, OrderType>*> get_parents() {
+        //     return parents;
+        // }
 
 
         // OrderType get_partition_priority() { return partition_priority; }
@@ -331,3 +354,13 @@ class Node {
 
         }
 };
+
+
+template <class PointType, class OrderType>
+int Node<PointType, OrderType>::nodes_created = 0;
+
+template <class PointType, class OrderType>
+int Node<PointType, OrderType>::nodes_deleted = 0;
+
+template <class PointType, class OrderType>
+int Node<PointType, OrderType>::node_count = 0;
