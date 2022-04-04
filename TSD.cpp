@@ -58,9 +58,10 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             traps.push_back(node->get_B()->get_trapezoid());
         }
 
-        io::write_trapezoids(traps, "refinement_debug.dat");
+        // io::write_trapezoids(traps, "refinement_debug.dat");
         // std::cout << "wrote refinement traps...\n";
     }
+
 
     if (node->get_L() != nullptr) 
         if (node->get_L()->get_trapezoid().intersects_segment(seg)) {
@@ -68,24 +69,22 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
             // auto val = trap.intersects_segment(seg);
             intersecting_descendants[0] = node->get_L();
         }
-    
     if (node->get_B() != nullptr) {
         assert(node->get_A() != nullptr);
 
         auto A_right = *(node->get_A()->get_trapezoid().get_right());
 
         auto B_right = *(node->get_B()->get_trapezoid().get_right());
-
         Cut<PointType, OrderType>* edge_cut = node
         ->get_destruction_cuts()
         .get_e();
 
         assert(edge_cut->get_cut_type() == EDGE);
 
+
         auto slope_comp = Segment<PointType, OrderType>::slope_comparison(
             *seg, *edge_cut->get_segment()
         );
-
         if (slope_comp > 0) {
             if (node->get_A()->last_seg_priority != seg->get_priority() &&
             node->get_A()->get_trapezoid().intersects_segment(seg))
@@ -201,6 +200,7 @@ void TSD<PointType, OrderType>::search_refinement(Segment<PointType, OrderType>*
     if (node->get_R() != nullptr)
         if (node->get_R()->get_trapezoid().intersects_segment(seg))
             intersecting_descendants[3] = node->get_R();
+
 }
 
 
@@ -258,7 +258,7 @@ TSD<PointType, OrderType>::TSD() {
 }
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert) {
+void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert, bool query) {
 
     node_visits = 0;
     int num_visited = 0;
@@ -290,7 +290,7 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
 
     while (!search_stack.empty()) {
         num_visited++;
-
+        
         Node<PointType, OrderType>* top = search_stack.top();
         while(top->is_visited() /*top->last_seg_priority == seg->get_priority()*/) {
             search_stack.pop();
@@ -306,6 +306,8 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
 
         if ((insert && (top->is_leaf() || top->get_priority() > seg->get_priority())) 
         || (!insert && top->get_priority() == seg->get_priority())) {
+            // std::cout << "second if...\n";
+            // std::cout << "top priority: " << top->get_priority() << std::endl;
             top->toggle_visited();
             num_subdag_roots++;
             subdag_roots.push_back(top);
@@ -376,6 +378,11 @@ void TSD<PointType, OrderType>::affected_subdag_roots(Segment<PointType, OrderTy
                 search_stack.push(node);
         }
     }
+    
+    // if (query) {
+    //     std::cout << seg->get_source().X_() << " " << seg->get_source().Y_() << "\n";
+    //     std::cout << "from subdag roots: " << subdag_roots.size() << "\n";
+    // }
 
     for (auto node: visited_nodes) {
         assert(node != nullptr);
@@ -407,7 +414,7 @@ struct MergeIndices {
 };
 
 template <class PointType, class OrderType>
-void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& seg) {
+void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& seg, bool add_conflict) {
    //TODO: implement this properly/test the code
 
     // for (auto& s: segments) {
@@ -417,6 +424,14 @@ void TSD<PointType, OrderType>::insert_segment(Segment<PointType, OrderType>& se
     // TODO: check if move is needed
     segments.push_back(seg);
     affected_subdag_roots(&seg, true);
+
+    if (add_conflict) {
+        for (auto node: subdag_roots) {
+            node->conflict_list.push_back(seg);
+        }
+
+        return;
+    }
 
     if (segments.size() > 5000 && subdag_roots.size() > (double)segments.size() / 100) {
         std::cout << "UNFORTUNATE INSERT...\n";
@@ -1403,6 +1418,41 @@ TSD<PointType, OrderType>::~TSD() {
 
     cleanup();
 }
+
+template <class PointType, class OrderType>
+void add_leaves(std::vector<Node<PointType, OrderType>*>& leaves, 
+Node<PointType, OrderType>* node, std::set<Node<PointType, OrderType>*>& visited_set) {
+    
+    if (visited_set.find(node) != visited_set.end()) {
+        return;
+    }
+
+    visited_set.insert(node);
+
+    if (node->is_leaf()) {
+        leaves.push_back(node);
+    } else {
+        if (node->get_L() != nullptr)
+            add_leaves(leaves, node->get_L(), visited_set);
+        if (node->get_R() != nullptr)
+            add_leaves(leaves, node->get_R(), visited_set);
+        if (node->get_A() != nullptr)
+            add_leaves(leaves, node->get_A(), visited_set);
+        if (node->get_B() != nullptr)
+            add_leaves(leaves, node->get_B(), visited_set);
+    }
+    
+}
+
+template <class PointType, class OrderType>
+std::vector<Node<PointType, OrderType>*> TSD<PointType, OrderType>::get_leaves() {
+    auto output = std::vector<Node<PointType, OrderType>*>();
+    std::set<Node<PointType, OrderType>*> visited_set = std::set<Node<PointType, OrderType>*>();
+    add_leaves(output, root, visited_set);
+
+    return output;
+}
+
 
 template <class PointType, class OrderType>
 int TSD<PointType, OrderType>::total_search_visits = 0;

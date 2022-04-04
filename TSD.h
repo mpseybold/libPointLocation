@@ -100,17 +100,21 @@ class TSD {
 
         std::string visMe;
 
+        std::vector<Node<PointType, OrderType>*> get_leaves();
+
         int get_node_visits() { return node_visits; }
         int get_naive_node_visits() { return naive_node_visits; }
 
         Node<PointType, OrderType>* get_root() { return root; }
-        std::vector<Node<PointType, OrderType>*> get_subdag_roots() { return subdag_roots; }
+        std::vector<Node<PointType, OrderType>*> get_subdag_roots() { 
+            return subdag_roots; 
+        }
 
-        void insert_segment(Segment<PointType, OrderType>& seg);
+        void insert_segment(Segment<PointType, OrderType>& seg, bool add_conflict=false);
 
         void delete_segment(Segment<PointType, OrderType>& seg);
 
-        void affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert);
+        void affected_subdag_roots(Segment<PointType, OrderType>* seg, bool insert, bool query=false);
 
         Node<PointType, OrderType>* v_merge(Node<PointType, OrderType>* left, Node<PointType, OrderType>* right);
 

@@ -7,7 +7,7 @@
 #include <CGAL/enum.h>
 #include <CGAL/Segment_2.h>
 
-#define EXACT true
+#define EXACT false
 
 
 using Kernel = CGAL::Exact_predicates_exact_constructions_kernel;

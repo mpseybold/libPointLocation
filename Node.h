@@ -58,6 +58,8 @@ class Node {
                 ::operator delete( ptr );
             }
 
+        std::vector<Segment<PointType, OrderType>> conflict_list;
+
         //for debugging purposes only
         std::string name = "";
 

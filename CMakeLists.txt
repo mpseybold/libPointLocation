@@ -47,17 +47,19 @@ SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
 add_executable( main  
   main.cpp
   Point_2D.cpp
-  Point_S2ratss.cpp
   Cut.cpp
   BoundingTrap.cpp
+  io.cpp
+  RS_TSD.cpp
 )
 
 add_executable( run_experiments
   run_experiments.cpp
   Point_2D.cpp
-  Point_S2ratss.cpp
   Cut.cpp
   BoundingTrap.cpp
+  io.cpp
+  RS_TSD.cpp
 )
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )

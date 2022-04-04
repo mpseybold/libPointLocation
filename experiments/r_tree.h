@@ -35,17 +35,17 @@ void r_tree_exp() {
     rtree.insert(query_seg);
     rtree.insert(query_seg);
     // boost::detail::variant::node_visits = 0;
-    int before_q_count = boost::geometry::predicate_count;
+    // int before_q_count = boost::geometry::predicate_count;
     // boost::geometry::detail::intersects::predicate_count = 0;
-    rtree.query(bgi::intersects(query_seg), std::back_inserter(results));
-    int after_q_count = boost::geometry::predicate_count;
-    rtree.query(bgi::intersects(seg), std::back_inserter(results));
+    // rtree.query(bgi::intersects(query_seg), std::back_inserter(results));
+    // int after_q_count = boost::geometry::predicate_count;
+    // rtree.query(bgi::intersects(seg), std::back_inserter(results));
 
     // for (auto seg: results) {
     //     std::cout << bg::get<0, 0>(seg) << " " << bg::get<0, 1>(seg) << " " 
     //     << bg::get<1, 0>(seg) << " " << bg::get<1, 1>(seg) << std::endl;
     // }
 
-    std::cout << "k: " << results.size() << std::endl;
-    std::cout << "predicate_count: " << after_q_count - before_q_count << std::endl;
+    // std::cout << "k: " << results.size() << std::endl;
+    // std::cout << "predicate_count: " << after_q_count - before_q_count << std::endl;
 }

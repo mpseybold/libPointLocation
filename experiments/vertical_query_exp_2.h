@@ -3,7 +3,7 @@
 #include <random>
 #include <math.h>
 #include <algorithm>
-#include <omp.h>
+// #include <omp.h>
 
 bool comp(Segment<PointCart, int>* s1, Segment<PointCart, int>* s2) {
     return s1->get_priority() < s2->get_priority();

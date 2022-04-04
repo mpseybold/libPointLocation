@@ -2,7 +2,6 @@
 
 #include "../io.h"
 #include "../segment_ds/SegmentDS.h"
-#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/algorithms/detail/intersects/interface.hpp>
@@ -14,7 +13,7 @@ namespace query_seg_utility {
     using _segment_t = bg::model::segment<_point_t>;
     using R_Tree = bgi::rtree<_segment_t, bgi::quadratic<16>>;
 
-    std::vector<std::vector<long double>> remove_intersections(std::vector<std::vector<long double>> initial_segs) {
+    std::vector<std::vector<long double>> remove_intersections(std::vector<std::vector<long double>> initial_segs, std::string new_file_name) {
         auto output = std::vector<std::vector<long double>>();
         R_Tree rtree;
         std::cout << std::setprecision(20);
@@ -47,14 +46,27 @@ namespace query_seg_utility {
                 
                 // std::cout << k << std::endl;
 
-                if (common_endpoints_only && s[0] != s[2]) {
+                if (common_endpoints_only /*&& s[0] != s[2]*/) {
+                    // std::cout << "candidate seg: " << s[0] << " " << s[1] << " " << s[2] << " " << s[3] << "\n";
                     output.push_back(s);
                     rtree.insert({{s[0], s[1]}, {s[2], s[3]}});
-                } 
+                } else {
+                    // std::cout << "candidate seg: " << s[0] << " " << s[1] << " " << s[2] << " " << s[3] << "\n";
+                    // for (auto _t: results) {
+                        // std::vector<double> t = std::vector<double>();
+                        // t.push_back(bg::get<0, 0>(_t));
+                        // t.push_back(bg::get<0, 1>(_t));
+                        // t.push_back(bg::get<1, 0>(_t));
+                        // t.push_back(bg::get<1, 1>(_t));
+                        
+
+                        // std::cout << "\tintersecting seg: " << t[0] << " " << t[1] << " " << t[2] << " " << t[3] << "\n";
+                    // } 
+                }
             }
         }
 
-        io::write_segments(output, "data/australia_clean.txt");
+        io::write_segments(output, new_file_name);
 
         return output;
     }
@@ -64,7 +76,7 @@ namespace query_seg_utility {
         auto segments = io::read_segments(seg_filename);
 
         std::cout << "before clean: " << segments.size() << "\n";
-        segments = remove_intersections(segments);
+        segments = remove_intersections(segments, seg_filename + "int_free.txt");
         std::cout << "after clean: " << segments.size() << "\n";
         
         R_Tree rtree;
@@ -101,14 +113,14 @@ namespace query_seg_utility {
 
         int n = segments.size();
 
-        for (int i = 0; i < n; ++i) {
-            // for (int j = 0; j < sqrt(n); ++j) {
-                double x  = x_min + i * total_width / n;
-                // double y = j * j * (total_height / sqrt(n));
+        for (int i = 0; i < 10000; ++i) {
+            for (int j = 0; j < sqrt(n); ++j) {
+                double x  = x_min + i * total_width / 10000;
+                double y = j * j * (total_height / sqrt(n));
 
                 // std::cout << x << std::endl;
 
-                std::vector<double> q_seg{ x, -40, x, -10/* y + scale*total_height / n*/};
+                std::vector<double> q_seg{ x, y_max, x, y_max - j*total_height / sqrt(n)/*y + scale*total_height / n*/};
 
                 std::vector<_segment_t> results;
                 _segment_t _query_seg{{q_seg[0], q_seg[1]}, {q_seg[2], q_seg[3]}};
@@ -117,16 +129,17 @@ namespace query_seg_utility {
                 int k = results.size();
 
 
-                if (k < 2*log(n) && k > .5*log(n)) {
+                if (k < 2*log(n) /*&& k > .5*log(n)*/) {
                     // std::cout << k << std::endl;
                     output.push_back(q_seg);
                 }
-            // }
+            }
         }
 
 
-        std::cout << output.size();
+        std::cout << output.size() << std::endl;
+        std::cout << log(n) << std::endl;
 
-        io::write_segments(output, "data/australia_queries.txt");
+        io::write_segments(output, "data/new_c_queries.txt");
     }
 }

@@ -25,7 +25,7 @@
 #include "experiments/vertical_query_exp_2.h"
 #include "experiments/r_tree.h"
 #include "experiments/experiments.h"
-#include "data/data_generators.h"
+// #include "data/data_generators.h"
 
 #include "experiments/query_segs.h"
 
@@ -61,18 +61,53 @@ void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<Point
 int main() {
 
 
-    query_seg_utility::get_query_segs("data/osm/australia-200601.plot", 10000);
-    // example();
-    // vertical_query_exp();
-    // vertical_query_exp_2();
-    // r_tree_exp();
-    // generate_data();
-    // experiments::run_synthetic(512, "random_horizontal", 200, "r_tree");
-    // experiments::run_synthetic(512, "seg_tree_worst_case", 2);
-    // auto new_calidonia = io::read_segments<PointCart, int>("new-caledonia-200601.plot.lonlat");
-    
-//    TSD<PointCart, int> tsd = TSD<PointCart, int>();
 
+    auto new_c_segs = io::read_segments("data/osm/new-caledonia.txt");
+    std::cout << "before clean: " << new_c_segs.size() << std::endl;
+    auto clean_data = query_seg_utility::remove_intersections(new_c_segs, "data/osm/nc_clean.txt");
+    std::cout << "after clean: " << clean_data.size() << std::endl;
+    io::write_segments(clean_data, "data/osm/new_c_clean.txt");
+    query_seg_utility::get_query_segs("data/osm/new_c_clean.txt");
+
+    auto segs = io::read_segments("data/osm/nc_clean.txt");
+
+    auto tsd = TSD<PointCart, int>();
+
+    experiments::build_rs_tsd(segs, 10, tsd);
+
+    // auto segments = io::read_segments("data/random_horizontal/128.txt");
+    // TSD<PointCart, int> tsd = TSD<PointCart, int>();
+    // std::vector<double> query_seg = {
+    //     700000, 600000, 700000, 400000
+    // };
+
+
+    // for (int i = 0; i < segments.size(); ++i) {
+    //     auto seg = segments[i];
+    //     Segment<PointCart, int>* s =  new Segment<PointCart, int>(
+    //         PointCart(seg[0], seg[1]), PointCart(seg[2], seg[3]), i
+    //     );
+
+    //     tsd.insert_segment(*s, false);
+    // }
+
+    // auto query = new Segment<PointCart, int>(
+    //     PointCart(700000, 600000), PointCart(700000, 400000),
+    //     10000001
+    // );
+
+    // RS_TSD rs_tsd = RS_TSD(segments, query);
+
+
+    // auto root = tsd.get_root();
+    // auto s = root->get_destruction_cuts().get_e();
+    // auto x = s->get_segment()->get_source().X_();
+    // auto priority = root->get_priority();
+
+    // auto tsd_stats = experiments::tsd_query(tsd, query_seg);
+    // auto rs_tsd_stats = experiments::rs_tsd_query(rs_tsd, query_seg);
+
+    // int i = 0;      
 //     auto start_time = std::chrono::high_resolution_clock::now();
 //     for (int i = 0; i < new_calidonia.size(); ++i) {
 //         std::cout << i << "\n";

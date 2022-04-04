@@ -1,5 +1,5 @@
 project(test)
-add_subdirectory(googletest)
+# add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 find_package( CGAL QUIET COMPONENTS  )
