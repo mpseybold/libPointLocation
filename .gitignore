@@ -12,6 +12,9 @@ data
 plotting/leaf_insert.dat
 plotting/*
 
+persist_range
+milutin-persist-range
+
 *.dat
 *.csv
 *.txt

@@ -46,7 +46,7 @@ namespace query_seg_utility {
                 
                 // std::cout << k << std::endl;
 
-                if (common_endpoints_only /*&& s[0] != s[2]*/) {
+                if (common_endpoints_only && s[0] != s[2]) {
                     // std::cout << "candidate seg: " << s[0] << " " << s[1] << " " << s[2] << " " << s[3] << "\n";
                     output.push_back(s);
                     rtree.insert({{s[0], s[1]}, {s[2], s[3]}});
@@ -73,11 +73,11 @@ namespace query_seg_utility {
 
 
     void get_query_segs(std::string seg_filename, double scale=1) {
-        auto segments = io::read_segments(seg_filename);
-
-        std::cout << "before clean: " << segments.size() << "\n";
-        segments = remove_intersections(segments, seg_filename + "int_free.txt");
-        std::cout << "after clean: " << segments.size() << "\n";
+        auto segments = io::read_segments("data/osm/" + seg_filename + ".csv");
+        std::cout << seg_filename << "\n";
+        // std::cout << "before clean: " << segments.size() << "\n";
+        // segments = remove_intersections(segments, seg_filename + "int_free.txt");
+        // std::cout << "after clean: " << segments.size() << "\n";
         
         R_Tree rtree;
 
@@ -113,9 +113,9 @@ namespace query_seg_utility {
 
         int n = segments.size();
 
-        for (int i = 0; i < 10000; ++i) {
+        for (int i = 0; i < 100; ++i) {
             for (int j = 0; j < sqrt(n); ++j) {
-                double x  = x_min + i * total_width / 10000;
+                double x  = x_min + i * total_width / 100;
                 double y = j * j * (total_height / sqrt(n));
 
                 // std::cout << x << std::endl;
@@ -129,17 +129,17 @@ namespace query_seg_utility {
                 int k = results.size();
 
 
-                if (k < 2*log(n) /*&& k > .5*log(n)*/) {
-                    // std::cout << k << std::endl;
+                if (k < 2*log(n) && k > .5*log(n)) {
+                    std::cout << k << std::endl;
                     output.push_back(q_seg);
                 }
             }
         }
 
-
         std::cout << output.size() << std::endl;
         std::cout << log(n) << std::endl;
 
-        io::write_segments(output, "data/new_c_queries.txt");
+        io::write_segments(output, "data/query_segments/" + seg_filename + "_q.csv");
+        std::cout << "data/query_segments/" + seg_filename + "_q.csv" << std::endl;
     }
 }

@@ -6,11 +6,11 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/index/rtree.hpp>
-#include <boost/geometry/algorithms/detail/intersects/interface.hpp>
 #include "../io.h"
 #include <unordered_set>
 #include <chrono>
 #include "../RS_TSD.h"
+#include "../persist_range/persist1D.h"
 // #include "query_segs.h"
 
 
@@ -87,6 +87,21 @@ namespace experiments {
 
     RS_TSD build_rs_tsd(std::vector<std::vector<long double>>& segments) {
         return RS_TSD(segments, nullptr);
+    }
+
+    PERSIST1D::Persist1D build_persist1d(std::vector<std::vector<long double>>& segments) {
+
+        auto d_segs = std::vector<std::vector<double>>();
+
+        for (auto seg: segments) {
+            d_segs.push_back({
+                (double)seg[0], (double)seg[1], (double)seg[2], (double)seg[3]
+            });
+        }
+
+        auto p1d = PERSIST1D::Persist1D(d_segs);
+
+        return p1d;
     }
 
     double variance(std::vector<int>& x, double mean) {
@@ -257,17 +272,43 @@ namespace experiments {
         // return tsd;
     }
 
+    QueryStatistics persist1d_query(PERSIST1D::Persist1D& p1d, std::vector<double> query_seg) {
+        
+        auto stats = QueryStatistics();
+
+        auto start_time = std::chrono::high_resolution_clock::now();
+        std::cout << "y1: " << (int)query_seg[1] << std::endl;
+        std::cout << "y2: " << (int)query_seg[3] << std::endl;
+        std::cout << "x: " << (int)query_seg[0] << std::endl;
+        int k = p1d.v_query((int)query_seg[1], (int)query_seg[3], (int)query_seg[0]);
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+        
+        stats.time = duration;
+        stats.output_size = k;
+        stats.predicate_count = MPS_COUNTER;
+
+        // std::cout << "k: " << k <<std::endl;
+
+        return stats;
+    }
+
     QueryStatistics rtree_query(R_Tree& r_tree, std::vector<double> query_seg) {
         auto stats = QueryStatistics();
+
+        boost::geometry::predicate_count = 0;
+
         std::vector<segment_t> results;
         segment_t _query_seg{{query_seg[0], query_seg[1]}, {query_seg[2], query_seg[3]}};
         auto start_time = std::chrono::high_resolution_clock::now();
-        r_tree.query(bgi::intersects(_query_seg), std::back_inserter(results));
+        r_tree.query(
+            bgi::intersects(_query_seg), 
+            std::back_inserter(results));
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
         stats.output_size = results.size();
-        // stats.predicate_count = boost::geometry::predicate_count;
-        std::cout << duration << std::endl;
+        stats.predicate_count = boost::geometry::predicate_count;
+        // std::cout << duration << std::endl;
         stats.time = duration;
         return stats;
     }
@@ -278,18 +319,23 @@ namespace experiments {
         segment_t _query_seg{{query_seg[0], query_seg[1]}, {query_seg[2], query_seg[3]}};
         r_tree.query(bgi::intersects(_query_seg), std::back_inserter(results));
         stats.output_size = results.size();
-        // stats.predicate_count = boost::geometry::predicate_count;
+        stats.predicate_count = boost::geometry::predicate_count;
 
         return stats;
     }
 
     QueryStatistics rtree_star_query(R_Tree_Star& r_tree, std::vector<double> query_seg) {
         auto stats = QueryStatistics();
+        boost::geometry::predicate_count = 0;
         std::vector<segment_t> results;
         segment_t _query_seg{{query_seg[0], query_seg[1]}, {query_seg[2], query_seg[3]}};
+        auto start_time = std::chrono::high_resolution_clock::now();
         r_tree.query(bgi::intersects(_query_seg), std::back_inserter(results));
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
         stats.output_size = results.size();
-        // stats.predicate_count = boost::geometry::predicate_count;
+        stats.predicate_count = boost::geometry::predicate_count;
+        stats.time = duration;
 
         return stats;
     }
@@ -414,6 +460,7 @@ namespace experiments {
         segment_ds.vertical_query(_query_seg, output);
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+        std::cout << "output_size: " << output.size() << std::endl;
         stats.output_size = output.size();
         stats.predicate_count = SegmentDS::node_visits;
         stats.time = duration;
@@ -454,9 +501,11 @@ namespace experiments {
 
 
     std::vector<std::vector<double>> 
-    query_segs_for_osm() {
-        auto segs = io::read_segments("data/query_segments/nc_q.txt");
-
+    query_segs_for_osm(std::string dataset) {
+        std::cout << "data/query_segments/"+dataset+"_q.csv\n";
+        auto segs = io::read_segments("data/query_segments/"+dataset+"_q.csv");
+        std::cout << segs[0][0] << " " << segs[0][1] << " " << segs[0][2] << " " << segs[0][3] << std::endl;
+        // exit(0);
         auto output = std::vector<std::vector<double>>();
 
         std::uniform_real_distribution<double> dis(0.0, 1.0);
@@ -482,6 +531,25 @@ namespace experiments {
         int num_of_queries
     ) {
 
+        auto seg_ds = build_layered_tree(segments);
+        std::cout << "built layered tree...\n";
+
+        double x_max = -1;
+        double x_min = 100000000000;
+        double y_max = -1;
+        double y_min = 10000000000;
+
+        for (auto seg: segments) {
+            if (seg[2] > x_max)
+                x_max = seg[2];
+            if (seg[0] < x_min)
+                x_min = seg[0];
+            if (seg[1] > y_max)
+                y_max = seg[3];
+            if (seg[1] < y_min)
+                y_min = seg[1];
+        }
+
         int seed = 1;
 
         std::uniform_real_distribution<double> dis(0.0, 1.0);
@@ -500,22 +568,39 @@ namespace experiments {
         }
 
         for (int i = 0; i < num_of_queries; ++i) {
-            // double x = 4000000 + std::floor((double)1000000 * dis(generator));
-            double x = 5000000;
-            double y1 = std::floor((double)(9999999 - .5*log(segments.size())*(9999999 / segments.size())*log(segments.size())) * dis(generator));
-            double y2 = y1 +  .5*log(segments.size())*(9999999 / segments.size())*log(segments.size());
-            
-            while (x_coords.find(x) != x_coords.end()) {
-                x = std::floor((double)9999999 * dis(generator));
-            }
+            bool condition;
+            double x;
+            double y1;
+            double y2;
+            do {
+                x = 50000;
+                y1 = std::floor((double)(y_max - .5*log(segments.size())*(y_max / segments.size())*log(segments.size())) * dis(generator));
+                // y1 = std::floor((double)y_max*dis(generator));
+                y2 = std::floor(y1 +  .5*log(segments.size())*(y_max / segments.size())*log(segments.size()));
+                
+                while (x_coords.find(x) != x_coords.end() || x > x_max || x < x_min) {
+                    x = x_min + std::floor((double)x_max * dis(generator));
+                }
 
-            while (y_coords.find(y1) != y_coords.end()) {
-                y1 = std::floor((double)(9999999 - .5*log(segments.size())*(9999999 / segments.size())*log(segments.size())) * dis(generator));
-            }
+                while (y_coords.find(y1) != y_coords.end() || y1 > y_max || y1 < y_min) {
+                    y1 = std::floor((double)(y_max - .5*log(segments.size())*(y_max / segments.size())*log(segments.size())) * dis(generator));
+                    // y1 = std::floor((double)y_max*dis(generator));
+                }
 
-            while (y_coords.find(y2) != y_coords.end() && y2 > y1) {
-                y2 = y1 + .5*log(segments.size())*(9999999 / segments.size())*log(segments.size());
-            }
+                while (y_coords.find(y2) != y_coords.end() /*&& y2 > y1*/ || y2 > y_max) {
+                    y2 = std::floor(y1 +  .5*log(segments.size())*(y_max / segments.size())*log(segments.size()));
+                }
+
+                std::cout << "about to issue query...\n";
+                auto qs = SegmentDS::Segment(x, y1, x, y2);
+                auto _output = std::vector<SegmentDS::Segment>();
+                seg_ds.vertical_query(qs, _output);
+
+                condition = _output.size() > 10*log(segments.size());
+                std::cout << output.size() << " " << 10*log(segments.size()) << std::endl;
+
+
+            } while (condition);
 
             x_coords.insert(x);
             y_coords.insert(y1);
@@ -560,7 +645,7 @@ namespace experiments {
         for (int i = 0; i < query_count; ++i) {
             double x = log(size) + std::floor((double)(size - log(size)) * dis(generator)) - 0.1;
             double y = dis(generator) * (size -x) - log(size);
-            output.push_back({x, y, x, y+log(size)});
+            output.push_back({x, y, x, y+3*log(size)});
         }
 
 
@@ -568,22 +653,31 @@ namespace experiments {
     }
 
     void run_synthetic(int size, std::string instance_type, int num_of_queries, std::string data_structure) {
-        auto segments = instance_type != "osm" ? io::read_segments("data/"+instance_type+"/" + std::to_string(size) + ".txt")
-        : io::read_segments("data/osm/nc_clean.txt");
+        std::vector<std::vector<long double>> segments;
+
+        if (instance_type == "random_horizontal" 
+        || instance_type == "random_slanted" 
+        || instance_type == "seg_tree_worst_case") {
+            segments = io::read_segments("data/"+instance_type+"/" + std::to_string(size) + ".txt");
+        } else {
+            segments = io::read_segments("data/osm/"+instance_type+".csv");
+        }
+        
+        // auto segments = instance_type != "osm" ? io::read_segments("data/"+instance_type+"/" + std::to_string(size) + ".txt")
+        // : io::read_segments("data/osm/"+instance_type+"_clean.csv");
 
         std::vector<std::vector<double>> query_segs;
         std::cout << "fetching query segs...\n";
         if (instance_type == "random_horizontal")
             query_segs = query_segs_for_random_horizontal(segments, num_of_queries);
-        if (instance_type == "random_slanted")
+        else if (instance_type == "random_slanted")
             query_segs = query_segs_for_random_slanted(segments, num_of_queries);
-        if (instance_type == "seg_tree_worst_case")
+        else if (instance_type == "seg_tree_worst_case")
             query_segs = query_segs_for_seg_tree_worst_case(size, num_of_queries);
-        if (instance_type == "osm")
-            query_segs = query_segs_for_osm();
-        if (instance_type == "bad_conflict")
+        else if (instance_type == "bad_conflict")
             query_segs = query_segs_for_bad_conflict();
-
+        else
+            query_segs = query_segs_for_osm(instance_type);
 
         std::cout << "fetched!\n";
 
@@ -595,6 +689,7 @@ namespace experiments {
         SegmentDS::SegmentDS seg_ds = SegmentDS::SegmentDS(seg_ds_segs);
         TSD<PointCart, int> tsd = TSD<PointCart, int>();
         TSD<PointCart, int> rs_tsd = TSD<PointCart, int>();
+        PERSIST1D::Persist1D p1d;
         // RS_TSD rs_tsd = RS_TSD(std::vector<std::vector<long double>>(), nullptr);
 
 
@@ -625,36 +720,50 @@ namespace experiments {
             // rs_tsd = build_rs_tsd(segments);
         }
 
+        if (data_structure == "persist_1d") {
+            std::cout << "building 1d persist...\n";
+            p1d = build_persist1d(segments);
+        }
+
         std::cout << "built data structures...\n";
 
-        std::string res_string = instance_type != "osm" ? "data/results/" + instance_type + "/" + std::to_string(size) + data_structure + ".csv"
-        : "data/results/" + instance_type + "/new_calidonia" + data_structure +".csv";
+        std::string res_string;
+
+        if (instance_type == "random_horizontal" 
+        || instance_type == "random_slanted" 
+        || instance_type == "seg_tree_worst_case") {
+            res_string = "data/results/" + instance_type + "/" + std::to_string(size) + data_structure + ".csv";
+        } else {
+            res_string = "data/results/osm/" + instance_type + "_" + data_structure +".csv";
+        }
+
 
         std::ofstream results(res_string);
 
-        results << "k,";
+        results << "k,time,comp_count\n";
 
-        if (data_structure == "tsd")
-            results << "tsd\n";
+        // if (data_structure == "tsd")
+        //     results << "tsd\n";
 
-        if (data_structure == "seg_ds")
-            results << "seg_ds\n";
+        // if (data_structure == "seg_ds")
+        //     results << "seg_ds\n";
 
-        if (data_structure == "r_tree")
-            results << "r_tree\n";
+        // if (data_structure == "r_tree")
+        //     results << "r_tree\n";
 
-        if (data_structure == "r_tree_linear")
-            results << "r_tree_linear\n";
+        // if (data_structure == "r_tree_linear")
+        //     results << "r_tree_linear\n";
 
-        if (data_structure == "r_tree_star")
-            results << "r_tree_star\n";
+        // if (data_structure == "r_tree_star")
+        //     results << "r_tree_star\n";
 
-        if (data_structure == "rs_tsd")
-            results << "rs_tsd\n";
+        // if (data_structure == "rs_tsd")
+        //     results << "rs_tsd\n";
 
         std::cout << "running queries...\n";
 
         for (int i = 0; i < query_segs.size(); ++i) {
+            std::cout << i << std::endl;
             auto qs = query_segs[i];
             if (data_structure == "tsd") {  
                 auto tsd_stats = tsd_query(tsd, qs);
@@ -664,17 +773,18 @@ namespace experiments {
                     tsd_stats.predicate_count << "\n";
             } else if (data_structure == "r_tree") {
                 auto r_tree_stats = rtree_query(r_tree, qs);
-                if (r_tree_stats.output_size > 0)
+                // if (r_tree_stats.output_size > 0)
                     results << r_tree_stats.output_size << ","
-                << r_tree_stats.time << "\n";
+                << r_tree_stats.time << "," << r_tree_stats.predicate_count << "\n";
             } else if (data_structure == "seg_ds") {
                 auto seg_ds_stats = layered_tree_query(seg_ds, qs);
                 results << seg_ds_stats.output_size << ","
-                << seg_ds_stats.time << "\n";
+                << seg_ds_stats.time << "," << seg_ds_stats.predicate_count << "\n";
+                std::cout << "predicate_count: " << seg_ds_stats.predicate_count << std::endl;
             } else if (data_structure == "r_tree_star") {
-                auto seg_ds_stats = rtree_star_query(r_tree_star, qs);
-                results << seg_ds_stats.output_size << ","
-                << seg_ds_stats.predicate_count << "\n";
+                auto rtree_star_stats = rtree_star_query(r_tree_star, qs);
+                results << rtree_star_stats.output_size << "," << rtree_star_stats.time << ","
+                << rtree_star_stats.predicate_count << "\n";
             } else if (data_structure == "r_tree_linear") {
                 auto seg_ds_stats = rtree_linear_query(r_tree_linear, qs);
                 if (seg_ds_stats.output_size > 0)
@@ -688,6 +798,11 @@ namespace experiments {
                 // }
                 // auto rs_tsd_stats = rs_tsd_query(segments, qs);
                 // results << rs_tsd_stats.output_size << ", " << rs_tsd_stats.time << "\n";
+            } else if (data_structure == "persist_1d") {
+                auto p1d_stats = persist1d_query(p1d, qs);
+                results << p1d_stats.output_size << ", " << p1d_stats.time << ", " 
+                    << p1d_stats.predicate_count << "\n";
+
             }
         }
 

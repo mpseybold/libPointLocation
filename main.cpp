@@ -60,20 +60,74 @@ void write_leaf_traps(Node<PointCart, int>* node, std::vector<BoundingTrap<Point
 
 int main() {
 
+    std::vector<std::string> osm_filenames = {
+        "albania", "bosnia-herzegovina", "bulgaria",
+        "croatia", "kosovo", "macedonia", "montenegro", "serbia"
+    };
+
+    for (auto& name: osm_filenames) {
+        query_seg_utility::get_query_segs(name+"_clean");
+    }
+    // std::vector<std::vector<long double>> segments = io::read_segments("data/random_horizontal/128.txt");
+
+    // std::vector<std::vector<double>> d_segs = {
+    //     {904196, 381526, 8079083, 381526},
+    //     {1276652, 925986, 10596571, 925986},
+    //     {1937328, 1217414, 2470665, 1217414},
+    //     {1090776, 697544, 3491291, 697544},
+    //     {1705212, 53244, 4405210, 53244},
+    //     {1679604, 217836, 1834752, 217836},
+    //     {1585494, 258364, 7495498, 258364},
+    //     {476800, 1303412, 3603755, 1303412},
+    //     {298502, 197976, 9461825, 197976},
+    //     {376998, 1230944, 9877653, 1230944},
+    //     {1658386, 909446, 6469740, 909446},
+    //     {945772, 1640382, 6803032, 1640382},
+    //     {276808, 1093866, 1419912, 1093866},
+    //     {1385532, 1152920, 2192230, 1152920},
+    //     {1954480, 328908, 9638701, 328908},
+    //     {1719976, 1017880, 8209364, 1017880}
+    // };
+
+    // std::vector<std::vector<long double>> l_segs;
+
+    // for (auto seg: d_segs) {
+    //     l_segs.push_back({
+    //         (long double)seg[0], (long double)seg[1], (long double)seg[2], (long double)seg[3]
+    //     });
+    // }
+
+    // std::vector<double> qs = {10228342, 930850, 10228342, 536787};
+
+    // R_Tree r_tree = experiments::build_r_tree(l_segs);
+
+    // auto stats = experiments::rtree_query(r_tree, qs);
 
 
-    auto new_c_segs = io::read_segments("data/osm/new-caledonia.txt");
-    std::cout << "before clean: " << new_c_segs.size() << std::endl;
-    auto clean_data = query_seg_utility::remove_intersections(new_c_segs, "data/osm/nc_clean.txt");
-    std::cout << "after clean: " << clean_data.size() << std::endl;
-    io::write_segments(clean_data, "data/osm/new_c_clean.txt");
-    query_seg_utility::get_query_segs("data/osm/new_c_clean.txt");
 
-    auto segs = io::read_segments("data/osm/nc_clean.txt");
+    // TSD<PointCart, int> tsd;
 
-    auto tsd = TSD<PointCart, int>();
+    // experiments::build_tsd(l_segs, 1000, tsd);
 
-    experiments::build_rs_tsd(segs, 10, tsd);
+    // Segment<PointCart, int> query = Segment<PointCart, int>(
+    //     PointCart(10228342, 930850), PointCart(10228342, 536787),
+    //     1000000000
+    // );
+
+    // auto p1d = PERSIST1D::Persist1D(d_segs);
+
+    // std::cout << "k: " << p1d.v_query(536787, 930850, 10228342) << std::endl;
+
+    // tsd.affected_subdag_roots(&query, true);
+
+    // std::cout << "tsd_k: " << tsd.get_subdag_roots().size() - 1 << std::endl;
+
+
+    // auto segs = io::read_segments("data/osm/nc_clean.txt");
+
+    // auto tsd = TSD<PointCart, int>();
+
+    // experiments::build_rs_tsd(segs, 10, tsd);
 
     // auto segments = io::read_segments("data/random_horizontal/128.txt");
     // TSD<PointCart, int> tsd = TSD<PointCart, int>();

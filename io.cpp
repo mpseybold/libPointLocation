@@ -117,7 +117,7 @@ void io::write_trapezoid(BoundingTrap<PointCart, int> trap, std::fstream& file) 
         std::string path = filename;
         
         std::ifstream file(path);
-
+        std::cout << filename << std::endl;
         if (!file.is_open()) {
             std::cout << "failed to open file\n";
         } else 

@@ -38,7 +38,7 @@ slant_result_data = {
 # subprocess.run(["./build/run_experiments", str(math.pow(2, 1)), "osm", "300", "tsd"])
 # subprocess.run(["./build/run_experiments", str(math.pow(2, 1)), "osm", "300", "seg_ds"])
 
-for i in range(7, 20):
+for i in range(7, 14):
     print(i)
     # subprocess.run(["./build/run_experiments", str(math.pow(2, i)), "random_horizontal", "300", "r_tree"])
     # subprocess.run(["./build/run_experiments", str(math.pow(2, i)), "random_horizontal", "300", "r_tree_linear"])

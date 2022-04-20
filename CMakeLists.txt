@@ -32,6 +32,8 @@ endif()
 
 # include for local package
 
+include_directories("/usr/include/glib-2.0/")
+
 
 add_subdirectory(test)
 
@@ -51,6 +53,7 @@ add_executable( main
   BoundingTrap.cpp
   io.cpp
   RS_TSD.cpp
+  persist_range/ptree.c
 )
 
 add_executable( run_experiments
@@ -60,6 +63,7 @@ add_executable( run_experiments
   BoundingTrap.cpp
   io.cpp
   RS_TSD.cpp
+  persist_range/ptree.c
 )
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
@@ -70,8 +74,8 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(main  ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(main  ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} glib-2.0 )
 
-target_link_libraries(run_experiments ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(run_experiments ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} glib-2.0 )
 
 target_compile_options(main PRIVATE -pg)
