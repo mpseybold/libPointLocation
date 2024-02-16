@@ -10,4 +10,4 @@ Compile: `mkdir build && cd build && cmake ../ && make`
 Run:
 - Populate subfolders in `build` with input and query segments:
   `./data/osm`,`./data/query_segments`,`./data/results` 
-- Call `./run_experiments 512 random_horizontal 2 seg_ds`, for example, to run two queries.
+- Call `./run_experiments 512 random_horizontal 1 tsd` for `./data/results/random_horizontal/512tsd.csv`.
