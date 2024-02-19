@@ -1,0 +1,114 @@
+--- /home/martin/git-repos/libPointLocation/persist_range/ptree.c.orig	2009-11-25 20:22:26.000000000 +0100
++++ /home/martin/git-repos/libPointLocation/persist_range/ptree.c	2022-04-14 06:22:58.000000000 +0200
+@@ -20,7 +20,8 @@
+  * MT safe
+  */
+ 
+-#include "adds.h"
++// #include "adds.h"
++#include "ptree.h"
+ 
+ #undef P_TREE_DEBUG
+ 
+@@ -36,6 +37,8 @@
+ typedef struct _PTreeNodeData      PTreeNodeData;
+ typedef struct _PTreeNode          PTreeNode;
+ 
++gint MPS_COUNTER = 0; // Definition of global variable
++
+ struct _PTreeRootVersion
+ {
+   PTreeNode *root;
+@@ -113,6 +116,11 @@
+                                                      gconstpointer    data,
+                                                      PTreeSearchType  search_type,
+                                                      guint            version);
++// MPS: a fwd decl
++guint p_tree_node_rangesearch_v( PTreeNode       *node,
++                guint               version,
++                gconstpointer       key_low,
++                gconstpointer       key_high );
+ static PTreeNode* p_tree_node_rotate_left           (PTree           *tree,
+                                                      PTreeNode       *node);
+ static PTreeNode* p_tree_node_rotate_right          (PTree           *tree,
+@@ -298,6 +306,7 @@
+   r = v+(nv-1);
+   while (l <= r) /* binary search */
+     {
++      MPS_COUNTER++;
+       PTreeRootVersion *const m = l + (r - l) / 2;
+       if (version == m->version)
+         return m;
+@@ -329,14 +338,17 @@
+   /* note: we never search for a version smaller than the smallest
+      version in the array */
+ 
++  MPS_COUNTER++;
+   if (v[0].version <= version)
+     return v;
+ 
+   /* there are at most TABLE_SIZE things to look through, which is small,
+      so just scan through them from largest version to smallest */
+-  for (n = v+(nv-1); n != v; --n)
++  for (n = v+(nv-1); n != v; --n){
++    MPS_COUNTER++;
+     if (n->version <= version)
+       break;
++  }
+   /* searched for something smaller than the lowest version in the node */
+   g_assert (n != v);
+   return n;
+@@ -1727,6 +1739,23 @@
+                              version);
+ }
+ 
++/* 
++  Finds root for version and starts with the range-search
++*/
++guint    
++p_tree_rangesearch_v(  PTree              *tree,
++                        guint               version,
++                        gconstpointer       key_low,
++                        gconstpointer       key_high )
++{
++  g_return_val_if_fail (tree != NULL, -1);
++  g_return_val_if_fail (version <= tree->version, -1);
++
++  return p_tree_node_rangesearch_v (
++    p_tree_root_find_version (tree, version)->root, 
++    version, key_low, key_high      );
++}
++
+ /**
+  * p_tree_search_related:
+  * @tree: a #PTree.
+@@ -2045,6 +2074,29 @@
+     }
+ }
+ 
++// MPS: CAUTION Recursion !!!
++guint p_tree_node_rangesearch_v( PTreeNode       *node,
++                                 guint               version,
++                                 gconstpointer       key_low,
++                                 gconstpointer       key_high )
++{ 
++
++  if ( node == NULL )
++    return 0;
++
++  PTreeNodeVersion *nodev = p_tree_node_find_version (node, version);
++  MPS_COUNTER+=2;
++  if(         node->data->key < key_low  ){  
++    return p_tree_node_rangesearch_v( nodev->right, version, key_low, key_high);
++  } else if ( node->data->key > key_high ){  
++    return p_tree_node_rangesearch_v( nodev->left, version, key_low, key_high);
++  } else {                                   
++    return 1+
++      p_tree_node_rangesearch_v( nodev->left,  version, key_low, key_high )+
++      p_tree_node_rangesearch_v( nodev->right, version, key_low, key_high ) ;
++  }
++}
++
+ static PTreeNode*
+ p_tree_node_rotate_left (PTree     *tree,
+                          PTreeNode *node)

@@ -1,0 +1,20 @@
+--- /home/martin/git-repos/libPointLocation/persist_range/ptree.h.orig	2009-11-25 20:22:37.000000000 +0100
++++ /home/martin/git-repos/libPointLocation/persist_range/ptree.h	2022-04-04 14:54:20.000000000 +0200
+@@ -111,11 +111,17 @@
+                                  GCompareFunc        search_func,
+                                  gconstpointer       user_data,
+                                  PTreeSearchType     search_type);
++guint    p_tree_rangesearch_v(  PTree              *tree,
++                                 guint               version,
++                                 gconstpointer       key_low,
++                                 gconstpointer       key_high );
+ gint     p_tree_height          (PTree              *tree);
+ gint     p_tree_height_v        (PTree              *tree,
+                                  guint               version);
+ gint     p_tree_nnodes          (PTree              *tree);
+ 
++extern gint MPS_COUNTER;  // Declaration of global variable
++
+ G_END_DECLS
+ 
+ #endif /* __P_TREE_H__ */
