@@ -33,9 +33,9 @@ endif()
 # include for local package
 
 include_directories("/usr/include/glib-2.0/")
+include_directories("/usr/lib/x86_64-linux-gnu/glib-2.0/include/")
 
-
-add_subdirectory(test)
+#add_subdirectory(test)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")

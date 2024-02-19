@@ -13,6 +13,8 @@
 #include "../persist_range/persist1D.h"
 // #include "query_segs.h"
 
+// #define PATCHED_BOOST true // Enable if patched version present
+#define VERBOSITY 100
 
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;
@@ -277,9 +279,11 @@ namespace experiments {
         auto stats = QueryStatistics();
 
         auto start_time = std::chrono::high_resolution_clock::now();
-        std::cout << "y1: " << (int)query_seg[1] << std::endl;
-        std::cout << "y2: " << (int)query_seg[3] << std::endl;
-        std::cout << "x: " << (int)query_seg[0] << std::endl;
+        if( VERBOSITY>=100 ){
+            std::cout << "y1: " << (int)query_seg[1] << std::endl;
+            std::cout << "y2: " << (int)query_seg[3] << std::endl;
+            std::cout << "x: " << (int)query_seg[0] << std::endl;
+        }
         int k = p1d.v_query((int)query_seg[1], (int)query_seg[3], (int)query_seg[0]);
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
@@ -288,7 +292,8 @@ namespace experiments {
         stats.output_size = k;
         stats.predicate_count = MPS_COUNTER;
 
-        // std::cout << "k: " << k <<std::endl;
+        if( VERBOSITY>=100 )
+            std::cout << "k: " << k <<std::endl;
 
         return stats;
     }
@@ -296,7 +301,10 @@ namespace experiments {
     QueryStatistics rtree_query(R_Tree& r_tree, std::vector<double> query_seg) {
         auto stats = QueryStatistics();
 
-        boost::geometry::predicate_count = 0;
+        #ifdef PATCHED_BOOST 
+            boost::geometry::predicate_count    = 0;
+            boost::geometry::index::node_visits = 0;
+        #endif
 
         std::vector<segment_t> results;
         segment_t _query_seg{{query_seg[0], query_seg[1]}, {query_seg[2], query_seg[3]}};
@@ -307,8 +315,11 @@ namespace experiments {
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
         stats.output_size = results.size();
-        stats.predicate_count = boost::geometry::predicate_count;
-        // std::cout << duration << std::endl;
+        #ifdef PATCHED_BOOST
+            stats.predicate_count = boost::geometry::predicate_count;
+        #endif
+        if( VERBOSITY>=1000 )
+            std::cout << duration << std::endl;
         stats.time = duration;
         return stats;
     }
@@ -319,14 +330,18 @@ namespace experiments {
         segment_t _query_seg{{query_seg[0], query_seg[1]}, {query_seg[2], query_seg[3]}};
         r_tree.query(bgi::intersects(_query_seg), std::back_inserter(results));
         stats.output_size = results.size();
-        stats.predicate_count = boost::geometry::predicate_count;
-
+        #ifdef PATCHED_BOOST
+            stats.predicate_count = boost::geometry::predicate_count;
+        #endif
         return stats;
     }
 
     QueryStatistics rtree_star_query(R_Tree_Star& r_tree, std::vector<double> query_seg) {
         auto stats = QueryStatistics();
-        boost::geometry::predicate_count = 0;
+        #ifdef PATCHED_BOOST
+            boost::geometry::predicate_count = 0;
+        #endif
+        boost::geometry::index::my_node_visits = 0;
         std::vector<segment_t> results;
         segment_t _query_seg{{query_seg[0], query_seg[1]}, {query_seg[2], query_seg[3]}};
         auto start_time = std::chrono::high_resolution_clock::now();
@@ -334,14 +349,18 @@ namespace experiments {
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
         stats.output_size = results.size();
-        stats.predicate_count = boost::geometry::predicate_count;
+        #ifdef PATCHED_BOOST
+            stats.predicate_count = boost::geometry::predicate_count;
+        #endif
+        stats.predicate_count = boost::geometry::index::my_node_visits;
         stats.time = duration;
 
         return stats;
     }
 
     QueryStatistics rs_tsd_query(std::vector<std::vector<long double>> segments, std::vector<double> query_seg) {
-        // std::cout << "starting new query...\n";
+        if( VERBOSITY>=1000 )
+            std::cout << "starting new query...\n";
 
         auto query = new Segment<PointCart, int>(
             PointCart(query_seg[0], query_seg[1]), PointCart(query_seg[2], query_seg[3]),
@@ -356,7 +375,8 @@ namespace experiments {
         stats.time = rs_tsd.query_time;
         stats.output_size = rs_tsd.intersections.size();
 
-        // std::cout << "returning query stats...\n";
+        if( VERBOSITY>=1000 )
+            std::cout << "returning query stats...\n";
 
         return stats;
     }
@@ -460,7 +480,8 @@ namespace experiments {
         segment_ds.vertical_query(_query_seg, output);
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
-        std::cout << "output_size: " << output.size() << std::endl;
+        if( VERBOSITY>=100 )
+            std::cout << "output_size: " << output.size() << std::endl;
         stats.output_size = output.size();
         stats.predicate_count = SegmentDS::node_visits;
         stats.time = duration;
@@ -508,19 +529,15 @@ namespace experiments {
         // exit(0);
         auto output = std::vector<std::vector<double>>();
 
-        std::uniform_real_distribution<double> dis(0.0, 1.0);
-        std::mt19937 generator (10);
+        // Hot vs Cold caching.
+        // std::uniform_real_distribution<double> dis(0.0, 1.0);
+        // std::mt19937 generator (10);
+        // std::cout << "Putting queries in a random order" << std¨endl;
+        // std::shuffle(segs.begin(), segs.end(), generator);
 
-        std::shuffle(segs.begin(), segs.end(), generator);
-
-        int count = 0;
-        int i = 1;
-
-        while (count < 300) {
-            output.push_back({(double)segs[i][0], (double)segs[i][1], (double)segs[i][2], (double)segs[i][3]});
-            i += 100;
-            count++;
-        }
+        for( int i=0; i<segs.size(); ++i /*300*/)
+            output.push_back({(double)segs[i][0], (double)segs[i][1],
+                              (double)segs[i][2], (double)segs[i][3]});
 
         return output;
     }
@@ -530,25 +547,6 @@ namespace experiments {
         std::vector<std::vector<long double>> segments,
         int num_of_queries
     ) {
-
-        auto seg_ds = build_layered_tree(segments);
-        std::cout << "built layered tree...\n";
-
-        double x_max = -1;
-        double x_min = 100000000000;
-        double y_max = -1;
-        double y_min = 10000000000;
-
-        for (auto seg: segments) {
-            if (seg[2] > x_max)
-                x_max = seg[2];
-            if (seg[0] < x_min)
-                x_min = seg[0];
-            if (seg[1] > y_max)
-                y_max = seg[3];
-            if (seg[1] < y_min)
-                y_min = seg[1];
-        }
 
         int seed = 1;
 
@@ -568,52 +566,29 @@ namespace experiments {
         }
 
         for (int i = 0; i < num_of_queries; ++i) {
-            bool condition;
-            double x;
-            double y1;
-            double y2;
-            do {
-                x = 50000;
-                y1 = std::floor((double)(y_max - .5*log(segments.size())*(y_max / segments.size())*log(segments.size())) * dis(generator));
-                // y1 = std::floor((double)y_max*dis(generator));
-                y2 = std::floor(y1 +  .5*log(segments.size())*(y_max / segments.size())*log(segments.size()));
-                
-                while (x_coords.find(x) != x_coords.end() || x > x_max || x < x_min) {
-                    x = x_min + std::floor((double)x_max * dis(generator));
-                }
-
-                while (y_coords.find(y1) != y_coords.end() || y1 > y_max || y1 < y_min) {
-                    y1 = std::floor((double)(y_max - .5*log(segments.size())*(y_max / segments.size())*log(segments.size())) * dis(generator));
-                    // y1 = std::floor((double)y_max*dis(generator));
-                }
-
-                while (y_coords.find(y2) != y_coords.end() /*&& y2 > y1*/ || y2 > y_max) {
-                    y2 = std::floor(y1 +  .5*log(segments.size())*(y_max / segments.size())*log(segments.size()));
-                }
-
-                std::cout << "about to issue query...\n";
-                auto qs = SegmentDS::Segment(x, y1, x, y2);
-                auto _output = std::vector<SegmentDS::Segment>();
-                seg_ds.vertical_query(qs, _output);
-
-                condition = _output.size() > 10*log(segments.size());
-                std::cout << output.size() << " " << 10*log(segments.size()) << std::endl;
-
-
-            } while (condition);
-
-            x_coords.insert(x);
-            y_coords.insert(y1);
-            y_coords.insert(y2);
-
+            // double x = 4000000 + std::floor((double)1000000 * dis(generator));
+            double x = 5000000;
+            double y1 = std::floor((double)(9999999 - .5*log(segments.size())*(9999999 / segments.size())*log(segments.size())) * dis(generator));
+            double y2 = y1 +  .5*log(segments.size())*(9999999 / segments.size())*log(segments.size());
             
-            std::cout << x << std::endl;
+            while (x_coords.find(x) != x_coords.end()) {
+                x = std::floor((double)9999999 * dis(generator));
+            }
 
+            while (y_coords.find(y1) != y_coords.end()) {
+                y1 = std::floor((double)(9999999 - .5*log(segments.size())*(9999999 / segments.size())*log(segments.size())) * dis(generator));
+            }
+
+            while (y_coords.find(y2) != y_coords.end() && y2 > y1) {
+                y2 = y1 + .5*log(segments.size())*(9999999 / segments.size())*log(segments.size());
+            }
+            
             output.push_back({x, y1, x, y2});
         }
 
         return output;
     }
+
 
     std::vector<std::vector<double>> 
     query_segs_for_random_slanted(
@@ -635,6 +610,8 @@ namespace experiments {
 
     std::vector<std::vector<double>>
     query_segs_for_seg_tree_worst_case(int size, int query_count) {
+        if( VERBOSITY>=100 )
+            std::cout << "IN query_segs_for_seg_tree_worst_case\t Generating Random Queries...\n";
         auto output = std::vector<std::vector<double>>();
 
         int seed = 1;
@@ -645,7 +622,7 @@ namespace experiments {
         for (int i = 0; i < query_count; ++i) {
             double x = log(size) + std::floor((double)(size - log(size)) * dis(generator)) - 0.1;
             double y = dis(generator) * (size -x) - log(size);
-            output.push_back({x, y, x, y+3*log(size)});
+            output.push_back({x, y, x, y+log(size)});
         }
 
 
@@ -679,7 +656,7 @@ namespace experiments {
         else
             query_segs = query_segs_for_osm(instance_type);
 
-        std::cout << "fetched!\n";
+        std::cout << "fetched nofQueries=" << query_segs.size() << std::endl;
 
         R_Tree r_tree;
         R_Tree_Linear r_tree_linear;
@@ -693,15 +670,15 @@ namespace experiments {
         // RS_TSD rs_tsd = RS_TSD(std::vector<std::vector<long double>>(), nullptr);
 
 
-
-        // std::cout << "building tsd...\n";
+        if( VERBOSITY>=100 )
+            std::cout << "building tsd...\n";
         if (data_structure == "tsd")
             build_tsd(segments, 10, tsd);
-        // std::cout << "building r_tree...\n";
+        if( VERBOSITY>=100 )
+            std::cout << "building r_tree...\n";
         if (data_structure == "r_tree") {
             r_tree = build_r_tree(segments);
             auto alloc = r_tree.get_allocator();
-            // std::cout << "building r_tree...\n";
         }
 
         if (data_structure == "r_tree_linear")
@@ -709,20 +686,18 @@ namespace experiments {
 
         if (data_structure == "r_tree_star")
             r_tree_star = build_r_tree_star(segments);
-        // std::cout << "building seg_ds...\n";
 
         if (data_structure == "seg_ds")    
             seg_ds = build_layered_tree(segments);
 
         if (data_structure == "rs_tsd") {
-            std::cout << "building rs_tsd...\n";
-            build_rs_tsd(segments, 10, rs_tsd);
-            // rs_tsd = build_rs_tsd(segments);
+            build_rs_tsd(segments, 10, rs_tsd); 
+            // rs_tsd = build_rs_tsd(segments); // random seed
         }
 
         if (data_structure == "persist_1d") {
             std::cout << "building 1d persist...\n";
-            p1d = build_persist1d(segments);
+            p1d = build_persist1d(segments);    // random seed
         }
 
         std::cout << "built data structures...\n";
@@ -760,37 +735,46 @@ namespace experiments {
         // if (data_structure == "rs_tsd")
         //     results << "rs_tsd\n";
 
-        std::cout << "running queries...\n";
+        if( VERBOSITY>=1 )
+            std::cout << "running all queries on " << data_structure << ", writing results to file...\n";
 
         for (int i = 0; i < query_segs.size(); ++i) {
-            std::cout << i << std::endl;
             auto qs = query_segs[i];
+            QueryStatistics result;
+            std::cout << i << ":\t" << qs[0] <<",\t"<< qs[1] 
+                           << ",\t" << qs[2] <<",\t"<< qs[3] << "\t:\t";
             if (data_structure == "tsd") {  
+                result = tsd_query(tsd, qs); /*
                 auto tsd_stats = tsd_query(tsd, qs);
                 auto k = tsd_stats.output_size;
                     results << tsd_stats.output_size << ", "
                     << tsd_stats.time << ", " <<
-                    tsd_stats.predicate_count << "\n";
+                    tsd_stats.predicate_count << "\n"; */
             } else if (data_structure == "r_tree") {
+                result = rtree_query(r_tree, qs); /*
                 auto r_tree_stats = rtree_query(r_tree, qs);
                 // if (r_tree_stats.output_size > 0)
                     results << r_tree_stats.output_size << ","
-                << r_tree_stats.time << "," << r_tree_stats.predicate_count << "\n";
+                << r_tree_stats.time << "," << r_tree_stats.predicate_count << "\n"; */
             } else if (data_structure == "seg_ds") {
+                result = layered_tree_query(seg_ds, qs);/*
                 auto seg_ds_stats = layered_tree_query(seg_ds, qs);
                 results << seg_ds_stats.output_size << ","
                 << seg_ds_stats.time << "," << seg_ds_stats.predicate_count << "\n";
-                std::cout << "predicate_count: " << seg_ds_stats.predicate_count << std::endl;
-            } else if (data_structure == "r_tree_star") {
+                std::cout << "predicate_count: " << seg_ds_stats.predicate_count << std::endl; */
+            } else if (data_structure == "r_tree_star") { 
+                result = rtree_star_query(r_tree_star, qs);/*
                 auto rtree_star_stats = rtree_star_query(r_tree_star, qs);
                 results << rtree_star_stats.output_size << "," << rtree_star_stats.time << ","
-                << rtree_star_stats.predicate_count << "\n";
+                << rtree_star_stats.predicate_count << "\n"; */
             } else if (data_structure == "r_tree_linear") {
+                result = rtree_linear_query(r_tree_linear, qs); /*
                 auto seg_ds_stats = rtree_linear_query(r_tree_linear, qs);
                 if (seg_ds_stats.output_size > 0)
                     results << seg_ds_stats.output_size << ","
-                << seg_ds_stats.predicate_count << "\n";
+                << seg_ds_stats.predicate_count << "\n"; */
             } else if (data_structure == "rs_tsd") {
+                result = rs_tsd_query_beta(rs_tsd, qs); /*
                 auto rs_tsd_stats = rs_tsd_query_beta(rs_tsd, qs);
                 // if (rs_tsd_stats.output_size > 0) {
                     results << rs_tsd_stats.output_size << ", " << rs_tsd_stats.time << ", " 
@@ -798,12 +782,16 @@ namespace experiments {
                 // }
                 // auto rs_tsd_stats = rs_tsd_query(segments, qs);
                 // results << rs_tsd_stats.output_size << ", " << rs_tsd_stats.time << "\n";
+                */
             } else if (data_structure == "persist_1d") {
+                result = persist1d_query(p1d, qs); /*
                 auto p1d_stats = persist1d_query(p1d, qs);
                 results << p1d_stats.output_size << ", " << p1d_stats.time << ", " 
-                    << p1d_stats.predicate_count << "\n";
-
+                    << p1d_stats.predicate_count << "\n"; */
             }
+            results << result.output_size << ", " << result.time << ", "<< result.predicate_count << "\n";
+            if( VERBOSITY>=100 )
+                std::cout << result.output_size << ", " << result.time << ", "<< result.predicate_count << "\n";
         }
 
         results.close();
